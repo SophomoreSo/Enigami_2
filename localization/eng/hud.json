@@ -119,7 +119,6 @@
     },
     "tab": {
       "ground": "GROUND",
-      "back": "BACK",
       "creatures": "CREATURES",
       "things": "THINGS",
       "props": "PROPS"
@@ -131,28 +130,22 @@
       "bench": "BENCH",
       "door_west": "DOORWAY WEST",
       "door_east": "DOORWAY EAST",
-      "gate_up": "GATE UP",
-      "gate_down": "GATE DOWN",
-      "exit": "EXIT"
+      "exit": "EXIT",
+      "door_north": "DOORWAY NORTH",
+      "door_south": "DOORWAY SOUTH"
     },
     "tiles": {
       "grove": {
+        "title": "MOONLIT GROVE",
         "stone": "STONE",
         "earth": "EARTH",
         "bark": "BARK",
         "wood": "PLANKS",
-        "leaves": "LEAVES",
-        "wall": "RUIN WALL",
-        "column": "COLUMN",
-        "lintel": "LINTEL",
-        "tree": "TREE",
-        "brush": "UNDERGROWTH",
-        "rail": "RAIL"
+        "leaves": "LEAVES"
       },
       "rock": {
         "title": "ROCK",
-        "rock": "ROCK",
-        "wall": "ROCK WALL"
+        "rock": "ROCK"
       }
     },
     "glass": {
@@ -170,9 +163,7 @@
       "grass": "GRASS",
       "flowers": "FLOWERS",
       "bush": "BUSH",
-      "fern": "FERN",
-      "vine": "VINE",
-      "rope": "ROPE"
+      "fern": "FERN"
     },
     "width": "WIDTH",
     "height": "HEIGHT",
@@ -198,7 +189,8 @@
     "none": "NO MAPS KEPT YET",
     "delete": "DELETE",
     "sure": "SURE?",
-    "keys": "R RESET  TAB SKILL BOARD  ESC BACK TO THE MAP"
+    "keys": "R RESET  TAB SKILL BOARD  ESC BACK TO THE MAP",
+    "pit": "PIT"
   },
   "story": {
     "title": "STORY MAKER",

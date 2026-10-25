@@ -373,11 +373,13 @@ func goto_sandbox() -> void:
 ## The map creator is opened from the title, like the bench beside it, and
 ## hands back to it. What was on its table is kept for the next visit
 ## (`MapMaker`), so leaving costs nothing.
-##
-## Not here yet: the map creator comes back with the floor plans' layers
-## (PLAN.md, step 14), and until then the title's button says so and stays.
 func goto_map_maker() -> void:
-	push_warning("Game: the map creator is not here yet (PLAN.md, step 14)")
+	_clear()
+	state = State.MAP_MAKER
+	var m := MapMaker.new()
+	m.exit_requested.connect(goto_title)
+	add_child(m)
+	current = m
 
 ## The story maker is opened from the title too, and hands back to it. What
 ## was on its desk is kept for the next visit (`StoryMaker`), like a map.

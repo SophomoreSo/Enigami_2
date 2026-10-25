@@ -25,6 +25,9 @@ const FERN := "n"
 var made: MadeRoom
 ## The props standing about the room, in the order they were put down.
 var props: Array = []
+## The tileset the room is drawn in (`MapTiles`): for now a tint over the
+## atlas's own tiles, and the name the creator's table shows.
+var tiles: MapTiles
 
 ## Something put about the floor that is not a plant: a lantern, a fire,
 ## glowing caps, fireflies, a fern — a small picture of it at its cell, which
@@ -40,45 +43,52 @@ class Prop extends Node2D:
 			queue_redraw()
 
 	func _draw() -> void:
-		var px := float(PixelCamera.SCALE)
-		var box := func(x: int, y: int, w: int, h: int, col: Color) -> void:
-			draw_rect(Rect2(Vector2(x, -y - h) * px, Vector2(w, h) * px), col)
-		match mark:
-			"L", "B":
-				# A lantern on a post: the post, the paper, and the flame in it.
-				box.call(-1, 0, 2, 10, Color(0.30, 0.22, 0.14))
-				box.call(-3, 10, 6, 7, Color(0.95, 0.80, 0.45))
-				box.call(-2, 12, 4, 3, Color(1.0, 0.95, 0.75))
-				box.call(-4, 17, 8, 1, Color(0.25, 0.18, 0.12))
-			"F", "H":
-				# A ring of stones, and the flames over them, never still.
-				box.call(-6, 0, 12, 2, Color(0.35, 0.33, 0.32))
-				var lick := Lamp.flicker(_t, salt)
-				var high := int(4.0 + lick * 5.0)
-				box.call(-3, 1, 6, high, Color(1.0, 0.55, 0.2))
-				box.call(-1, 2, 2, maxi(high - 2, 1), Color(1.0, 0.9, 0.5))
-			"m":
-				# Glowing caps, three of them.
-				for k in 3:
-					box.call(-5 + k * 4, 0, 1, 2, Color(0.75, 0.75, 0.7))
-					box.call(-6 + k * 4, 2, 3, 2, Color(0.36, 0.96, 0.9))
-			"*":
-				# Fireflies, drifting about over the floor.
-				for k in 4:
-					var a := _t * (0.6 + float(k) * 0.2) + float(salt + k)
-					var at := Vector2(cos(a) * 10.0, -8.0 - sin(a * 1.3) * 6.0)
-					var on := 0.4 + 0.6 * maxf(sin(_t * 2.0 + float(k) * 1.7), 0.0)
-					draw_rect(Rect2((at / px).floor() * px, Vector2.ONE * px), Color(0.82, 1.0, 0.45, on))
-			"n":
-				# A fern: fronds fanning out from the root.
-				for k in 5:
-					var way := Vector2.from_angle(-PI * 0.5 + (float(k) - 2.0) * 0.45)
-					draw_line(Vector2.ZERO, way * 14.0, Color(0.24, 0.52, 0.26), px)
-					draw_line(way * 14.0, way * 14.0 + Vector2(0, -3.0), Color(0.36, 0.68, 0.34), px)
+		MadeRoomView.paint_prop(self, mark, Vector2.ZERO, float(PixelCamera.SCALE), _t, salt)
+
+## `mark`'s picture, standing with its feet at `foot` on `c`, a pixel of the
+## buffer `px` across, `t` seconds in and `salt` telling one from the next:
+## as a room draws it moving, and as the creator's table draws it still
+## (`MapTiles.paint_prop_still`).
+static func paint_prop(c: CanvasItem, mark: String, foot: Vector2, px: float, t: float, salt: int) -> void:
+	var box := func(x: int, y: int, w: int, h: int, col: Color) -> void:
+		c.draw_rect(Rect2(foot + Vector2(x, -y - h) * px, Vector2(w, h) * px), col)
+	match mark:
+		"L", "B":
+			# A lantern on a post: the post, the paper, and the flame in it.
+			box.call(-1, 0, 2, 10, Color(0.30, 0.22, 0.14))
+			box.call(-3, 10, 6, 7, Color(0.95, 0.80, 0.45))
+			box.call(-2, 12, 4, 3, Color(1.0, 0.95, 0.75))
+			box.call(-4, 17, 8, 1, Color(0.25, 0.18, 0.12))
+		"F", "H":
+			# A ring of stones, and the flames over them, never still.
+			box.call(-6, 0, 12, 2, Color(0.35, 0.33, 0.32))
+			var lick := Lamp.flicker(t, salt)
+			var high := int(4.0 + lick * 5.0)
+			box.call(-3, 1, 6, high, Color(1.0, 0.55, 0.2))
+			box.call(-1, 2, 2, maxi(high - 2, 1), Color(1.0, 0.9, 0.5))
+		"m":
+			# Glowing caps, three of them.
+			for k in 3:
+				box.call(-5 + k * 4, 0, 1, 2, Color(0.75, 0.75, 0.7))
+				box.call(-6 + k * 4, 2, 3, 2, Color(0.36, 0.96, 0.9))
+		"*":
+			# Fireflies, drifting about over the floor.
+			for k in 4:
+				var a := t * (0.6 + float(k) * 0.2) + float(salt + k)
+				var at := Vector2(cos(a) * 10.0, -8.0 - sin(a * 1.3) * 6.0)
+				var on := 0.4 + 0.6 * maxf(sin(t * 2.0 + float(k) * 1.7), 0.0)
+				c.draw_rect(Rect2(foot + (at / px).floor() * px, Vector2.ONE * px), Color(0.82, 1.0, 0.45, on))
+		"n":
+			# A fern: fronds fanning out from the root.
+			for k in 5:
+				var way := Vector2.from_angle(-PI * 0.5 + (float(k) - 2.0) * 0.45)
+				c.draw_line(foot, foot + way * 14.0, Color(0.24, 0.52, 0.26), px)
+				c.draw_line(foot + way * 14.0, foot + way * 14.0 + Vector2(0, -3.0), Color(0.36, 0.68, 0.34), px)
 
 func _ready() -> void:
 	super._ready()
 	made = room as MadeRoom
+	tiles = MapTiles.of(made.tileset if made != null else "")
 	# The magic stone went, or came back: the tiles and the shadows' edges
 	# are laid again.
 	if made != null:

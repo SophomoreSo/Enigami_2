@@ -119,7 +119,6 @@
     },
     "tab": {
       "ground": "지형",
-      "back": "배경",
       "creatures": "생물",
       "things": "개체",
       "props": "소품"
@@ -131,28 +130,22 @@
       "bench": "벤치",
       "door_west": "서쪽 출입구",
       "door_east": "동쪽 출입구",
-      "gate_up": "위층 문",
-      "gate_down": "아래층 문",
-      "exit": "출구"
+      "exit": "출구",
+      "door_north": "북쪽 출입구",
+      "door_south": "남쪽 출입구"
     },
     "tiles": {
       "grove": {
+        "title": "달빛 숲",
         "stone": "돌",
         "earth": "흙",
         "bark": "나무껍질",
         "wood": "판자",
-        "leaves": "나뭇잎",
-        "wall": "폐허 벽",
-        "column": "기둥",
-        "lintel": "돌 들보",
-        "tree": "나무",
-        "brush": "수풀",
-        "rail": "가로대"
+        "leaves": "나뭇잎"
       },
       "rock": {
         "title": "바위",
-        "rock": "바위",
-        "wall": "바위 벽"
+        "rock": "바위"
       }
     },
     "glass": {
@@ -170,9 +163,7 @@
       "grass": "풀",
       "flowers": "꽃",
       "bush": "덤불",
-      "fern": "고사리",
-      "vine": "덩굴",
-      "rope": "밧줄"
+      "fern": "고사리"
     },
     "width": "너비",
     "height": "높이",
@@ -198,7 +189,8 @@
     "none": "저장한 맵이 없습니다",
     "delete": "삭제",
     "sure": "정말요?",
-    "keys": "R 초기화  TAB 스킬 보드  ESC 맵으로"
+    "keys": "R 초기화  TAB 스킬 보드  ESC 맵으로",
+    "pit": "구덩이"
   },
   "story": {
     "title": "스토리 제작",
