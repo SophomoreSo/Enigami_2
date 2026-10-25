@@ -35,8 +35,7 @@ var mesh: ArrayMesh = null
 var bounds := Rect2()
 ## Whether this is one closed shape that a light can be inside — a body, not
 ## a room's rock. A light inside one that is the body's own takes no shadow
-## from it: a body on fire lights the room round it. A spot inside one still
-## has the body throw a shadow (`beyond`).
+## from it: a body on fire lights the room round it.
 var body := false
 ## What a body is drawn as — its sprite, and what it holds — which is its
 ## figure: where it stands, for the lights. With none, its outline is.

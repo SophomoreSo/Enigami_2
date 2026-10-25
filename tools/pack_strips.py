@@ -29,8 +29,8 @@ are there, and fetched into that folder when they are not, so a second run
 costs nothing and a frame drawn over by hand is kept. That folder is Godot's
 to ignore (a `.gdignore` is written into it) and git's (`.gitignore`).
 
-The baseline every frame is stood on is the lowest drawn row of the idle's
-first frame, per facing, on the square canvas; a frame whose lowest drawn row
+The baseline every frame is stood on is the lowest drawn row of the down
+idle's first frame, on the square canvas, for every facing; a frame whose lowest drawn row
 is elsewhere is shifted to it, so a clip drawn on a bigger canvas stands on
 the same feet. Pass `--no-align` to keep PixelLab's rows as they are.
 """
@@ -110,11 +110,15 @@ def main() -> int:
     # the square canvas — and every strip against it, on that canvas too: the
     # clips come on canvases of their own sizes, and only the square they all
     # go on compares.
+    # One baseline for every facing: the down idle's, which is what the game
+    # stands the sprite by (`Sprites.art_rect`), so a body turning does not
+    # step up or down a pixel.
+    first = "down" if "down" in frames.get("idle", {}) else next(iter(frames.get("idle", {})), None)
     for face in faces:
-        if "idle" not in frames or face not in frames["idle"]:
+        if "idle" not in frames or face not in frames["idle"] or first is None:
             print(f"{hero}: no idle for the {face} facing, so nothing is packed for it", file=sys.stderr)
             continue
-        base = lowest_row(square(frames["idle"][face][0], side, 0))
+        base = lowest_row(square(frames["idle"][first][0], side, 0))
         for anim in anims:
             if face not in frames[anim]:
                 continue

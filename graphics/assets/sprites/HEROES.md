@@ -38,10 +38,11 @@ on a hero's card and in the dialogue box.
 - **Square frames, side by side in one row.** The loader reads the frame's
   side off the idle strip's height, so a strip of 4 frames at 48 is 192 by
   48. Every strip of a hero is frames of that one size.
-- **Feet on the same row in every frame.** The feet are read off the first
-  idle frame of the down facing — its lowest drawn row is put on the floor,
-  which is the body's position — so every other frame keeps its feet on that
-  row. `tools/pack_strips.py` lines them up.
+- **Feet on the same row in every frame and every facing.** The feet are
+  read off the first idle frame of the down facing — its lowest drawn row is
+  put on the floor, which is the body's position — so every other frame of
+  every facing keeps its feet on that row. `tools/pack_strips.py` lines them
+  up.
 - **How tall.** The rooms are built for a body about a floor cell tall (16
   pixels of art, drawn at twice its size): a figure of 26 to 40 pixels
   stands one to two and a half cells.
@@ -82,4 +83,14 @@ With PixelLab (the `pixellab` MCP tools), from the hero's reference:
    prints, into this folder: south is `down`, north is `up`, east is `side`.
 
 Legna Dennis's strips were made that way from the south rotation of her
-earlier side-view character.
+earlier side-view character. The other three were drawn by `create_character`
+in v3 from their prompts alone, 48 pixels, and animated the same way; their
+frames come at 68. `tools/spec_from_listing.py` turns what `get_character`
+prints into the spec `pack_strips.py` reads.
+
+| Hero | PixelLab character |
+|---|---|
+| Legna Dennis | `70f26012-1d54-494f-8380-1a4433459e48` |
+| Dren Repus | `3fae2840-9e3b-4a36-9238-c547d5958c8f` |
+| Reniart Lamina | `237da68f-2cc3-4f18-9aa8-a07978b3aa9b` |
+| Sett Eragic | `f7a0125d-eb59-4eed-bb6e-9158e5ac1524` |
