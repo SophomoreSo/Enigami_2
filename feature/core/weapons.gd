@@ -52,7 +52,7 @@ const DEFS := {
 		"projectile_speed": 0.8,
 		"reach_mul": 0.7,
 		"size_mul": 1.15,
-		"gravity_shots": false,
+		"lobbed_shots": false,
 	},
 	"GUN": {
 		"name": "Gun",
@@ -65,7 +65,7 @@ const DEFS := {
 		"projectile_speed": 1.6,
 		"reach_mul": 1.5,
 		"size_mul": 0.95,
-		"gravity_shots": false,
+		"lobbed_shots": false,
 	},
 	"ROCK": {
 		"name": "Rock",
@@ -80,7 +80,7 @@ const DEFS := {
 		"projectile_speed": 1.4,
 		"reach_mul": 1.0,
 		"size_mul": 1.25,
-		"gravity_shots": true,
+		"lobbed_shots": true,
 		"thrown": true,
 	},
 	"SHOVEL": {
@@ -94,7 +94,7 @@ const DEFS := {
 		"projectile_speed": 0.8,
 		"reach_mul": 0.6,
 		"size_mul": 1.1,
-		"gravity_shots": false,
+		"lobbed_shots": false,
 		"digs": true,
 	},
 	"RUNE": {
@@ -109,7 +109,7 @@ const DEFS := {
 		"projectile_speed": 1.4,
 		"reach_mul": 1.0,
 		"size_mul": 1.15,
-		"gravity_shots": true,
+		"lobbed_shots": true,
 		"thrown": true,
 		"rune": true,
 	},
@@ -125,7 +125,7 @@ const DEFS := {
 		"reach_mul": 1.2,
 		"size_mul": 0.85,
 		# Lobbed, as every thrown thing is; straight only with ANTI-GRAVITY.
-		"gravity_shots": true,
+		"lobbed_shots": true,
 		"stack": 10,
 	},
 }
@@ -149,7 +149,7 @@ const HAND_DEF := {
 	"projectile_speed": 1.0,
 	"reach_mul": 1.0,
 	"size_mul": 1.0,
-	"gravity_shots": false,
+	"lobbed_shots": false,
 }
 
 static func get_def(id: String) -> Dictionary:
@@ -213,8 +213,11 @@ static func finalize(weapon_id: String, p: Payload) -> Payload:
 	# with no form, where it is the attack.
 	return p
 
-static func uses_gravity_shots(weapon_id: String) -> bool:
-	return bool(get_def(weapon_id)["gravity_shots"])
+## Whether the weapon's bolts are lobbed: thrown in an arc over the floor,
+## a shadow under each, coming down where they land (`Projectile.height`),
+## rather than flying straight along it.
+static func uses_lobbed_shots(weapon_id: String) -> bool:
+	return bool(get_def(weapon_id)["lobbed_shots"])
 
 ## Whether the weapon is itself what it throws: the rock. One flow of a cast
 ## sends it out of the hand, and the weapon casts nothing again until it has

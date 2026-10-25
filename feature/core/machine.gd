@@ -11,10 +11,9 @@ extends RefCounted
 ## owner keeps is the words the rows are written in, handed to `build` by
 ## name: its *actions*, each one thing the body does on a frame, which a
 ## state's steps take in order; and its *senses*, each one thing it can tell
-## about itself, which a condition reads. So the player keeps `_action_gravity`
-## and whether it is on the floor, and the table says that a fall is steering,
-## gravity, a jump and a dash, and that the way into it is open when
-## `not dashing and not on_floor and wall == 0 and velocity.y >= 0`.
+## about itself, which a condition reads. So the player keeps `_action_run`
+## and whether a way is held, and the table says that a walk is running and a
+## dash, and that the way into it is open when `not dashing and moving`.
 ##
 ## A condition is a Godot `Expression`, parsed once, over the senses by name
 ## and nothing else — not the owner, not the scene — and asked afresh each

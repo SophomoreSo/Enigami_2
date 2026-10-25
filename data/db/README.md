@@ -300,9 +300,7 @@ INSERT INTO states (machine_id, id, label) VALUES
 -- What each does every frame, in order.
 INSERT INTO steps (machine_id, state_id, position, action) VALUES
 	('player', 'idle', 0, 'brake'),
-	('player', 'idle', 1, 'gravity'),
-	('player', 'idle', 2, 'jump'),
-	('player', 'idle', 3, 'dash'),
+	('player', 'idle', 1, 'dash'),
 	('player', 'dash', 0, 'rush');
 
 INSERT INTO conditions (machine_id, id, expression) VALUES
@@ -322,9 +320,9 @@ INSERT INTO transitions (machine_id, from_id, position, to_id, condition) VALUES
 | `transitions.condition` | Whether this way is open: the `id` of one of the machine's `conditions`. The build refuses one that is not written. |
 | `transitions.probability` | Rows sharing a `from_id` and a `position` are one way out that **splits** between their `to_id`s by this, and add up to 1. One row, and the way is certain. The rows of a split name the same condition; the build refuses ones that do not. |
 
-The player's eight states can each reach every other, so `player.sql` is
-fifty-six ways; close one by deleting its row, and open a split by adding rows
-at the same position.
+The player's three states can each reach every other, so `player.sql` is
+six ways; close one by deleting its row, and open a split by adding rows at
+the same position.
 
 ### The player's words
 
@@ -333,27 +331,15 @@ and, for an action, the method it calls.
 
 | Action | What it does |
 |---|---|
-| `brake` | slows to a stop along the ground |
-| `run` | speeds up toward the direction held, along the ground |
-| `steer` | the same in the air, easing off when nothing is held |
-| `gravity` | falls faster, up to the fastest fall |
-| `cling` | a hugged wall holds the fall to a slide |
-| `jump` | a press becomes a jump — off the ground, off a wall, or the air jump — and letting go early cuts the rise short |
-| `dash` | a press starts a dash, when the stamina and the cooldown allow |
+| `brake` | slows to a stop |
+| `run` | speeds up toward the way held, as hard as it is held: a stick half over walks at half pace |
+| `dash` | a press starts a dash, when the stamina and the cooldown allow, the way held or the way the body faces |
 | `rush` | a dash under way carries the body until its time runs out |
-| `duck` | keeps the body low for the frame — crouched; the frame no step does, it stands back up |
-| `swing` | on a rope: up and down climb it, left and right kick it off their way from hanging still and push its swing along when it is already going their way, the world's pull swings it back down; down held at its end lets go |
-| `leap` | a press lets go of the rope with a jump, on top of the swing's speed |
 
 | Sense | What it says |
 |---|---|
 | `dashing` | whether a dash is under way |
-| `roped` | whether a rope is in the hands: up held within reach of one took it |
-| `on_floor` | whether the player is standing on something |
-| `crouch` | whether a crouch is asked for: the down key held, or a stick pointing down |
-| `wall` | the wall being hugged: `-1` on the left, `1` on the right, `0` none |
-| `dir` | the direction held, `-1` to `1` |
-| `velocity` | in pixels a second, y down: `velocity.y < 0` is going up |
+| `moving` | whether a way is held: the stick off its middle, or a key down |
 
 ### Conditions
 
@@ -367,10 +353,10 @@ ask it are left out rather than guessed at.
 
 ```sql
 INSERT INTO conditions (machine_id, id, expression) VALUES
-	('player', 'running', 'not dashing and on_floor and dir != 0');
+	('player', 'walking', 'not dashing and moving');
 ```
 
-The player's eight are exclusive and leave nothing out: on any frame exactly
+The player's three are exclusive and leave nothing out: on any frame exactly
 one holds, so the order a state asks its ways in only says which is asked
 first. `machine_test` tries them against every combination of the senses
 that matters to them. A condition that overlaps another fails it; if that
