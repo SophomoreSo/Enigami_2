@@ -333,8 +333,8 @@ func _load_room(coord: Vector2i) -> Room:
 	for dir: int in [Components.W, Components.E, Components.N, Components.S]:
 		var other: Vector2i = coord + RaidMap.dir_delta(dir)
 		if rooms.has(other) and is_instance_valid(rooms[other]):
-			r.neighbours[dir] = rooms[other]
-			(rooms[other] as Room).neighbours[RaidMap.opposite(dir)] = r
+			r.set_beside(dir, rooms[other])
+			(rooms[other] as Room).set_beside(RaidMap.opposite(dir), r)
 	return r
 
 ## Takes the room at `coord` down. Whatever of its stands in a room still up
@@ -352,7 +352,7 @@ func _unload_room(coord: Vector2i) -> void:
 	for dir in r.neighbours:
 		var n = r.neighbours[dir]
 		if n != null and is_instance_valid(n):
-			(n as Room).neighbours.erase(RaidMap.opposite(int(dir)))
+			(n as Room).set_beside(RaidMap.opposite(int(dir)), null)
 	r.neighbours.clear()
 	var w := Attacks.container()
 	if w != null and is_instance_valid(w):

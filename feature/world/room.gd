@@ -37,6 +37,9 @@ signal extraction_done(info: Dictionary)
 ## Raised once the grid, the collision and the contents are all in place. A
 ## room is drawn once and then never again, so the view waits for this.
 signal built()
+## A room was stood up beside this one, or taken down (`set_beside`): what is
+## past that edge is drawn by that room now, or is the rock again.
+signal beside_changed()
 
 const W := 40
 const H := 22
@@ -201,6 +204,38 @@ func _beside(l: Vector2) -> Room:
 		return null
 	var n = neighbours[side]
 	return n if n != null and is_instance_valid(n) else null
+
+## The room beside this one on side `dir`, as the raid stands it up — or, for
+## null, takes it down: queries past that edge are its to answer while it
+## stands (`_beside`), and the picture hears `beside_changed`.
+func set_beside(dir: int, other: Room) -> void:
+	if other == null:
+		neighbours.erase(dir)
+	else:
+		neighbours[dir] = other
+	beside_changed.emit()
+
+## The room stood up whose cell the room's cell (x, y) is, past its edge: the
+## one beside it on that side, or, out past a corner, the one beside that — or
+## null for rock. What the picture asks; a body's queries stop at the sides.
+func beside_at(x: int, y: int) -> Room:
+	var l := centre_of(x, y)
+	var n := _beside(l)
+	if n != null:
+		return n
+	var gp := to_global(l)
+	for along: Vector2 in [Vector2(clampf(l.x, 0.0, cols * CELL - 1.0), l.y), Vector2(l.x, clampf(l.y, 0.0, rows * CELL - 1.0))]:
+		var side := _beside(along)
+		if side != null:
+			var far := side._beside(side.to_local(gp))
+			if far != null:
+				return far
+	return null
+
+## Whether the room's cell (x, y), past its edge, is a cell of a room stood up
+## round it (`beside_at`): that room's to draw, and to say what it is.
+func beside_owns(x: int, y: int) -> bool:
+	return beside_at(x, y) != null
 
 ## Where a room at `c` on the floor stands in the world when the raid stands
 ## its rooms side by side: a room's size along for every column and row.

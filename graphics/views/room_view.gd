@@ -63,6 +63,9 @@ func _ready() -> void:
 	add_child(shadow)
 	if room != null:
 		room.built.connect(_on_built)
+		# A room stood up beside this one draws what is past that edge, and one
+		# taken down leaves the rock there again.
+		room.beside_changed.connect(_on_reshaped)
 	# The rock past the room is only as wide as the screen shows, so a screen
 	# that changes shape — a window dragged, a phone turned — has it laid again.
 	get_viewport().size_changed.connect(_on_reshaped)
@@ -99,6 +102,9 @@ func _tint() -> Color:
 ## The floor and the walls, out as far as the screen shows past the room, laid
 ## by the tileset (`MapTiles.lay`): the pits in the floor open where the room
 ## has them, and the walls stand wherever the rock is, in the room and beyond.
+## Where a room stands beside this one, its cells are its own to draw: a tile
+## wholly over them is taken up again, and only those straddling the seam are
+## laid by both, out of what both rooms are there.
 func _lay_tiles() -> void:
 	if room == null or not is_instance_valid(room) or room.solid.is_empty():
 		return
@@ -109,7 +115,14 @@ func _lay_tiles() -> void:
 	var out := reach(get_viewport())
 	var salt := int(room.rng.seed % 65536)
 	var area := Rect2i(-out.x, -out.y, room.cols + out.x * 2, room.rows + out.y * 2)
-	tiles.lay(_floor, _walls, _rock, room.is_pit, area, salt)
+	tiles.lay(_floor, _walls, _rock, _pit, area, salt)
+	for j in range(area.position.y, area.end.y + 1):
+		for i in range(area.position.x, area.end.x + 1):
+			var theirs := room.beside_owns(i - 1, j) and room.beside_owns(i, j)
+			if theirs:
+				_walls.erase_cell(Vector2i(i, j))
+			if theirs and room.beside_owns(i - 1, j - 1) and room.beside_owns(i, j - 1):
+				_floor.erase_cell(Vector2i(i, j))
 
 ## What grows on the room's floor is the `growths` rows of the content
 ## database: of each kind of foliage, how many patches and how long. Where each
@@ -184,11 +197,16 @@ static func reach(vp: Viewport) -> Vector2i:
 	var spare := (shown - Vector2(Room.W, Room.H) * Room.CELL).max(Vector2.ZERO) * 0.5
 	return Vector2i((spare / Room.CELL).ceil()) + Vector2i(2, 2)
 
-## Whether a cell is rock, out past the room's own edge as well as in it. All of
-## the outside is, but for the gap a doorway cuts, which runs on through it.
+## Whether a cell is rock, out past the room's own edge as well as in it. Past
+## an edge with a room stood up beside it — or round a corner from one — it is
+## what that room says; past any other, all of the outside is, but for the gap
+## a doorway cuts, which runs on through it.
 func _rock(x: int, y: int) -> bool:
 	if x >= 0 and y >= 0 and x < room.cols and y < room.rows:
 		return room.is_solid(x, y)
+	var beside := room.beside_at(x, y)
+	if beside != null:
+		return beside.is_solid_at(room.to_global(Room.centre_of(x, y)))
 	if y >= 0 and y < room.rows and Room.DOOR_ROWS.has(y):
 		if (x < 0 and room.doors.has(Components.W)) or (x >= room.cols and room.doors.has(Components.E)):
 			return false
@@ -196,6 +214,14 @@ func _rock(x: int, y: int) -> bool:
 		if (y < 0 and room.doors.has(Components.N)) or (y >= room.rows and room.doors.has(Components.S)):
 			return false
 	return true
+
+## Whether a cell is a pit: the room's own, or the room's beside it past an
+## edge, so the floor across the seam opens where that room's does.
+func _pit(x: int, y: int) -> bool:
+	var beside := room.beside_at(x, y)
+	if beside != null:
+		return beside.is_pit_at(room.to_global(Room.centre_of(x, y)))
+	return room.is_pit(x, y)
 
 func _process(_delta: float) -> void:
 	if room != null and not room.extraction.is_empty():
@@ -217,8 +243,9 @@ func _light_exit() -> void:
 
 ## Every line where the room's rock meets open floor, out as far as the screen
 ## shows: [from, to, the way the rock faces there], each as long a run as it
-## goes on for. Rock beside rock is no line. What a lamp throws shadows off
-## (`_cast`).
+## goes on for. Rock beside rock is no line, and nor is a line between two
+## cells of the room stood up beside this one, which casts its own. What a
+## lamp throws shadows off (`_cast`).
 func air_lines() -> Array:
 	var lines: Array = []
 	if room == null or not is_instance_valid(room) or room.solid.is_empty():
@@ -234,7 +261,9 @@ func air_lines() -> Array:
 			if x < room.cols + out.x:
 				var below := _rock(x, y)
 				var above := _rock(x, y - 1)
-				if below and not above:
+				if room.beside_owns(x, y) and room.beside_owns(x, y - 1):
+					pass
+				elif below and not above:
 					now = -1
 				elif above and not below:
 					now = 1
@@ -252,7 +281,9 @@ func air_lines() -> Array:
 			if y < room.rows + out.y:
 				var after := _rock(x, y)
 				var before := _rock(x - 1, y)
-				if after and not before:
+				if room.beside_owns(x, y) and room.beside_owns(x - 1, y):
+					pass
+				elif after and not before:
 					now = -1
 				elif before and not after:
 					now = 1
