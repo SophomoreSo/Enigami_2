@@ -119,6 +119,24 @@ func _has(anim: String) -> bool:
 			return true
 	return false
 
+## A motion drawn in facings and not for every facing has its down facing
+## stand in under the plain name — `idle` for `idle_down` — so whatever asks
+## for a frame with no body to face by, a portrait on a card or in the box,
+## gets the face turned to whoever is looking. The view never asks for it
+## while a facing's own strip is there (`ActorView._resolve`).
+func _stand_in() -> void:
+	for anim: String in ANIMS:
+		var down := "%s_%s" % [anim, Actor.FACE_DOWN]
+		if frames.has_animation(anim) or not frames.has_animation(down):
+			continue
+		frames.add_animation(anim)
+		frames.set_animation_speed(anim, frames.get_animation_speed(down))
+		frames.set_animation_loop(anim, frames.get_animation_loop(down))
+		for i in frames.get_frame_count(down):
+			frames.add_frame(anim, frames.get_frame_texture(down, i))
+		_lookup[anim] = _lookup[down]
+		strays[anim] = strays.get(down, 0)
+
 ## The lookup frames `art_rect` is read off: the idle's, in whichever facing
 ## there is one.
 func _idle_looks() -> Array:
@@ -150,6 +168,7 @@ static func load_character(base_name: String) -> SkinnedCharacter:
 	for anim: String in ANIMS:
 		for suffix in _suffixes(anim):
 			c._load_strip(suffix)
+	c._stand_in()
 	if not c._has("idle"):
 		push_error("SkinnedCharacter: '%s' has no idle strip" % base_name)
 		return null
@@ -171,6 +190,7 @@ static func _load_painted(c: SkinnedCharacter) -> SkinnedCharacter:
 	for anim: String in ANIMS:
 		for suffix in _suffixes(anim):
 			c._load_painted_strip(suffix)
+	c._stand_in()
 	if not c._has("idle"):
 		push_error("SkinnedCharacter: '%s' has no idle strip" % c.base)
 		return null

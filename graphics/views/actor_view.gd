@@ -49,6 +49,9 @@ var _mat: ShaderMaterial
 var _started: bool = false
 ## The size of the body the sprite was last stood on (`_stand_sprite`).
 var _stood_on: Vector2 = Vector2.ZERO
+## Where the sprite stands with its feet on the floor (`_stand_sprite`); a
+## body off the floor (`Actor.height`) is drawn up from there.
+var _stand_y: float = 0.0
 ## Whether the strip showing is one drawn for a side, and so mirrored for the
 ## left; a strip drawn facing up or down the screen is never mirrored.
 var _sided: bool = true
@@ -125,19 +128,20 @@ func _stand_sprite() -> void:
 	var s := Sprites.PIXEL_SCALE
 	var frame := Sprites.frame_size(art)
 	_stood_on = actor.body_size
-	sprite.position = Vector2(0, (frame.y * 0.5 - Sprites.art_rect(art).end.y) * s)
+	_stand_y = (frame.y * 0.5 - Sprites.art_rect(art).end.y) * s
+	sprite.position = Vector2(0, _stand_y - actor.height)
 	caster.scale = _stood_on
 
 ## The middle of the body, in the view's own coordinates: half its height up
-## from the feet. Where a thing held is drawn, and what a status effect
-## scatters round.
+## from the feet, and up off the floor by however far the body is. Where a
+## thing held is drawn, and what a status effect scatters round.
 func middle() -> Vector2:
-	return Vector2(0.0, -actor.body_size.y * 0.5)
+	return Vector2(0.0, -actor.body_size.y * 0.5 - actor.height)
 
 ## Where the top of the drawn art is, in the view's own coordinates: what
 ## rides over the head hangs from here.
 func top_y() -> float:
-	return -Sprites.art_rect(art).size.y * Sprites.PIXEL_SCALE
+	return -Sprites.art_rect(art).size.y * Sprites.PIXEL_SCALE - actor.height
 
 func _process(delta: float) -> void:
 	if not _ensure():
@@ -146,6 +150,7 @@ func _process(delta: float) -> void:
 		flash = maxf(0.0, flash - delta * 4.0)
 	if actor.body_size != _stood_on:
 		_stand_sprite()
+	sprite.position.y = _stand_y - actor.height
 	_animate()
 	sprite.flip_h = _sided and actor.side() < 0
 	_update_status()

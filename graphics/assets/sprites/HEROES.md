@@ -2,54 +2,64 @@
 
 Each of the four heroes (`data/db/heroes/heroes.sql`) is drawn from a folder
 of their own here, `graphics/assets/sprites/<id>/` — a sprite sheet an
-animation, painted straight in its own colours, made with PixelLab from the
-hero's reference sprite and dropped in. With the folder there, the hero is
+animation a facing, painted straight in its own colours, made with PixelLab
+from the hero's reference and dropped in. With the folder there, the hero is
 played as it, their face is drawn from it on the bench's screen and in the
 dialogue box; until it is there they are played as the player's own art, with
 the atlas character the roster names standing in for their face.
 
 ```
-graphics/assets/sprites/legna_dennis/legna_dennis.idle.png
-graphics/assets/sprites/legna_dennis/legna_dennis.run.png
-...                                                       a strip an animation
+graphics/assets/sprites/legna_dennis/legna_dennis.idle.down.png
+graphics/assets/sprites/legna_dennis/legna_dennis.idle.up.png
+graphics/assets/sprites/legna_dennis/legna_dennis.idle.side.png
+graphics/assets/sprites/legna_dennis/legna_dennis.walk.down.png
+...                                               a strip an animation a facing
 ```
 
 After dropping a folder in, run the editor or `godot --headless --path . --import`
 once so the files are imported, and the hero is there.
 
+## The facings
+
+The game is seen from above and a little in front, so a body has four ways to
+face and three to draw: `down` the screen, toward whoever is looking; `up` it,
+away; and `side`, to the right, which the game mirrors for the left
+(`Actor.facing_name`, `ActorView`). A body walking a diagonal shows its side.
+A strip with no facing in its name, `<id>.<anim>.png`, is taken as drawn side
+on and shown for every facing, mirrored for the left — that is how the
+player's own art and the atlas's characters are drawn.
+
+The down facing of an animation also answers to the plain name — `idle` is
+`idle.down` — for whatever draws a face with no body to face by: the portrait
+on a hero's card and in the dialogue box.
+
 ## The frame
 
 - **Square frames, side by side in one row.** The loader reads the frame's
-  side off the idle strip's height, so a strip of 6 frames at 48 is 288 by
+  side off the idle strip's height, so a strip of 4 frames at 48 is 192 by
   48. Every strip of a hero is frames of that one size.
-- **Feet on the same row in every frame, facing right.** The feet are read
-  off the first idle frame — its lowest drawn row is put on the floor — so
-  every other frame keeps its feet on that row. The game flips the sprite to
-  face left.
+- **Feet on the same row in every frame.** The feet are read off the first
+  idle frame of the down facing — its lowest drawn row is put on the floor,
+  which is the body's position — so every other frame keeps its feet on that
+  row. `tools/pack_strips.py` lines them up.
 - **How tall.** The rooms are built for a body about a floor cell tall (16
-  pixels of art): a figure of 26 to 40 pixels stands one to two and a half
-  cells, and a crouch should fit a cell. The sprite is drawn at twice its
-  size.
+  pixels of art, drawn at twice its size): a figure of 26 to 40 pixels
+  stands one to two and a half cells.
 - **Transparent background, no anti-aliasing**, pixel-perfect.
 
 ## The animations
 
-A strip is `<id>.<animation>.png`, one per row of this table. A strip left
-out is not an animation of the hero, and the game falls back to idle for it.
+A strip is `<id>.<animation>.<facing>.png`, one per row of this table per
+facing. A strip left out is not an animation of the hero, and the game falls
+back to idle for it.
 
 | Strip | What it shows | Rate | Loops |
 |---|---|---|---|
 | `idle` | standing at rest, breathing | 5 a second | yes |
-| `run` | a running cycle | 12 a second | yes |
-| `crouch` | crouched low, shifting a little | 3 a second | yes |
-| `hit` | flinching from a blow | 8 a second | no |
-| `rise` | going up off a jump | 10 a second | no |
-| `fall` | falling | 6 a second | yes |
-| `wall_slide` | back to a wall on the facing side, sliding down it | 6 a second | yes |
+| `walk` | a walking cycle | 10 a second | yes |
 | `dash` | a dash, stretched long and low | 20 a second | no |
-| `hang` | hanging from a rope by one fist straight over the head, the fist on the frame's middle column — the rope's line runs into it, and how high it is over the body's middle is the roster's `hands`: twice its pixels above the feet, less 15 | — | — |
-| `climb_up` | climbing up a rope hand over hand, both hands on the frame's middle column, legs round the rope; played while the hands go up it | 8 a second | yes |
-| `climb_down` | climbing down a rope hand under hand, the same way | 8 a second | yes |
+| `hit` | flinching from a blow | 8 a second | no |
+| `cast` | a cast: an arm thrust out, the hand open | 10 a second | no |
 | `sit` | sitting on a bench, on a seat 4 pixels off the floor | — | — |
 
 The rates are `SkinnedCharacter.ANIMS` (graphics/skin/skinned_character.gd).
@@ -57,16 +67,19 @@ The loader takes however many frames a strip has.
 
 ## Making them
 
-From here on a hero's strips are rendered from a 3D character: a mesh made
-by Meshy AI, rigged in Blender to the skeleton of NVIDIA Kimodo's generated
-motion, cleaned up in Cascadeur, and rendered side on in a pixel look into
-this folder. That is the four folders beside the checkouts, `Meshy`,
-`Blender`, `Kimodo` and `Cascadeur` in `WIPGames/Enigami/` (`PIPELINE.md`
-there), one a step; `Blender/run.py render <id> --install` puts the strips
-here.
+With PixelLab (the `pixellab` MCP tools), from the hero's reference:
 
-Legna Dennis's present strips were made with PixelLab from her reference
-sprite: a character rotated from it (`create_character`, v3, side view),
-each clip animated on its east direction, and the frames packed into strips
-here with the feet on one row. Who each hero is, in words for a tool, is the
-roster's `prompt`.
+1. `create_character` in v3 with the reference as `reference_image_url`,
+   `view` "low top-down", `n_directions` 4 — south, east, north and west,
+   of which the game uses three. Who each hero is, in words for the tool, is
+   the roster's `prompt`.
+2. `animate_character` for each row of the table, `directions` south, east
+   and north: `breathing-idle` for the idle, `walking` for the walk,
+   `taking-punch` for the hit and `fireball` for the cast as template
+   animations; the dash and the sit as v3 custom animations of four frames
+   with `keep_first_frame` false.
+3. `tools/pack_strips.py` with a spec naming the frame URLs `get_character`
+   prints, into this folder: south is `down`, north is `up`, east is `side`.
+
+Legna Dennis's strips were made that way from the south rotation of her
+earlier side-view character.

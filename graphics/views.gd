@@ -40,6 +40,22 @@ func of(n: Node) -> Node:
 func view_script_for(n: Node) -> GDScript:
 	if n is Player:
 		return PlayerView
+	if n is Enemy:
+		return EnemyView
+	if n is Projectile:
+		return ProjectileView
+	if n is Pet:
+		return PetView
+	if n is MeleeArc:
+		return MeleeArcView
+	if n is AreaBurst:
+		return AreaBurstView
+	if n is DashSlash:
+		return DashSlashView
+	if n is LooseRock:
+		return LooseRockView
+	if n is StuckShuriken:
+		return StuckShurikenView
 	# The rest of the game's nodes get theirs as each arrives (PLAN.md).
 	# Story keeps its own table, in `story/view/story_views.gd`.
 	return StoryViews.view_script_for(n)

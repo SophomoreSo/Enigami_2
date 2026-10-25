@@ -46,6 +46,11 @@ var _collider: RectangleShape2D = null
 ## with no direction held goes this way, so it is a rule and not only a
 ## turned sprite. It starts facing down the screen, toward whoever is looking.
 var facing: Vector2 = Vector2.DOWN
+## How far off the floor the body is, in world units: nothing for anything
+## standing on it, a flyer's hover. Everything on the floor is measured from
+## the feet whatever this says — a hit's reach, who is near — and the picture
+## lifts the sprite by it and leaves the shadow at the feet.
+var height: float = 0.0
 ## The last side the facing had anything of: 1 right, -1 left. What a sprite
 ## drawn for one side is mirrored by, kept while the body faces straight up or
 ## down so a turn back to the side comes back the way it left.

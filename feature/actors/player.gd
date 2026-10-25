@@ -803,7 +803,7 @@ func _on_fired(payload: Payload, weapon: String = "") -> void:
 	var ctx := {
 		"attacker": from, "room": room, "team": team,
 		"aim": aim, "reach": aim_reach, "origin": from.global_position,
-		"lobbed": Weapons.uses_lobbed_shots(weapon),
+		"lobbed": Weapons.uses_lobbed_shots(weapon), "aim_point": aim_point,
 	}
 	if Weapons.is_thrown(weapon) and p.form == "PROJECTILE":
 		ctx["thrown"] = weapon
