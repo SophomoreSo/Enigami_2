@@ -6,7 +6,7 @@ extends Control
 ## CHARACTER along the top, the heroes in a row under it, a card each with
 ## their portrait on it in their own colour and their name under it, the one
 ## the cursor is on lit and the one played as marked; left and right, or the
-## pointer, move the cursor, interact or jump takes the hero it is on
+## pointer, move the cursor, interact takes the hero it is on
 ## (`picked`), and ESC puts the screen away with nothing changed (`closed`), as
 ## standing up does. Which heroes there are and what each looks like is the
 ## content database's (`Heroes`); who is played as is the profile's
@@ -72,7 +72,7 @@ func _input(event: InputEvent) -> void:
 	elif event.is_action_pressed("move_right") or event.is_action_pressed("ui_right"):
 		_move(1)
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("interact") or event.is_action_pressed("jump") or event.is_action_pressed("ui_accept"):
+	elif event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
 		_take()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseMotion:

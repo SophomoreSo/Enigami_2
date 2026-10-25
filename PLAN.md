@@ -298,3 +298,21 @@ and their pictures (steps 9, 14, 15) are about half of it; the body and
 its attacks (5, 8, 10) a quarter; the hideout, the glass, the light and
 the art the rest. The UI, the engine, the telling, the perks, the shell
 and the database — some 35,000 lines — copy.
+
+## 14. Where it stands (2026-10-25)
+
+Every step is a commit, but two are not finished, and nothing has been run.
+
+- **Step 17 is stopped** at the user's word: no more character sprites for
+  now. Legna Dennis and Dren Repus are packed and in the game; Reniart Lamina
+  has his six animations made in PixelLab and not packed, and Sett Eragic only
+  a breathing idle. Both still play as the player's own art. The monsters the
+  atlas lacks are not made. `HEROES.md` names each PixelLab character.
+- **The `v2.0.0` tag** waits for the user, and the repository has no remote
+  yet for CI to run on.
+- **Nothing has been run in Godot.** Not the game, not an import, not a test.
+  The code was checked by reading it and by searching it: no class v1 had and
+  this one dropped is still named in code, no input action is asked for that
+  the input map lacks, and every `Class.member` the code names exists. The
+  first `godot --headless --import --path .` is where the parse errors this
+  reading missed will show, and then `tests/run.sh` (see README.md).

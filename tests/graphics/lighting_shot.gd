@@ -116,7 +116,7 @@ func _ready() -> void:
 	var freezing: Array[String] = ["ICE"]
 	var ice := Payload.new()
 	ice.elements = freezing
-	Attacks._burst(ice, middle + Vector2(40.0, 30.0), 0, null, sb.room)
+	Attacks._go_off(ice, middle + Vector2(40.0, 30.0), 60.0, 0, null, sb.room)
 	await frames(5)
 	await shot("62_blast")
 	await wait(1.0)
