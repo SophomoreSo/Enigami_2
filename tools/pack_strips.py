@@ -26,15 +26,18 @@ goes and the frame count beside it:
 
 Frames are read from `<out dir>/.frames/<anim>/<direction>/<i>.png` when they
 are there, and fetched into that folder when they are not, so a second run
-costs nothing and a frame drawn over by hand is kept. The baseline every frame
-is stood on is the lowest drawn row of the idle's first frame, per facing; a
-frame whose lowest drawn row is elsewhere is shifted to it, so a foot lifted
-mid-stride is read as lifted and not as the body floating. Pass `--no-align`
-to keep PixelLab's rows as they are.
+costs nothing and a frame drawn over by hand is kept. That folder is Godot's
+to ignore (a `.gdignore` is written into it) and git's (`.gitignore`).
+
+The baseline every frame is stood on is the lowest drawn row of the idle's
+first frame, per facing, on the square canvas; a frame whose lowest drawn row
+is elsewhere is shifted to it, so a clip drawn on a bigger canvas stands on
+the same feet. Pass `--no-align` to keep PixelLab's rows as they are.
 """
 
 import json
 import os
+import subprocess
 import sys
 import urllib.request
 
@@ -44,8 +47,12 @@ from PIL import Image
 def fetch(url: str, path: str) -> Image.Image:
     if not os.path.exists(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with urllib.request.urlopen(url, timeout=60) as r, open(path, "wb") as f:
-            f.write(r.read())
+        try:
+            with urllib.request.urlopen(url, timeout=60) as r, open(path, "wb") as f:
+                f.write(r.read())
+        except Exception:
+            # A Python with no certificates of its own: curl has the system's.
+            subprocess.run(["curl", "-sfL", url, "-o", path], check=True)
     return Image.open(path).convert("RGBA")
 
 
@@ -77,6 +84,8 @@ def main() -> int:
     anims = spec["animations"]
     os.makedirs(out_dir, exist_ok=True)
     cache = os.path.join(out_dir, ".frames")
+    os.makedirs(cache, exist_ok=True)
+    open(os.path.join(cache, ".gdignore"), "a").close()
 
     # The frames, a list per animation per direction.
     frames = {}
@@ -97,23 +106,26 @@ def main() -> int:
         print("nothing to pack", file=sys.stderr)
         return 1
 
-    # The baseline a facing's idle stands on, and every strip against it.
+    # The baseline every frame is stood on — the idle's first frame's feet, on
+    # the square canvas — and every strip against it, on that canvas too: the
+    # clips come on canvases of their own sizes, and only the square they all
+    # go on compares.
     for face in faces:
         if "idle" not in frames or face not in frames["idle"]:
             print(f"{hero}: no idle for the {face} facing, so nothing is packed for it", file=sys.stderr)
             continue
-        base = lowest_row(frames["idle"][face][0])
+        base = lowest_row(square(frames["idle"][face][0], side, 0))
         for anim in anims:
             if face not in frames[anim]:
                 continue
             cells = []
             for n, im in enumerate(frames[anim][face]):
-                low = lowest_row(im)
+                low = lowest_row(square(im, side, 0))
                 shift = 0
                 if align and low >= 0 and low != base:
-                    # The frame's own canvas is the idle's, so a lower or higher
-                    # bottom row is the body drawn lower or higher: moved back.
-                    shift = (im.height - 1 - low) - (im.height - 1 - base)
+                    # The body drawn higher or lower on its canvas than the
+                    # idle's is: moved back onto the idle's feet.
+                    shift = base - low
                 cells.append(square(im, side, shift))
             strip = Image.new("RGBA", (side * len(cells), side), (0, 0, 0, 0))
             for n, cell in enumerate(cells):

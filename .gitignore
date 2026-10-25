@@ -49,3 +49,7 @@ addons/godot-sqlite/bin/*.wasm
 # data/db/build.sh writes the content database beside itself first, then
 # moves it into place, so a build that fails halfway leaves the old one whole.
 data/enigami.db.building
+
+# The frames tools/pack_strips.py fetched to pack a hero's strips from: remade from
+# PixelLab, and not the game's to ship.
+.frames/
