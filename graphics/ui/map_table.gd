@@ -664,14 +664,15 @@ func _drop_chunks() -> void:
 	_chunks.clear()
 
 ## Draws again every chunk the cells of `area` of `layer` could change the
-## look of. A cell of the plan is drawn as it meets its neighbours, so theirs
-## are drawn again too. What is put about the map changes the look of nothing
-## but itself.
+## look of. A cell of the plan is drawn as it meets its neighbours, and a
+## wall's tile is picked from the four cells round it (`TerrainTiles`), so
+## two cells either way are drawn again too. What is put about the map
+## changes the look of nothing but itself.
 func _touch(area: Rect2i, layer: int = MapMaker.PLAN) -> void:
-	var near := area.grow(1)
+	var near := area.grow(2)
 	if layer != MapMaker.DRESSING:
 		_redraw(near, 0)
-	_redraw(near, 1)
+	_redraw(area.grow(1), 1)
 
 ## Draws again piece `piece` (0 the floor and the walls, 1 what stands and is
 ## put about; -1 both) of every chunk `area` touches.
@@ -690,17 +691,10 @@ func _paint_sheet(cv: CanvasItem) -> void:
 	cv.draw_rect(Rect2(Vector2.ZERO, _sheet.size), tiles.outside_colour())
 	tiles.paint_open(cv, Rect2(_origin, Vector2(maker.cols, maker.rows) * cell_size()))
 
-## The floor of every cell, and over it the walls and the pits.
+## The floor of every cell, the pits in it and the walls on it, as the
+## tileset draws them (`MapTiles.paint_area`).
 func _paint_grounds(c: CanvasItem, area: Rect2i) -> void:
-	for y in range(area.position.y, area.end.y):
-		for x in range(area.position.x, area.end.x):
-			tiles.paint_floor(c, _cells, x, y)
-			# Magic stone is drawn here whether or not magic is on: the table
-			# shows what was laid, and the room decides what is there.
-			if _cells.solid(x, y) or _cells.ground(x, y) == MadeRoom.MAGIC:
-				tiles.paint_ground(c, _cells, x, y)
-			elif _cells.pit(x, y):
-				tiles.paint_pit(c, _cells, x, y)
+	tiles.paint_area(c, _cells, area)
 
 ## What stands in the map, and what is put about it.
 func _paint_overlays(c: CanvasItem, area: Rect2i) -> void:

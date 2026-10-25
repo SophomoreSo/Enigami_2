@@ -146,6 +146,10 @@
       "rock": {
         "title": "ROCK",
         "rock": "ROCK"
+      },
+      "keep": {
+        "title": "HIDEOUT HALL",
+        "stone": "BRICK"
       }
     },
     "glass": {

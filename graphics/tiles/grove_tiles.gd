@@ -1,10 +1,11 @@
 class_name GroveTiles
 extends MapTiles
 
-## The Moonlit Grove: the hideout's old look, as a tileset. Until its own tiles
-## come (PLAN.md, step 15) it is the atlas's stone under a green of its own,
-## with a kind of wall for each of the grove's — stone, earth, bark, planks
-## and leaves — each a shade of it.
+## The Moonlit Grove: the hideout's old look, as a tileset — a mossy forest
+## floor and ruined walls under ivy, made with PixelLab (`grove_walls` and
+## `grove_pits` in `graphics/assets/tiles/`). Its kinds of wall — stone, earth,
+## bark, planks and leaves — are each a shade of the one wall for now, on the
+## creator's table.
 
 const TINTS := {
 	"#": Color(0.78, 0.86, 0.80),

@@ -146,6 +146,10 @@
       "rock": {
         "title": "바위",
         "rock": "바위"
+      },
+      "keep": {
+        "title": "은신처 홀",
+        "stone": "벽돌"
       }
     },
     "glass": {

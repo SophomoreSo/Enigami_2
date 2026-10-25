@@ -1263,6 +1263,13 @@ const DIALOGUE_HINT := Color(0.5, 0.5, 0.56)
 ## The sign over each thing you walk up to. Lit when the player is close enough
 ## for a press to count, so the room says what it will answer to before the key
 ## is pressed. The things themselves are the scenery's, below.
+## Which tileset each place is drawn in (`MapTiles.IDS`): a raid's rooms, the
+## hideout's hall, and the stage a scene of its own stands on. A made map
+## names its own.
+const RAID_TILESET := "rock"
+const HIDEOUT_TILESET := "keep"
+const STAGE_TILESET := "keep"
+
 const HIDEOUT_PLATE := Color(0.06, 0.08, 0.11)
 const HIDEOUT_SIGN := Color(0.38, 0.52, 0.66)
 const HIDEOUT_SIGN_LIT := Color(0.55, 0.88, 1.0)

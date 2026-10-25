@@ -1,15 +1,19 @@
 class_name MapTiles
 extends RefCounted
 
-## A tileset: how a map made in the map creator (`MadeRoom`) is drawn, on the
-## creator's table and in a room, cell by cell. For now every tileset draws
-## the atlas's own floor and walls (`AtlasTiles`), as every room is drawn, in
-## a tint of its own: the Moonlit Grove's green over the stone, the plain rock's
-## the region's. Tilesets of the game's own, with a look a kind, come with
-## PLAN.md's step 15, and will be scripts that extend this one, as these two
-## do: `GroveTiles` and `RockTiles`. Which there are is `IDS`; another is its
-## script, its id there and in `of`, and its words under `hud.maker.tiles` in
-## `localization/`.
+## A tileset: how a map made in the map creator (`MadeRoom`), a raid's room and
+## the hideout's hall are drawn, on the creator's table and in a room, out of
+## the game's own tiles — a wall set and, where the floor can have pits in it,
+## a pit set, each made with PixelLab and kept under `graphics/assets/tiles/`
+## (`TerrainTiles`, and the README there). The Moonlit Grove, the rock a
+## raid's rooms are cut from, and the hall the hideout is: `GroveTiles`,
+## `RockTiles`, `KeepTiles`. Which there are is `IDS`; another is its script,
+## its id there and in `of`, its two sets in `graphics/assets/tiles/`, and its
+## words under `hud.maker.tiles` in `localization/`.
+##
+## A set that is not there yet is drawn out of the atlas's own floor and walls
+## instead (`AtlasTiles`), in the tileset's tint, so a tileset can be named
+## before its tiles are made.
 ##
 ## What is put about a map — a lantern, a lightbulb, a fire, a fireplace, the
 ## glowing caps, the fireflies, the grass, the flowers, a bush, a fern — is the
@@ -26,8 +30,9 @@ const S := PixelCamera.SCALE
 const C := Room.CELL / PixelCamera.SCALE
 
 ## The tilesets, by id, in the order the map creator offers them. A map with
-## none of these named is drawn in the last.
-const IDS := ["grove", "rock"]
+## none of these named is drawn in DEFAULT.
+const IDS := ["grove", "rock", "keep"]
+const DEFAULT := "rock"
 
 ## What can be put about a map, by the mark that puts each, in the order the
 ## creator offers them: the lights and the growing things a room draws
@@ -47,22 +52,35 @@ const MAGIC_LIT := Color(0.68, 0.54, 0.95)
 const MAGIC_DARK := Color(0.22, 0.14, 0.38)
 const MAGIC_GLINT := Color(0.92, 0.86, 1.0)
 ## Glass, which is a wall of a kind until a tileset of its own draws it: a
-## pane's blue, and a mirror's dark.
+## pane's blue, and a mirror's dark, over the wall it is drawn as.
 const GLASS_TINT := Color(0.70, 0.90, 1.0)
 const MIRROR_TINT := Color(0.45, 0.50, 0.60)
+## The dark under a pit where a tileset has no pit set of its own.
+const PIT_DARK := Color(0.02, 0.02, 0.03)
 
 static var _made: Dictionary = {}
 
-## The tileset called `called`; the last of `IDS` for one that is not there.
+## The tileset's own tiles: its walls, and its pits, or null for a set that is
+## not there (`TerrainTiles.of`).
+var walls: TerrainTiles = null
+var pits: TerrainTiles = null
+
+## The tileset called `called`; DEFAULT for one that is not there.
 static func of(called: String) -> MapTiles:
 	if not IDS.has(called):
-		called = IDS[IDS.size() - 1]
+		called = DEFAULT
 	if not _made.has(called):
+		var t: MapTiles
 		match called:
 			"grove":
-				_made[called] = GroveTiles.new()
+				t = GroveTiles.new()
+			"keep":
+				t = KeepTiles.new()
 			_:
-				_made[called] = RockTiles.new()
+				t = RockTiles.new()
+		t.walls = TerrainTiles.of(t.id() + "_walls")
+		t.pits = TerrainTiles.of(t.id() + "_pits")
+		_made[called] = t
 	return _made[called]
 
 ## --- what a tileset says about itself -----------------------------------------
@@ -107,7 +125,7 @@ static func prop_name(mark: String) -> String:
 	return Loc.t("hud.maker.prop.%s" % String(PROPS.get(mark, "lantern")))
 
 ## The tint the atlas's stone takes in this tileset, for a wall of `mark`, in
-## `region`'s rock.
+## `region`'s rock, where the tileset's own tiles are not there.
 func tint(mark: String, region: int) -> Color:
 	if mark == "o":
 		return GLASS_TINT
@@ -117,6 +135,11 @@ func tint(mark: String, region: int) -> Color:
 
 func kind_tint(_mark: String, region: int) -> Color:
 	return Style.region_tint(region).lerp(Color.WHITE, 0.55)
+
+## The tint a room drawn in this tileset's own tiles takes, in `region`'s
+## rock: none, for a tileset that is its own colours.
+func room_tint(_region: int) -> Color:
+	return Color.WHITE
 
 ## The colour of what is past the map's edge on the creator's table, and under
 ## the floor's tiles.
@@ -134,29 +157,89 @@ func paint_open(c: CanvasItem, rect: Rect2) -> void:
 func ambient() -> Color:
 	return Color.WHITE
 
-## --- painting -------------------------------------------------------------------
-## Every painter paints cell (x, y) in the world's units, its corner at
-## (x, y) × `Room.CELL`, out of whatever it reads off `cells`.
+## --- a room's floor and walls ------------------------------------------------------
+## The floor and the walls of a room, as tiles: laid in a `TileMapLayer` each
+## for a room standing in the world, and drawn by hand for the creator's table.
+## Both read the room through two callables — `rock(x, y)` for whether a cell
+## is wall, `pit(x, y)` for whether it is a pit — over `area`, in cells, so a
+## room's rock past its edge and a map's are drawn the same way.
 
-## The floor of cell (x, y): a flagstone, the same one every time for the
-## same cell (`AtlasTiles.floor_at`).
-func paint_floor(c: CanvasItem, cells: MapCells, x: int, y: int) -> void:
-	_tile(c, AtlasTiles.floor_at(x, y, cells.region * 7919), x, y, tint(MadeRoom.ROCK, cells.region))
+## Two layers for a room: the floor, and the walls, which sort among the
+## bodies. Out of the tileset's own tiles, or the atlas's.
+func layers() -> Array:
+	if walls == null:
+		return [AtlasTiles.layer(false), AtlasTiles.layer(true)]
+	var floor_layer := (pits if pits != null else walls).layer(false)
+	return [floor_layer, walls.layer(true)]
 
-## Cell (x, y)'s wall, whatever kind it is: the atlas's wall tile that meets
-## its neighbours the way this cell does (`AtlasTiles.wall_at`), in the kind's
-## tint — and the magic stone as the magic stone (`paint_magic`).
-func paint_ground(c: CanvasItem, cells: MapCells, x: int, y: int) -> void:
-	var mark := cells.ground(x, y)
-	if mark == MadeRoom.MAGIC:
-		paint_magic(c, cells, x, y)
+## Lays the cells of `area` into `floor_layer` and `walls_layer` (`layers`).
+## With the tileset's own tiles: the floor out of the pit set, a tile centred
+## on each corner of four cells; the walls out of the wall set, straddling two
+## cells across, the face in the wall's cell and the top above
+## (`TerrainTiles`). Without: the atlas's floor, walls and hole, a tile a cell.
+func lay(floor_layer: TileMapLayer, walls_layer: TileMapLayer, rock: Callable, pit: Callable, area: Rect2i, salt: int = 0) -> void:
+	if walls == null:
+		_lay_atlas(floor_layer, walls_layer, rock, pit, area, salt)
 		return
-	var name := AtlasTiles.wall_at(not cells.solid(x, y + 1), not cells.solid(x - 1, y), not cells.solid(x + 1, y))
-	_tile(c, name, x, y, tint(mark, cells.region))
+	var floor_set := pits if pits != null else walls
+	var plain := pits.plain_upper() if pits != null else walls.plain_lower()
+	for j in range(area.position.y, area.end.y + 1):
+		for i in range(area.position.x, area.end.x + 1):
+			var cell := Vector2i(i, j)
+			var f := floor_set.floor_tile(i, j, pit) if pits != null else plain
+			if f >= 0:
+				floor_layer.set_cell(cell, 0, floor_set.coords(f))
+			var w := walls.wall_tile(i, j, rock)
+			if w >= 0:
+				walls_layer.set_cell(cell, 0, walls.coords(w))
 
-## A pit in the floor of cell (x, y): the hole.
-func paint_pit(c: CanvasItem, cells: MapCells, x: int, y: int) -> void:
-	_tile(c, AtlasTiles.PIT, x, y, tint(MadeRoom.ROCK, cells.region))
+func _lay_atlas(floor_layer: TileMapLayer, walls_layer: TileMapLayer, rock: Callable, pit: Callable, area: Rect2i, salt: int) -> void:
+	for y in range(area.position.y, area.end.y):
+		for x in range(area.position.x, area.end.x):
+			var cell := Vector2i(x, y)
+			if pit.call(x, y):
+				floor_layer.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(AtlasTiles.PIT))
+				continue
+			if not rock.call(x, y):
+				floor_layer.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(AtlasTiles.floor_at(x, y, salt)))
+				continue
+			var tile := AtlasTiles.wall_at(not rock.call(x, y + 1), not rock.call(x - 1, y), not rock.call(x + 1, y))
+			walls_layer.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(tile))
+
+## The same, drawn by hand on `c` for the cells of `area`, in world units —
+## the creator's table's chunks (`MapTable`). With the tileset's own tiles the
+## floor and the walls are drawn as `lay` lays them, a dual tile reaching half
+## a cell past the area each way; without, the atlas's, a tile a cell. The
+## magic stone is drawn over either, whether or not magic is on: the table
+## shows what was laid.
+func paint_area(c: CanvasItem, cells: MapCells, area: Rect2i) -> void:
+	var rock := func(x: int, y: int) -> bool: return cells.solid(x, y)
+	var pit := func(x: int, y: int) -> bool: return cells.pit(x, y)
+	var cell := float(Room.CELL)
+	if walls == null:
+		for y in range(area.position.y, area.end.y):
+			for x in range(area.position.x, area.end.x):
+				_tile(c, AtlasTiles.floor_at(x, y, cells.region * 7919), x, y, tint(MadeRoom.ROCK, cells.region))
+				if cells.solid(x, y):
+					var mark := cells.ground(x, y)
+					var name := AtlasTiles.wall_at(not cells.solid(x, y + 1), not cells.solid(x - 1, y), not cells.solid(x + 1, y))
+					_tile(c, name, x, y, tint(mark, cells.region))
+				elif cells.pit(x, y):
+					_tile(c, AtlasTiles.PIT, x, y, tint(MadeRoom.ROCK, cells.region))
+	else:
+		var floor_set := pits if pits != null else walls
+		var plain := pits.plain_upper() if pits != null else walls.plain_lower()
+		for j in range(area.position.y, area.end.y + 1):
+			for i in range(area.position.x, area.end.x + 1):
+				var f := floor_set.floor_tile(i, j, pit) if pits != null else plain
+				floor_set.draw(c, f, Rect2(Vector2(i - 0.5, j - 0.5) * cell, Vector2.ONE * cell))
+		for j in range(area.position.y, area.end.y + 1):
+			for i in range(area.position.x, area.end.x + 1):
+				walls.draw(c, walls.wall_tile(i, j, rock), Rect2(Vector2(i - 0.5, j) * cell, Vector2.ONE * cell))
+	for y in range(area.position.y, area.end.y):
+		for x in range(area.position.x, area.end.x):
+			if cells.ground(x, y) == MadeRoom.MAGIC:
+				paint_magic(c, cells, x, y)
 
 ## Magic stone (`MadeRoom.MAGIC`), the same in every tileset: violet, lit along
 ## its top and dark along its foot, with a glint in it. Whether it is there to
@@ -207,9 +290,9 @@ static func paint_foliage_still(c: CanvasItem, mark: String, foot: Vector2, px: 
 					box_at.call(-6 + k * 3 - 1, 3 + (k * 7) % 4, 3, 2, BLOOM)
 
 ## A tile's picture on the creator's table, for an entry of `layer` under its
-## tab: a wall of `mark` as it stands alone, a pit, the magic stone, or a thing
-## put about a map as it stands — in the middle of `at`, `k` of the game's own
-## size.
+## tab: a wall of `mark` as it stands alone — the top of one, out of the
+## tileset's own tiles — a pit, the magic stone, or a thing put about a map as
+## it stands — in the middle of `at`, `k` of the game's own size.
 func icon(c: CanvasItem, layer: int, mark: String, at: Vector2, k: float) -> void:
 	var cell := Vector2.ONE * Room.CELL * k
 	var r := Rect2(at - cell * 0.5, cell)
@@ -220,13 +303,28 @@ func icon(c: CanvasItem, layer: int, mark: String, at: Vector2, k: float) -> voi
 			MadeRoomView.paint_prop(c, mark, Vector2(at.x, r.end.y - 2.0 * k), float(S) * k, 0.6, 3)
 		return
 	if mark == MadeRoom.PIT:
-		_tile_in(c, AtlasTiles.PIT, r, tint(MadeRoom.ROCK, 0))
+		if pits != null:
+			pits.draw(c, pits.plain_lower(), r)
+		else:
+			_tile_in(c, AtlasTiles.PIT, r, tint(MadeRoom.ROCK, 0))
 		return
 	if mark == MadeRoom.MAGIC:
 		c.draw_rect(r, MAGIC_STONE)
 		c.draw_rect(Rect2(r.position, Vector2(r.size.x, 2.0 * k)), MAGIC_LIT)
 		c.draw_rect(Rect2(r.position.x, r.end.y - k, r.size.x, k), MAGIC_DARK)
 		return
+	if walls != null:
+		# The face of a wall, in the kind's tint over it where the kind is not
+		# the tileset's own stone.
+		var face := -1
+		for t in walls.tiles.size():
+			if bool(walls.tiles[t]["face"]):
+				face = t
+				break
+		if face >= 0:
+			c.draw_texture_rect_region(walls.texture, r, Rect2(walls.rect(face)),
+				Color.WHITE if mark == MadeRoom.ROCK else tint(mark, 0))
+			return
 	_tile_in(c, AtlasTiles.WALL_FRONT, r, tint(mark, 0))
 
 ## The atlas tile `name` over cell (x, y), tinted.

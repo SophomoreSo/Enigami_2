@@ -2,9 +2,10 @@ class_name CutsceneView
 extends Node2D
 
 ## Everything a directed scene puts on the screen: the camera over the stage,
-## the floor it plays on — a hall seen from above, laid out of the atlas's
-## floor and wall tiles round the middle of everywhere the script names
-## (`AtlasTiles`) — the narration panel, and the fade the script calls for.
+## the floor it plays on — a hall seen from above, laid out of the hideout's
+## hall's tiles round the middle of everywhere the script names
+## (`Style.STAGE_TILESET`, `MapTiles.lay`) — the narration panel, and the
+## fade the script calls for.
 ##
 ## The staging directions have already been carried out by the `Cutscene` before
 ## this hears anything. What arrives here on the `scene_direction` cue is the
@@ -139,24 +140,25 @@ func _marks_centre() -> Vector2:
 func _lay_stage() -> void:
 	if not cut.own_stage or _floor != null:
 		return
-	_floor = AtlasTiles.layer(false)
+	var tiles := MapTiles.of(Style.STAGE_TILESET)
+	var layers := tiles.layers()
+	_floor = layers[0]
 	_floor.visibility_layer = PixelCamera.WORLD_LAYER
 	add_child(_floor)
-	_walls = AtlasTiles.layer(false)
+	_walls = layers[1]
 	_walls.visibility_layer = PixelCamera.WORLD_LAYER
 	add_child(_walls)
 	var middle := Vector2i((_centre / Room.CELL).floor())
 	var cols := int(STAGE / Room.CELL)
 	@warning_ignore("integer_division")
 	var left := middle.x - cols / 2
-	var salt := hash(cut.scene_id) % 65536
-	for x in range(left, left + cols):
-		for y in range(middle.y - FLOOR_UP, middle.y + FLOOR_DOWN + 1):
-			_floor.set_cell(Vector2i(x, y), AtlasTiles.SOURCE, AtlasTiles.coords(AtlasTiles.floor_at(x, y, salt)))
-		for k in WALL:
-			var y := middle.y - FLOOR_UP - 1 - k
-			var tile := AtlasTiles.WALL_FRONT if k == 0 else AtlasTiles.WALL_TOP
-			_walls.set_cell(Vector2i(x, y), AtlasTiles.SOURCE, AtlasTiles.coords(tile))
+	var top := middle.y - FLOOR_UP - WALL
+	# Wall above the floor, and wall again under it: rock all round the hall.
+	var rock := func(x: int, y: int) -> bool:
+		return y < middle.y - FLOOR_UP or y > middle.y + FLOOR_DOWN
+	var never := func(_x: int, _y: int) -> bool: return false
+	tiles.lay(_floor, _walls, rock, never,
+		Rect2i(left, top, cols, FLOOR_UP + FLOOR_DOWN + WALL * 2 + 1), hash(cut.scene_id) % 65536)
 
 func _direction(d: Dictionary) -> void:
 	if d.has("camera"):

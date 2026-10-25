@@ -4,12 +4,15 @@ extends Node2D
 ## A room, drawn from above: its floor, its walls, the pits in the floor,
 ## whatever exit it holds, and the foliage growing on its floor.
 ##
-## The floor and the walls are tiles cut from the atlas (`AtlasTiles`), on two
-## layers: the floor under everything, and the walls sorted among the bodies by
-## their feet, so a body walks behind a wall's front and in front of its top
-## (`Room.y_sort_enabled`). Tiles never change while a room is loaded, so they
-## are laid once the moment the room finishes building. The exit animates and
-## the grass bends where somebody walks through it.
+## The floor and the walls are tiles of the room's tileset (`MapTiles`: the
+## game's own, `TerrainTiles`, or the atlas's standing in), on two layers: the
+## floor under everything, and the walls sorted among the bodies by their
+## feet, so a body walks behind a wall's front and in front of its top
+## (`Room.y_sort_enabled`). Which tileset is a look: a raid's rooms are cut
+## from the rock, a made map is drawn in the one it names, and the hideout's
+## hall in its own (`Style`). Tiles never change while a room is loaded, so
+## they are laid once the moment the room finishes building. The exit
+## animates and the grass bends where somebody walks through it.
 ##
 ## The rock goes on past the room's edge, out to wherever the screen does. A
 ## room is 1280 across, and the screen is at least 1280x720 but takes the shape
@@ -29,6 +32,8 @@ const EXIT_LIGHT := 1.2
 const EXIT_AIR := 0.06
 
 var room: Room
+## The tileset the room is drawn in.
+var tiles: MapTiles
 ## The floor, and the walls.
 var _floor: TileMapLayer
 var _walls: TileMapLayer
@@ -45,11 +50,13 @@ func _ready() -> void:
 	y_sort_enabled = true
 	# What is drawn here itself is the way out, which is its own light.
 	material = Lighting.glow()
-	_floor = AtlasTiles.layer(false)
+	tiles = MapTiles.of(_tileset_id())
+	var layers := tiles.layers()
+	_floor = layers[0]
 	_floor.z_index = -1
 	_floor.visibility_layer = PixelCamera.WORLD_LAYER
 	add_child(_floor)
-	_walls = AtlasTiles.layer(true)
+	_walls = layers[1]
 	_walls.visibility_layer = PixelCamera.WORLD_LAYER
 	add_child(_walls)
 	shadow = ShadowCaster.new()
@@ -73,14 +80,25 @@ func _on_reshaped() -> void:
 	_lay_tiles()
 	_cast()
 
-## Which tint the rock is: the region's, lightened, over the atlas's own stone.
-func _tint() -> Color:
-	return Style.region_tint(int(room.data.get("region", 0))).lerp(Color.WHITE, 0.55)
+## Which tileset the room is drawn in: a made map's own, the hideout's hall's,
+## and the rock for a raid's rooms.
+func _tileset_id() -> String:
+	if room is MadeRoom and String((room as MadeRoom).tileset) != "":
+		return (room as MadeRoom).tileset
+	if room != null and room.get_parent() is HideoutWorld:
+		return Style.HIDEOUT_TILESET
+	return Style.RAID_TILESET
 
-## The floor and the walls, a tile a cell, out as far as the screen shows past
-## the room. A solid cell with open floor below it shows a wall's front face,
-## and one with more rock below it the top of the wall; the ends of either are
-## where the wall meets open floor to the left or the right.
+## Which tint the room takes: the tileset's say, by the region the room lies in.
+func _tint() -> Color:
+	var region := int(room.data.get("region", 0)) if room != null else 0
+	if room is MadeRoom:
+		region = (room as MadeRoom).region
+	return tiles.room_tint(region)
+
+## The floor and the walls, out as far as the screen shows past the room, laid
+## by the tileset (`MapTiles.lay`): the pits in the floor open where the room
+## has them, and the walls stand wherever the rock is, in the room and beyond.
 func _lay_tiles() -> void:
 	if room == null or not is_instance_valid(room) or room.solid.is_empty():
 		return
@@ -90,17 +108,8 @@ func _lay_tiles() -> void:
 	_walls.modulate = _tint()
 	var out := reach(get_viewport())
 	var salt := int(room.rng.seed % 65536)
-	for y in range(-out.y, room.rows + out.y):
-		for x in range(-out.x, room.cols + out.x):
-			var cell := Vector2i(x, y)
-			if room.is_pit(x, y):
-				_floor.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(AtlasTiles.PIT))
-				continue
-			if not _rock(x, y):
-				_floor.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(AtlasTiles.floor_at(x, y, salt)))
-				continue
-			var tile := AtlasTiles.wall_at(not _rock(x, y + 1), not _rock(x - 1, y), not _rock(x + 1, y))
-			_walls.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(tile))
+	var area := Rect2i(-out.x, -out.y, room.cols + out.x * 2, room.rows + out.y * 2)
+	tiles.lay(_floor, _walls, _rock, room.is_pit, area, salt)
 
 ## What grows on the room's floor is the `growths` rows of the content
 ## database: of each kind of foliage, how many patches and how long. Where each

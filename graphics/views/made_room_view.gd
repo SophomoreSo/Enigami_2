@@ -25,9 +25,6 @@ const FERN := "n"
 var made: MadeRoom
 ## The props standing about the room, in the order they were put down.
 var props: Array = []
-## The tileset the room is drawn in (`MapTiles`): for now a tint over the
-## atlas's own tiles, and the name the creator's table shows.
-var tiles: MapTiles
 
 ## Something put about the floor that is not a plant: a lantern, a fire,
 ## glowing caps, fireflies, a fern — a small picture of it at its cell, which
@@ -88,7 +85,6 @@ static func paint_prop(c: CanvasItem, mark: String, foot: Vector2, px: float, t:
 func _ready() -> void:
 	super._ready()
 	made = room as MadeRoom
-	tiles = MapTiles.of(made.tileset if made != null else "")
 	# The magic stone went, or came back: the tiles and the shadows' edges
 	# are laid again.
 	if made != null:
