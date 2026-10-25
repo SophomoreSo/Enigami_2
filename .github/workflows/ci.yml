@@ -179,10 +179,8 @@ jobs:
           mkdir -p "$SHOTS_DIR"
           xvfb-run -a --server-args="-screen 0 1920x1080x24" \
             ./tests/run.sh --display --timeout 180 --quarantine '' \
-              tests/graphics/shots.tscn \
-              tests/graphics/dragon_shot.tscn \
               tests/graphics/title_shot.tscn \
-              tests/graphics/wiring_shot.tscn
+              tests/graphics/lighting_shot.tscn
 
       - uses: actions/upload-artifact@v7
         if: always()

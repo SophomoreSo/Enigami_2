@@ -29,7 +29,7 @@ gh workflow run CI --ref master -f title="What this run is checking"
 |---|---|---|
 | **Rules tests** | `v*` tags | `tests/circuit`, `tests/feature`, `tests/story`, `tests/shared` under `--headless` |
 | **Module split holds** | `v*` tags | the four graphics autoloads deleted, the circuit and rules tests run again |
-| **Graphics tests** | `v*` tags | `tests/graphics` and `tests/mobile` under Xvfb, plus screenshots of every screen |
+| **Graphics tests** | `v*` tags | `tests/graphics` and `tests/mobile` under Xvfb, plus the title's and the light's screenshots |
 | **Build — Linux, Windows, Android** | `v*` tags, and master by hand | artifacts, kept 30 days |
 | **Build — macOS, iOS** | master by hand; tags only if opted in | artifacts, kept 30 days — see below |
 | **Release** | `v*` tags | whatever was built, zipped per platform, attached to a GitHub Release |
@@ -139,16 +139,24 @@ base64 -i release.keystore | pbcopy   # then paste as ANDROID_KEYSTORE_BASE64
   signing identity and a provisioning profile, and the exporter will not even
   start without a team id.
 
-There is also a thing worth saying out loud about the two mobile targets: the
-game is built for a keyboard and a mouse — LMB attacks, RMB charges, TAB opens
-assembly, 1–4 arm the slots. The Android and iOS builds compile and install;
-until there are touch controls there is not much to do once they are open.
+The two mobile targets play on the glass: a twin-stick console, the left
+thumb walking any of the eight ways and the right aiming the weapon and the
+cast (`mobile/`, `tests/mobile`).
+
+## Beside v1
+
+This is the second Enigami, and it installs and saves beside the first rather
+than over it: its bundle id and package name are `com.enigami.game2`, and it
+keeps its saves, settings and made maps in a folder of its own,
+`app_userdata/Enigami2` (`application/config/custom_user_dir_name` in
+`project.godot`), so a v1 save is never read by v2 nor the other way round.
+Its version is 2.0.0 in `project.godot` and every preset.
 
 ## Releasing
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag -a v2.0.0 -m "Enigami 2.0.0"
+git push origin v2.0.0
 ```
 
 Tests run, all five platforms build, and a GitHub Release appears with one zip
