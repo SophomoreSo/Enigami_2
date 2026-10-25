@@ -723,8 +723,7 @@ CREATE TABLE heroes (
 	place  INTEGER NOT NULL UNIQUE CHECK (place >= 1),
 	sprite TEXT NOT NULL CHECK (sprite <> ''),
 	color  TEXT NOT NULL CHECK (length(color) = 7 AND color GLOB '#[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]'),
-	prompt TEXT NOT NULL DEFAULT '',                      -- who they are, for the tool their sprites are made with (HEROES.md)
-	hands  REAL NOT NULL DEFAULT 30 CHECK (hands > 0)     -- how far over the middle of the body the hands hold a rope, in world units: where the hang pose's fist is (HEROES.md)
+	prompt TEXT NOT NULL DEFAULT ''                       -- who they are, for the tool their sprites are made with (HEROES.md)
 );
 
 -- ---- the sound bank -----------------------------------------------------------
