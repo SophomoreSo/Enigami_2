@@ -1,10 +1,51 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+.DS_Store
+
 # Godot
 .godot/
-*.import.tmp
+*.translation
 
-# Test runs
-.test-home/
+# export_presets.cfg is deliberately tracked: CI builds from it, so a preset
+# that only exists on one machine is a build nobody else can reproduce. It
+# carries no keys — the Android keystore and the Apple team id come from
+# repository secrets at build time. Keep it that way.
+
+# Build and test output
+build/
 .test-logs/
+.test-home/
+shots/
 
-# macOS
-.DS_Store
+# godot-sqlite: the iOS static libraries and the godot-cpp archives they need
+# are 280MB, so they are fetched by addons/godot-sqlite/fetch.sh before an iOS
+# export rather than kept here; the web builds have no preset. Every other
+# library in bin/ is committed — see addons/godot-sqlite/README.md.
+addons/godot-sqlite/bin/*.xcframework/
+addons/godot-sqlite/bin/*.wasm
+
+# data/db/build.sh writes the content database beside itself first, then
+# moves it into place, so a build that fails halfway leaves the old one whole.
+data/enigami.db.building

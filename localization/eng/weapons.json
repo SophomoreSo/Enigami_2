@@ -1,0 +1,30 @@
+{
+	"SWORD": {
+		"name": "Sword",
+		"desc": "Close work. A lunge that cuts everything on its line; melee flows hit far harder, and bolts leave the blade sluggish."
+	},
+	"GUN": {
+		"name": "Gun",
+		"desc": "Range and speed. Bolts fly flat and fast; the stock makes a poor club."
+	},
+	"ROCK": {
+		"name": "Rock",
+		"desc": "One stone, thrown with everything built into it. It lands where it lands, and does nothing more until you pick it up."
+	},
+	"RUNE": {
+		"name": "Rune",
+		"desc": "A stone with a charge stored in it, thrown as the rock is: the throw goes out charged, and costs you nothing. Thrown, it is spent: still a stone to throw, but bare, its skill gone out of it until you hold the cast button with it in hand to pour your own mana back in."
+	},
+	"SHOVEL": {
+		"name": "Shovel",
+		"desc": "A spade for a blade: it swings like anything heavy, and it digs. Hold the use key on lit ground to bring up what is buried there — loudly."
+	},
+	"SHURIKEN": {
+		"name": "Shuriken",
+		"desc": "A stack of throwing stars, thrown with everything built into them. Each is lobbed, and sticks where it strikes; walk over one to take it back."
+	},
+	"HAND": {
+		"name": "Empty hand",
+		"desc": "Nothing in it but a fist: what the hand casts is a graph of punches."
+	}
+}

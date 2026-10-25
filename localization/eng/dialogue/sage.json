@@ -1,0 +1,48 @@
+{
+	"name": "Old Tinker",
+	"player_name": "Knight",
+	"nodes": {
+		"hello": {
+			"text": "Ah, a new face. Nothing you break in here stays broken."
+		},
+		"ask": {
+			"text": "What would you like to know?",
+			"choices": [
+				"How do skills work?",
+				"What does charging do?",
+				"Who are you?",
+				"Nothing. Bye."
+			]
+		},
+		"circuits": {
+			"text": "Every skill is a circuit. The longer the path, the longer you wait for the next shot."
+		},
+		"charge": {
+			"text": "Build a loop, then hold the cast button. Charge buys the pulse more laps."
+		},
+		"who": {
+			"text": "I tinker. Mostly with things that explode.",
+			"choices": [
+				"Sounds dangerous.",
+				"Back to my questions."
+			]
+		},
+		"danger": {
+			"text": "Only out on a raid. In here, the dummy won't mind."
+		},
+		"danger_reply": {
+			"text": "Noted. I'll aim at the dummy."
+		},
+		"ask_again": {
+			"text": "Anything else?",
+			"choices": [
+				"How do skills work?",
+				"What does charging do?",
+				"That's all, thanks."
+			]
+		},
+		"bye": {
+			"text": "Go on, then. Break something."
+		}
+	}
+}

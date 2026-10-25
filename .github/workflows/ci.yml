@@ -1,0 +1,379 @@
+name: CI
+
+# One file rather than two, so that "don't ship a red build" is an edge in the
+# graph instead of a convention: the export jobs simply `needs` the test jobs.
+# Runs for what ships: a version tag. A push to master does not start a run for
+# now — master is tested at the desk as it is merged, like a branch being
+# worked on (`tests/run.sh`, see .github/README.md) — and `workflow_dispatch`
+# is the button for the odd time a run of master or a branch is wanted anyway.
+# To have master run again, put `branches: ['master']` back beside `tags`: the
+# jobs below still say what each does on master.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'What this run is checking: its name in the Actions list'
+        required: false
+        type: string
+
+# A run started by hand has no commit message for GitHub to name it by, so it
+# is named "CI" like every other one — a list of runs nobody can tell apart.
+# It is named by the title it is given (`gh workflow run CI --ref master -f
+# title="..."`), and with none by the branch and commit it ran on. A tag's run
+# is left to GitHub, which names it by its commit: an empty name falls back to
+# the default.
+run-name: "${{ github.event_name == 'workflow_dispatch' && (inputs.title || format('{0} at {1}', github.ref_name, github.sha)) || '' }}"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: '4.5.1'
+  GODOT_RELEASE: stable
+
+jobs:
+  # ---------------------------------------------------------------- tests ---
+
+  rules:
+    name: Rules tests (headless)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup-godot
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          release: ${{ env.GODOT_RELEASE }}
+
+      - name: Import
+        run: ./.github/scripts/import.sh
+
+      - name: Run
+        env:
+          GODOT_ARGS: --audio-driver Dummy
+        run: ./tests/run.sh --timeout 300 tests/circuit tests/feature tests/story tests/perks tests/shared
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          # `.test-logs` starts with a dot, and the action skips hidden
+          # paths unless told not to — silently, as a warning that uploads
+          # nothing. The first CI run produced no logs at all because of it.
+          include-hidden-files: true
+          name: logs-rules
+          path: .test-logs/
+          retention-days: 14
+
+  module-split:
+    name: Module split holds
+    runs-on: ubuntu-latest
+    # Not a gate on the build: a module-split violation is an architecture
+    # regression, not a broken game. It is here to be noticed, not to block a
+    # release. See ARCHITECTURE.md, "One rule, applied twice".
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup-godot
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          release: ${{ env.GODOT_RELEASE }}
+
+      - name: Delete the four graphics autoloads
+        run: |
+          set -euo pipefail
+          sed -i '/^Sprites=/d; /^Fx=/d; /^Views=/d; /^CueVisuals=/d' project.godot
+          echo "Autoloads left:"
+          sed -n '/^\[autoload\]/,/^\[/p' project.godot | grep '=' || true
+
+      - name: Import
+        # The rules half is expected to parse with the picture half's globals
+        # gone, but three tests print `Identifier "Sprites" not declared` noise
+        # while doing it, so this import is allowed to be noisy.
+        run: ./.github/scripts/import.sh --allow-errors
+
+      - name: The rules must still run with nothing to draw with
+        env:
+          GODOT_ARGS: --audio-driver Dummy
+        run: ./tests/run.sh --timeout 300 tests/circuit tests/feature tests/story tests/perks
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          # `.test-logs` starts with a dot, and the action skips hidden
+          # paths unless told not to — silently, as a warning that uploads
+          # nothing. The first CI run produced no logs at all because of it.
+          include-hidden-files: true
+          name: logs-module-split
+          path: .test-logs/
+          retention-days: 14
+
+  graphics:
+    name: Graphics tests (Xvfb)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup-godot
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          release: ${{ env.GODOT_RELEASE }}
+
+      - name: An X server, and fonts for the machine to have
+        # The libraries Godot links against come with the setup action. This is
+        # the virtual display to put the window on, and a CJK face.
+        #
+        # The face is not decoration. `Loc.LANGUAGES["kor"]["fonts"]` names
+        # system faces to borrow Hangul from, so playing in Korean builds a
+        # `SystemFont` over them — and every string measured then walks that
+        # chain. On a runner with no CJK font installed there is nothing for it
+        # to resolve to, and `settings_pixel_test` took 217s and then died of
+        # it. A machine with no Korean font is not a machine anyone plays on.
+        #
+        # Deliberately not installed for the rules job: `loc_test` is there to
+        # prove the *bundled* faces spell everything on their own, and a system
+        # face would quietly stand in for one that could not.
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq --no-install-recommends xvfb fontconfig fonts-noto-cjk
+          fc-cache -f >/dev/null 2>&1 || true
+          echo "fonts visible: $(fc-list | wc -l)"
+          echo "Korean resolves to: $(fc-match 'Noto Sans CJK KR')"
+
+      - name: Import
+        run: ./.github/scripts/import.sh
+
+      - name: Run
+        # These drive synthetic mouse input and assert exact pixel positions, so
+        # they need a real window — under --headless they hang rather than fail.
+        # There is no cursor on a virtual display and no other window to take
+        # the keyboard, which is the one way CI is a friendlier home for them
+        # than a desk is: `editor_input_test` and `save_slot_test` both fail on
+        # a real machine when the cursor or the focus is somewhere they did not
+        # expect. If either turns out to be red here for a reason nobody can
+        # fix today, tests/quarantine.txt is a one-line answer.
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          GODOT_ARGS: --audio-driver Dummy
+        run: |
+          xvfb-run -a --server-args="-screen 0 1920x1080x24" \
+            ./tests/run.sh --display --timeout 300 --exclude '*shot*' tests/graphics tests/mobile
+
+      - name: Screenshots
+        # The shot scenes assert nothing — they photograph every screen, which
+        # is what you want to look at when a pixel test above goes red. They
+        # wait on `frame_post_draw`, so they hang rather than fail if anything
+        # stops the window drawing; that is worth a picture, not a broken build.
+        #
+        # `always()`, because a red pixel test above is precisely when someone
+        # wants to see what the screen actually looked like.
+        if: always()
+        continue-on-error: true
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          GODOT_ARGS: --audio-driver Dummy
+          SHOTS_DIR: ${{ github.workspace }}/shots
+        run: |
+          mkdir -p "$SHOTS_DIR"
+          xvfb-run -a --server-args="-screen 0 1920x1080x24" \
+            ./tests/run.sh --display --timeout 180 --quarantine '' \
+              tests/graphics/shots.tscn \
+              tests/graphics/dragon_shot.tscn \
+              tests/graphics/title_shot.tscn \
+              tests/graphics/wiring_shot.tscn
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          # `.test-logs` starts with a dot, and the action skips hidden
+          # paths unless told not to — silently, as a warning that uploads
+          # nothing. The first CI run produced no logs at all because of it.
+          include-hidden-files: true
+          name: logs-graphics
+          path: |
+            .test-logs/
+            shots/
+          retention-days: 14
+
+  # --------------------------------------------------------------- builds ---
+
+  build-linux-windows-android:
+    name: Build — Linux, Windows, Android
+    needs: [rules, graphics]
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: ./.github/actions/setup-godot
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          release: ${{ env.GODOT_RELEASE }}
+          templates: 'true'
+
+      - name: Import
+        run: ./.github/scripts/import.sh
+
+      - name: Point the Android exporter at the SDK, and give it a key
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEYSTORE_USER: ${{ secrets.ANDROID_KEYSTORE_USER }}
+        run: ./.github/scripts/android-setup.sh
+
+      - name: Export Linux
+        run: ./.github/scripts/export.sh Linux build/linux/Enigami.x86_64
+
+      - name: Export Windows
+        run: ./.github/scripts/export.sh Windows build/windows/Enigami.exe
+
+      - name: Export Android
+        # Release mode only when there is a real key to sign with; otherwise a
+        # debug-signed APK, which installs for testing and nothing more.
+        run: |
+          set -euo pipefail
+          if [ -f "$HOME/release.keystore" ]; then mode=release; else mode=debug; fi
+          echo "Android export mode: $mode"
+          ./.github/scripts/export.sh Android build/android/Enigami.apk "$mode"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-linux
+          path: build/linux/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-windows
+          path: build/windows/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-android
+          path: build/android/
+          retention-days: 30
+
+  build-apple:
+    name: Build — macOS, iOS
+    needs: [rules, graphics]
+    # Every run for master, exactly as before — that is what keeps the macOS
+    # export honest. Not on a tag, though, unless RELEASE_APPLE says so: what
+    # this job can produce today is an unsigned .app that Gatekeeper refuses
+    # and an iOS step that skips itself, which is nothing worth attaching to a
+    # release at ten times the runner cost. Set the repository variable
+    # RELEASE_APPLE to `true` once there is a signing identity to build with.
+    if: >-
+      github.event_name != 'pull_request'
+      && (github.ref == 'refs/heads/master'
+          || (startsWith(github.ref, 'refs/tags/v') && vars.RELEASE_APPLE == 'true'))
+    runs-on: macos-latest
+    env:
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup-godot
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          release: ${{ env.GODOT_RELEASE }}
+          templates: 'true'
+
+      - name: Import
+        run: ./.github/scripts/import.sh
+
+      - name: Export macOS
+        # Unsigned. Gatekeeper will refuse it on someone else's Mac until it is
+        # signed and notarised, which needs a Developer ID in secrets.
+        run: ./.github/scripts/export.sh macOS build/macos/Enigami.zip
+
+      - name: Export iOS
+        # The exporter refuses to run at all without a team id, and a team id is
+        # not the repo's to carry, so this is skipped until one is in secrets.
+        if: env.APPLE_TEAM_ID != ''
+        run: |
+          set -euo pipefail
+          sed -i '' "s|application/app_store_team_id=\"\"|application/app_store_team_id=\"$APPLE_TEAM_ID\"|" export_presets.cfg
+          # The SQLite extension's iOS libraries are not committed — with the
+          # godot-cpp archives they need they are 280MB — so they come from
+          # the pinned release here. See addons/godot-sqlite/README.md.
+          ./addons/godot-sqlite/fetch.sh ios
+          ./.github/scripts/export.sh iOS build/ios/Enigami.ipa
+          # What comes out is an Xcode project, not an .ipa: the preset sets
+          # export_project_only, because turning it into an installable build
+          # needs a signing identity and a provisioning profile.
+          ( cd build/ios && zip -qr "$RUNNER_TEMP/Enigami-ios-xcode.zip" . )
+          rm -rf build/ios
+          mkdir -p build/ios
+          mv "$RUNNER_TEMP/Enigami-ios-xcode.zip" build/ios/
+
+      - name: Say why iOS was skipped
+        if: env.APPLE_TEAM_ID == ''
+        run: |
+          echo "::notice title=iOS skipped::Set the APPLE_TEAM_ID secret to build the iOS Xcode project."
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-macos
+          path: build/macos/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v7
+        if: env.APPLE_TEAM_ID != ''
+        with:
+          name: build-ios
+          path: build/ios/
+          retention-days: 30
+
+  # -------------------------------------------------------------- release ---
+
+  release:
+    name: Release
+    needs: [build-linux-windows-android, build-apple]
+    # A skipped dependency skips whatever depends on it, so without a status
+    # function here, turning the Apple job off would quietly stop releasing
+    # anything at all. `!cancelled()` lifts that default, and the two clauses
+    # below say what is actually required: the desktop build must have
+    # succeeded, and the Apple build must not have *failed* — skipped is fine,
+    # broken is not.
+    if: >-
+      !cancelled()
+      && startsWith(github.ref, 'refs/tags/v')
+      && needs.build-linux-windows-android.result == 'success'
+      && needs.build-apple.result != 'failure'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+          pattern: build-*
+
+      - name: One archive per platform
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          for dir in artifacts/build-*/; do
+            name=$(basename "$dir")
+            ( cd "$dir" && zip -qr "${GITHUB_WORKSPACE}/release/Enigami-${GITHUB_REF_NAME}-${name#build-}.zip" . )
+          done
+          ls -lh release/
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            release/*.zip

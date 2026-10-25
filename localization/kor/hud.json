@@ -1,0 +1,420 @@
+{
+	"health": "%d / %d",
+	"burning": "화상",
+	"chilled": "냉각",
+	"wet": "젖음",
+	"frozen": "얼어붙음",
+	"stunned": "기절",
+	"magic_off": "마법 차단",
+	"possessing": "%s 빙의 %d초",
+	"thrown": "%s (던짐)",
+	"stock": "%s x%d",
+	"rune": "%s 준비",
+	"rune_spent": "%s 소진 %d%%",
+	"empty_hand": "빈손",
+	"fx": {
+		"winded": "탈진",
+		"parry": "막아냄",
+		"boss_phase": "%s: 제2형태",
+		"no_weapon": "%s 없음"
+	},
+	"map": {
+		"title": "지도",
+		"clock": "%02d:%02d  •  %s",
+		"pressure": [
+			"조용함",
+			"술렁임",
+			"경계",
+			"추적",
+			"몰려듦"
+		],
+		"legend": {
+			"you": "현재 위치",
+			"entry": "입구",
+			"boss": "중재자",
+			"treasure": "보급품",
+			"exit": "출구",
+			"unseen": "미탐색",
+			"kit": "내 장비"
+		},
+		"close": "%s 또는 ESC로 닫기",
+		"none": "볼 수 있는 지도가 없습니다"
+	},
+	"tabs": {
+		"graph": "조립",
+		"map": "지도",
+		"dex": "도감",
+		"perks": "특성"
+	},
+	"dex": {
+		"title": "몬스터 도감",
+		"found": "%d / %d 발견",
+		"number": "No.%02d",
+		"unknown": "??",
+		"unmet": "아직 만나지 못했습니다",
+		"unseen": "아직 쓰는 것을 보지 못했습니다",
+		"skills": "스킬",
+		"skill": {
+			"board": "공격",
+			"board_phase2": "제2형태"
+		},
+		"stat": {
+			"health": "체력 %d",
+			"speed": "속도 %d",
+			"reach": "사거리 %d",
+			"scrap": "골드 %d"
+		},
+		"elite": "정예",
+		"boss": "보스"
+	},
+	"extracting": "탈출 중",
+	"extract": {
+		"hold": "%s를 길게 눌러 탈출",
+		"no_exit": "출구 없음",
+		"needs_scrap": "골드 %d 필요 (보유 %d)",
+		"sealed": "중재자를 쓰러뜨려야 열립니다"
+	},
+	"dialogue": {
+		"choose": "%s/%s 선택  ·  %s 대답",
+		"choose_touch": "눌러서 대답",
+		"next_touch": "눌러서 계속",
+		"player": "나"
+	},
+	"cutscene": {
+		"hint": "%s 계속  ·  %s 건너뛰기",
+		"hint_touch": "눌러서 계속"
+	},
+	"sandbox": {
+		"swap_weapon": "무기 교체",
+		"dragon_test": "드래곤 테스트 >",
+		"jean_grey_test": "진 그레이 테스트 >",
+		"lighting_test": "조명 테스트 >",
+		"samples": "샘플 스킬",
+		"sample": {
+			"dragon": "적중할 때마다 돌진이 이어짐",
+			"jean_grey": "맞은 적에게 10초 빙의",
+			"seeker": "번개처럼 날아가 끝까지 쫓아감"
+		},
+		"seeker": "추적 화살",
+		"spawn": "%s 소환",
+		"spawn_dummy": "허수아비 소환",
+		"clear": "비우기",
+		"leave": "나가기",
+		"dps": "초당 피해 (3초 평균): %.1f"
+	},
+	"maker": {
+		"title": "맵 제작",
+		"name": "맵 이름",
+		"save": "저장",
+		"load": "불러오기",
+		"new": "새 맵",
+		"map": "맵",
+		"undo": "되돌리기",
+		"redo": "다시 하기",
+		"play": "플레이",
+		"back": "뒤로",
+		"tool": {
+			"move": "이동",
+			"erase": "지우기"
+		},
+		"tab": {
+			"ground": "지형",
+			"back": "배경",
+			"creatures": "생물",
+			"things": "개체",
+			"props": "소품"
+		},
+		"mark": {
+			"start": "시작 지점",
+			"box": "보물 상자",
+			"dig": "파낼 땅",
+			"bench": "벤치",
+			"door_west": "서쪽 출입구",
+			"door_east": "동쪽 출입구",
+			"gate_up": "위층 문",
+			"gate_down": "아래층 문",
+			"exit": "출구"
+		},
+		"tiles": {
+			"grove": {
+				"stone": "돌",
+				"earth": "흙",
+				"bark": "나무껍질",
+				"wood": "판자",
+				"leaves": "나뭇잎",
+				"wall": "폐허 벽",
+				"column": "기둥",
+				"lintel": "돌 들보",
+				"tree": "나무",
+				"brush": "수풀",
+				"rail": "가로대"
+			},
+			"rock": {
+				"title": "바위",
+				"rock": "바위",
+				"wall": "바위 벽"
+			}
+		},
+		"glass": {
+			"clear": "투명 유리",
+			"mirror": "반사 유리"
+		},
+		"magic": "마법 돌",
+		"prop": {
+			"lantern": "랜턴",
+			"lightbulb": "전구",
+			"fire": "모닥불",
+			"fireplace": "벽난로",
+			"mushrooms": "빛나는 버섯",
+			"fireflies": "반딧불이",
+			"grass": "풀",
+			"flowers": "꽃",
+			"bush": "덤불",
+			"fern": "고사리",
+			"vine": "덩굴",
+			"rope": "밧줄"
+		},
+		"width": "너비",
+		"height": "높이",
+		"region": "바위 %d",
+		"weapon": "무기: %s",
+		"zoom": "배율 %d%%",
+		"hint": "좌클릭 놓기  우클릭 지우기  SHIFT+드래그 상자  휠 클릭 또는 이동 키로 화면 이동  휠 배율",
+		"hint_touch": "끌어서 놓기  이동을 고르면 화면 이동",
+		"edge": "가장자리를 끌어 맵을 키우거나 줄입니다",
+		"unsaved": "저장 안 함",
+		"saved": "저장했습니다  %s",
+		"loaded": "%s 불러왔습니다",
+		"deleted": "%s 삭제했습니다",
+		"replace": "%s 맵이 이미 있습니다. 다시 저장하면 덮어씁니다",
+		"refused": {
+			"name": "먼저 맵 이름을 정하세요: 영문자와 숫자",
+			"write": "맵을 저장하지 못했습니다",
+			"read": "맵을 읽지 못했습니다"
+		},
+		"load_heading": "맵 불러오기",
+		"map_heading": "맵 설정",
+		"tileset": "타일셋",
+		"none": "저장한 맵이 없습니다",
+		"delete": "삭제",
+		"sure": "정말요?",
+		"keys": "R 초기화  TAB 스킬 보드  ESC 맵으로"
+	},
+	"story": {
+		"title": "스토리 제작",
+		"name": "스토리 이름",
+		"save": "저장",
+		"load": "불러오기",
+		"new": "새 스토리",
+		"play": "플레이",
+		"back": "뒤로",
+		"add_node": "+ 노드",
+		"map": "맵",
+		"no_map": "맵 없음",
+		"mode": "진행 방식",
+		"modes": {
+			"free": "자유 이동",
+			"frozen": "이동 정지",
+			"novel": "노벨"
+		},
+		"modes_hint": {
+			"free": "자유 이동: 플레이어는 계속 움직이고 대사는 말풍선에 나오며, 질문은 대화 상자에서 묻습니다",
+			"frozen": "이동 정지: 플레이어가 다가가 대화 키를 누르면 멈춰 선 채 대화 상자가 진행됩니다",
+			"novel": "노벨: 아무도 움직이지 않습니다. 장면처럼 한 번 누를 때마다 한 줄씩 읽습니다"
+		},
+		"player": "플레이어",
+		"npc": "캐릭터",
+		"you": "나",
+		"node": "노드 %s",
+		"nothing_picked": "시트에서 노드를 고르거나 + 노드를 누르세요",
+		"start_here": "여기서 시작",
+		"is_start": "시작",
+		"line": "대사",
+		"emotion": {
+			"neutral": "보통",
+			"happy": "기쁨",
+			"sad": "슬픔",
+			"angry": "분노",
+			"surprised": "놀람",
+			"thinking": "생각",
+			"scared": "두려움"
+		},
+		"effect": {
+			"none": "정지",
+			"wave": "물결",
+			"shake": "흔들림",
+			"bounce": "통통"
+		},
+		"leads_to": "노드 %s(으)로",
+		"leads_end": "끝으로",
+		"unlink": "끊기",
+		"answer": "선택지",
+		"add_answer": "+ 선택지",
+		"action_count_one": "동작 %d",
+		"action_count": "동작 %d",
+		"do": {
+			"walk": "걷기",
+			"run": "달리기",
+			"pose": "자세",
+			"face": "돌아보기"
+		},
+		"to_whom": "%s 쪽으로",
+		"to": {
+			"left": "왼쪽",
+			"right": "오른쪽"
+		},
+		"steps": "%d칸",
+		"dir": {
+			"left": "왼쪽",
+			"right": "오른쪽",
+			"toward": "상대 쪽"
+		},
+		"pose": {
+			"idle": "서기",
+			"run": "달리기",
+			"crouch": "웅크리기",
+			"hit": "맞기",
+			"rise": "뛰어오르기",
+			"fall": "떨어지기",
+			"wall_slide": "벽 타기",
+			"dash": "대시"
+		},
+		"delete_node": "노드 삭제",
+		"remove_asks": "다시 누르면 노드 %s을(를) 삭제합니다",
+		"sure": "정말요?",
+		"saved": "저장했습니다  %s",
+		"loaded": "%s 불러왔습니다",
+		"deleted": "%s 삭제했습니다",
+		"replace": "%s 스토리가 이미 있습니다. 다시 저장하면 덮어씁니다",
+		"refused": {
+			"name": "먼저 스토리 이름을 정하세요: 영문자와 숫자",
+			"write": "스토리를 저장하지 못했습니다",
+			"read": "스토리를 읽지 못했습니다",
+			"empty": "먼저 대사를 한 줄 쓰고, 시작을 그 노드로 이어 주세요",
+			"map": "플레이할 맵이 없습니다: 맵 제작에서 먼저 만드세요"
+		},
+		"load_heading": "스토리 불러오기",
+		"map_heading": "맵 가져오기",
+		"none": "저장한 스토리가 없습니다",
+		"no_maps": "저장한 맵이 없습니다",
+		"delete": "삭제",
+		"keys": "F 대화  ESC 책상으로",
+		"end": "끝",
+		"add_property": "+ 속성",
+		"property": {
+			"line": "대사",
+			"emotion": "표정",
+			"effect": "글자 효과",
+			"action": "동작",
+			"choices": "선택지"
+		},
+		"action_n": "동작 %d",
+		"empty": "속성 없음"
+	},
+	"dragon": {
+		"play": "재생",
+		"guards": "경비병",
+		"chain": "연계 %d / %d",
+		"hold": "길게 눌러 충전",
+		"release": "떼면 시전",
+		"keys": "R 초기화  TAB 편집  ESC 뒤로",
+		"title": "드래곤 테스트",
+		"subtitle": "경비병 %d   단 한 번의 시전",
+		"rewind": "되감기",
+		"one_cast": "한 번의 시전으로 %d 전원 처치",
+		"clear": "층 클리어   최고 기록 %d / %d",
+		"board": "드래곤 대시"
+	},
+	"jean": {
+		"title": "진 그레이 테스트",
+		"subtitle": "직접 들어가지 않고 다이아몬드를 훔치세요",
+		"body": "몸 %d / %d",
+		"take": "다이아몬드를 가져가세요",
+		"down": "다이아몬드를 다시 주우세요",
+		"carry": "내 몸에게 가져다주세요",
+		"home": "들고 구덩이로 돌아가세요",
+		"unseen": "들키지 않음",
+		"seen": "%d명에게 들킴",
+		"best": "%s  최고 기록 %s",
+		"stolen": "다이아몬드 탈취  %s",
+		"fell": "몸이 쓰러졌습니다",
+		"again": "다시",
+		"rock_out": "돌이 바닥에 있음",
+		"keys": "R 초기화  TAB 편집  %s 몬스터에서 나가기  ESC 뒤로",
+		"board": "사이킥 투척"
+	},
+	"light": {
+		"title": "조명 테스트",
+		"subtitle": "조명 사이를 걸어 보세요",
+		"behind": "뒤에 있는 랜턴",
+		"front": "앞에 있는 랜턴",
+		"fire": "모닥불과 벽난로",
+		"spot": "스포트라이트 (기존 방식)",
+		"time": "밝기  %s",
+		"times": {
+			"night": "밤",
+			"grove": "달빛",
+			"day": "낮"
+		},
+		"crosshair": "조준점  %s",
+		"held": {
+			"nothing": "없음",
+			"lantern": "랜턴",
+			"bulb": "스포트라이트",
+			"tube": "조명관"
+		},
+		"in_front": "%s, 앞",
+		"in_back": "%s, 뒤",
+		"count": "조명 %d개  그림자 %d개",
+		"keys": "T 밝기  C 조준점  L 앞/뒤  R 다시  ESC 뒤로"
+	},
+	"exit": {
+		"sign": "비상구",
+		"entry": "입구 관문",
+		"arbiter": "중재자의 관문",
+		"toll": "통행료 관문",
+		"crack": "벽의 틈"
+	},
+	"phone": {
+		"app": {
+			"gallery": "갤러리",
+			"camera": "카메라",
+			"alarm": "알람",
+			"settings": "설정"
+		},
+		"gallery": {
+			"empty": "아직 사진이 없습니다",
+			"count": "사진 %d장",
+			"delete": "삭제"
+		},
+		"camera": {
+			"snap": "촬영",
+			"saved": "저장됨"
+		},
+		"alarm": {
+			"pick": "알람을 맞추세요. 전화기가 있는 곳에서 울리고, 근처의 것들이 보러 옵니다.",
+			"set": "설정",
+			"stop": "정지",
+			"down": "바닥에 내려놓기",
+			"ringing": "울리는 중",
+			"lying": "바닥에 놓여 있음"
+		},
+		"hud": {
+			"alarm": "알람 %s",
+			"ringing": "울리는 중",
+			"down": "전화기를 바닥에 둠"
+		}
+	},
+	"heroes": {
+		"title": "캐릭터 선택",
+		"confirm": "결정",
+		"back": "뒤로",
+		"playing": "플레이 중",
+		"name": {
+			"dren_repus": "드렌 레푸스",
+			"legna_dennis": "레그나 데니스",
+			"reniart_lamina": "레니아르트 라미나",
+			"sett_eragic": "세트 에라직"
+		}
+	}
+}

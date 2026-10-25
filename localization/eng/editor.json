@@ -1,0 +1,68 @@
+{
+	"turn": "TURN",
+	"remove": "REMOVE",
+	"count": "x%d",
+	"dead": {
+		"title": "DEAD CODE",
+		"body": "These parts are wired in a ring with no way out. A flow that gets in goes round until its life runs out, and nothing comes of it."
+	},
+	"no_room_turn": "No room to turn %s there.",
+	"no_room_place": "No room for %s there.",
+	"none_left": "No %s left in the bag.",
+	"root_fixed": "%s is the weapon's own. Move it and turn it, but it stays on the board.",
+	"share": {
+		"uncodeable": "This board cannot be put into a code.",
+		"copy": "COPY",
+		"paste": "PASTE",
+		"copied": "Code copied — %d characters.",
+		"no_clipboard": "There is no clipboard here.",
+		"clipboard_empty": "There is no code on the clipboard.",
+		"no_board": "There is no board open to build onto.",
+		"wrong_size": "That build was laid out on a %dx%d board; this one is %dx%d.",
+		"short_of": "Short of %s — nothing has been spent.",
+		"built": "Built — %d parts on the board.",
+		"more_of": "%d more %s"
+	},
+	"preset": {
+		"on": "Preset %d is on the weapon."
+	},
+	"code_error": {
+		"mistyped": "That code does not check out — a character is wrong, its case is wrong, or two of them have swapped.",
+		"truncated": "That code stops in the middle of a board.",
+		"impossible": "That code does not describe a board that can be built.",
+		"has_zero": "There is a 0 in that. A code has no zero in it — the round character is the letter O, capital or small.",
+		"empty": "There is no code in that.",
+		"length": "No code is %d characters long — one has been missed out, or one added.",
+		"version": "That code is version %d; this game reads version %d.",
+		"unknown_part": "That code carries a part this version of the game does not have."
+	},
+	"payload": {
+		"no_form": "no form",
+		"damage": "dmg %.0f",
+		"size": "x%.1f size",
+		"duplicates": "x%d",
+		"stacked": "%s x%d",
+		"pierce": "pierce %d",
+		"homing": "homing",
+		"auto_aim": "auto-aims",
+		"knockback": "pushes",
+		"near": "and round it: %s",
+		"shatter": "x%.1f on chilled",
+		"mana_drain": "+%.0f mana a hit",
+		"health_drain": "heals %d%% of damage",
+		"stun": "stuns %.1fs",
+		"possess": "possesses %.0fs",
+		"heal": "heals %.0f",
+		"cleanse": "cleanses",
+		"hook": "pulls",
+		"anti_gravity": "weightless",
+		"bounce": "bounces %d",
+		"returns": "comes back",
+		"chain": "chains %d",
+		"summon_pet": "summons a pet",
+		"pet_offensive": "pet attacks",
+		"pet_kamikaze": "pet blows up",
+		"separator": ", ",
+		"then": "then"
+	}
+}

@@ -1,0 +1,104 @@
+{
+	"map": "moonlit_grove",
+	"mode": "frozen",
+	"name": "Old Tinker",
+	"sprite": "wizzard_m",
+	"player_name": "Knight",
+	"start": "1",
+	"nodes": {
+		"1": {
+			"at": [
+				40,
+				60
+			],
+			"speaker": "npc",
+			"text": "So the seal let somebody through after all.",
+			"emotion": "happy",
+			"actions": [
+				{
+					"who": "npc",
+					"do": "walk",
+					"to": "player"
+				}
+			],
+			"next": "2"
+		},
+		"2": {
+			"at": [
+				320,
+				60
+			],
+			"speaker": "player",
+			"text": "Through? I walked in the front.",
+			"next": "3"
+		},
+		"3": {
+			"at": [
+				600,
+				60
+			],
+			"speaker": "npc",
+			"text": "What would you like to know?",
+			"emotion": "thinking",
+			"choices": [
+				{
+					"text": "Who are you?",
+					"next": "4"
+				},
+				{
+					"text": "What is this place?",
+					"next": "5"
+				},
+				{
+					"text": "Nothing. Bye.",
+					"next": "6"
+				}
+			]
+		},
+		"4": {
+			"at": [
+				900,
+				20
+			],
+			"speaker": "npc",
+			"text": "I tinker. Mostly with things that explode.",
+			"emotion": "surprised",
+			"effect": "shake",
+			"actions": [
+				{
+					"who": "npc",
+					"do": "pose",
+					"pose": "hit"
+				}
+			],
+			"next": "3"
+		},
+		"5": {
+			"at": [
+				900,
+				180
+			],
+			"speaker": "npc",
+			"text": "A ruin, mostly. The lanterns are new; mind them, they swing.",
+			"actions": [
+				{
+					"who": "npc",
+					"do": "walk",
+					"to": "right",
+					"steps": 2
+				}
+			],
+			"next": "3"
+		},
+		"6": {
+			"at": [
+				900,
+				340
+			],
+			"speaker": "npc",
+			"text": "Go on, then. Break something.",
+			"emotion": "happy",
+			"effect": "wave"
+		}
+	}
+}

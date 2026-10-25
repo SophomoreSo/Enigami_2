@@ -1,0 +1,74 @@
+{
+	"heading": "은신처",
+	"scrap": "골드 %d",
+	"records": "레이드 %d · 탈출 %d · 사망 %d · 처치 %d",
+	"title": "타이틀",
+	"weapons": {
+		"heading": "무기 — 레이드당 최대 %d개",
+		"row": "%s%s%s",
+		"lost": "  (분실)",
+		"graph": "%s 위에 부품 %d개",
+		"build": "조립 >",
+		"leave": "내려놓기"
+	},
+	"facilities": {
+		"heading": "시설",
+		"row": "%s  lv%d",
+		"max": "최대",
+		"info": {
+			"workbench": {
+				"name": "작업대"
+			},
+			"vault": {
+				"name": "금고"
+			},
+			"forge": {
+				"name": "제련로"
+			},
+			"scrapper": {
+				"name": "분해기"
+			},
+			"medbay": {
+				"name": "의무실"
+			}
+		}
+	},
+	"stash": {
+		"heading": "보관함",
+		"forge": "제련 3>1 (25)",
+		"row": "%s x%d",
+		"scrap": "분해",
+		"empty": "보관된 것이 없습니다. 무엇이든 챙겨 오세요."
+	},
+	"footer": {
+		"warning": "가져가는 모든 것을 잃을 수 있습니다.",
+		"kit_waiting": "당신의 장비가 아직 그곳에 있습니다 (%d).",
+		"deploy": "출격 >"
+	},
+	"station": {
+		"weapons": "무기 거치대",
+		"shop": "상점",
+		"perks": "특성",
+		"gate": "관문",
+		"back": "방으로 돌아가기",
+		"arrow": "<"
+	},
+	"gate": {
+		"no_weapon": "금고에 그 무기가 없습니다"
+	},
+	"shop": {
+		"heading": "판매 중",
+		"price": "%d"
+	},
+	"theme": {
+		"heading": "은신처 테마",
+		"note": "시험용 메뉴: 하나씩 살펴보고 마음에 드는 테마를 고르세요.",
+		"look": {
+			"city": "네온 도시",
+			"keep": "고성",
+			"grove": "달빛 숲",
+			"orbit": "궤도 정거장",
+			"brass": "시계탑 테라스"
+		}
+	}
+}

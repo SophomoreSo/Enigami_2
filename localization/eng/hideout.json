@@ -1,0 +1,74 @@
+{
+	"heading": "HIDEOUT",
+	"scrap": "gold %d",
+	"records": "raids %d · escaped %d · lost %d · kills %d",
+	"title": "TITLE",
+	"weapons": {
+		"heading": "WEAPONS — up to %d a raid",
+		"row": "%s%s%s",
+		"lost": "  (lost)",
+		"graph": "on the %s: %d parts built",
+		"build": "BUILD >",
+		"leave": "PUT BACK"
+	},
+	"facilities": {
+		"heading": "FACILITIES",
+		"row": "%s  lv%d",
+		"max": "max",
+		"info": {
+			"workbench": {
+				"name": "Workbench"
+			},
+			"vault": {
+				"name": "Vault"
+			},
+			"forge": {
+				"name": "Forge"
+			},
+			"scrapper": {
+				"name": "Scrapper"
+			},
+			"medbay": {
+				"name": "Medbay"
+			}
+		}
+	},
+	"stash": {
+		"heading": "STASH",
+		"forge": "FORGE 3>1 (25)",
+		"row": "%s x%d",
+		"scrap": "scrap",
+		"empty": "Nothing stored. Bring something home."
+	},
+	"footer": {
+		"warning": "Everything you take can be lost.",
+		"kit_waiting": "Your kit is still down there (%d).",
+		"deploy": "DEPLOY >"
+	},
+	"station": {
+		"weapons": "WEAPON RACK",
+		"shop": "COUNTER",
+		"perks": "PERKS",
+		"gate": "THE GATE",
+		"back": "BACK TO THE ROOM",
+		"arrow": "<"
+	},
+	"gate": {
+		"no_weapon": "the vault has no such weapon"
+	},
+	"shop": {
+		"heading": "FOR SALE",
+		"price": "%d"
+	},
+	"theme": {
+		"heading": "HIDEOUT THEME",
+		"note": "A test menu: try each look, and keep the one you like.",
+		"look": {
+			"city": "NEON CITY",
+			"keep": "CASTLE KEEP",
+			"grove": "MOONLIT GROVE",
+			"orbit": "ORBITAL STATION",
+			"brass": "CLOCKWORK TERRACE"
+		}
+	}
+}

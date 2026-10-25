@@ -1,0 +1,7 @@
+# Tests whose failure is known, understood, and not the fault of whatever landed
+# last. A quarantined test still runs and still reports; it just does not fail
+# the build. One line per scene path, `#` for comments.
+#
+# Delete a line the moment its test goes green — a quarantine nobody removes is
+# just a test nobody reads.
+

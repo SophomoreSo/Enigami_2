@@ -1,0 +1,94 @@
+name: Set up Godot
+description: >
+  Put a pinned Godot editor build on PATH, and optionally its export templates.
+  Downloaded straight from the engine's own releases and cached, so there is no
+  third-party action between the repo and the binary it builds with.
+
+inputs:
+  version:
+    description: Engine version, e.g. 4.5.1
+    required: true
+  release:
+    description: Release suffix, e.g. stable
+    required: false
+    default: stable
+  templates:
+    description: Also install the export templates (~1GB download, cached)
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: What the Linux binary links against
+      # The official build has these as hard dependencies, not dlopen'd, so
+      # without them Godot does not fail to draw — it fails to start. Cheaper to
+      # install them in every Linux job than to debug it once in one of them.
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        set -euo pipefail
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq --no-install-recommends \
+          libx11-6 libxcursor1 libxinerama1 libxrandr2 libxi6 libxext6 \
+          libgl1 libglx-mesa0 libglu1-mesa libfontconfig1
+
+    - name: Restore Godot from cache
+      id: cache
+      uses: actions/cache@v6
+      with:
+        path: |
+          ~/godot-ci
+          ~/.local/share/godot/export_templates
+          ~/Library/Application Support/Godot/export_templates
+        key: godot-${{ runner.os }}-${{ inputs.version }}-${{ inputs.release }}-templates-${{ inputs.templates }}
+
+    - name: Download the editor
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        RELEASE: ${{ inputs.release }}
+      run: |
+        set -euo pipefail
+        base="https://github.com/godotengine/godot/releases/download/${VERSION}-${RELEASE}"
+        mkdir -p ~/godot-ci && cd "$(mktemp -d)"
+        if [ "$RUNNER_OS" = "macOS" ]; then
+          curl -fsSL -o godot.zip "${base}/Godot_v${VERSION}-${RELEASE}_macos.universal.zip"
+          unzip -q godot.zip
+          mv Godot.app ~/godot-ci/
+          ln -sf ~/godot-ci/Godot.app/Contents/MacOS/Godot ~/godot-ci/godot
+        else
+          curl -fsSL -o godot.zip "${base}/Godot_v${VERSION}-${RELEASE}_linux.x86_64.zip"
+          unzip -q godot.zip
+          mv "Godot_v${VERSION}-${RELEASE}_linux.x86_64" ~/godot-ci/godot
+        fi
+        chmod +x ~/godot-ci/godot
+
+    - name: Download the export templates
+      if: inputs.templates == 'true' && steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        RELEASE: ${{ inputs.release }}
+      run: |
+        set -euo pipefail
+        base="https://github.com/godotengine/godot/releases/download/${VERSION}-${RELEASE}"
+        cd "$(mktemp -d)"
+        curl -fsSL -o templates.tpz "${base}/Godot_v${VERSION}-${RELEASE}_export_templates.tpz"
+        unzip -q templates.tpz
+        # The engine looks for them under a directory named for the exact build.
+        if [ "$RUNNER_OS" = "macOS" ]; then
+          dest="$HOME/Library/Application Support/Godot/export_templates/${VERSION}.${RELEASE}"
+        else
+          dest="$HOME/.local/share/godot/export_templates/${VERSION}.${RELEASE}"
+        fi
+        mkdir -p "$dest"
+        mv templates/* "$dest/"
+
+    - name: Put it on PATH and check it runs
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "$HOME/godot-ci" >> "$GITHUB_PATH"
+        "$HOME/godot-ci/godot" --version

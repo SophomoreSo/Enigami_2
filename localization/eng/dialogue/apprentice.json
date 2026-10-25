@@ -1,0 +1,78 @@
+{
+	"name": "Apprentice",
+	"player_name": "Knight",
+	"rules": {
+		"hello": {
+			"text": "Oh! Somebody new. Come here, I'll show you some footwork."
+		},
+		"back": {
+			"text": "You're back!"
+		},
+		"intro": {
+			"text": "I'm meant to be sweeping. Want to learn some footwork instead?"
+		},
+		"intro_reply": {
+			"text": "Sweeping sounds safer."
+		},
+		"intro_more": {
+			"text": "Nothing in here is safe. That's the fun of it."
+		},
+		"resume": {
+			"text": "Where were we? Right, footwork."
+		},
+		"kit_nag": {
+			"text": "Your kit's still lying where you fell, you know. Same floor, same room."
+		},
+		"no_raids": {
+			"text": "You haven't even been down yet? The gate's in the hideout."
+		},
+		"bye_for_now": {
+			"text": "That's all I've got. Go and break something."
+		},
+		"teach_double": {
+			"text": "Jump, then jump again while you're still in the air."
+		},
+		"teach_wall": {
+			"text": "Now a wall. Jump at one, and jump again as you touch it."
+		},
+		"teach_dash": {
+			"text": "Last one: dash. Sideways only, mind. Never up."
+		},
+		"lessons_done": {
+			"text": "That's everything I know. The Tinker knows the rest."
+		},
+		"knew_it_all": {
+			"text": "You know all this already, don't you? Never mind me, then."
+		},
+		"nice_double": {
+			"text": "There you go! The air holds you once."
+		},
+		"nice_wall": {
+			"text": "Ha! Walls are only floors standing up."
+		},
+		"nice_dash": {
+			"text": "Quick! Too quick to hit, for a moment."
+		},
+		"show_off": {
+			"text": "Show-off."
+		},
+		"show_off_reply": {
+			"text": "Just stretching."
+		},
+		"winded": {
+			"text": "Out of breath? Four dashes to a full bar. Watch it under your health."
+		},
+		"parried": {
+			"text": "A parry! Where did you learn that?"
+		},
+		"ouch": {
+			"text": "Ouch! Keep moving, it helps."
+		},
+		"wait": {
+			"text": "Hey! I wasn't finished!"
+		},
+		"wait_again": {
+			"text": "Fine. I'll be here."
+		}
+	}
+}

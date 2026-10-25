@@ -1,0 +1,172 @@
+{
+	"PROJECTILE": {
+		"name": "PROJECTILE",
+		"desc": "Fires a bolt along the aim direction. The standard ranged form."
+	},
+	"SLASH": {
+		"name": "SLASH",
+		"desc": "An instant short arc at the aim direction. Fast, but reach is short."
+	},
+	"DASHSLASH": {
+		"name": "SWIFT STRIKE",
+		"desc": "Lunges along the aim direction, cutting everything on the path."
+	},
+	"HEADBUTT": {
+		"name": "PUNCH",
+		"desc": "A fist thrown a short way along the aim from where you stand, into the first enemy in the way, and no further. You do not move with it. It needs no weapon: it goes off with the weapon in hand or without it."
+	},
+	"FIRE": {
+		"name": "FIRE",
+		"desc": "Adds flame. Struck enemies burn for damage over time; a wet one is only dried."
+	},
+	"ICE": {
+		"name": "ICE",
+		"desc": "Adds frost. Struck enemies are slowed; a wet one freezes solid for a moment."
+	},
+	"WATER": {
+		"name": "WATER",
+		"desc": "Soaks what it strikes. A wet enemy freezes solid under ICE, and FIRE only dries it; water puts a burning enemy out."
+	},
+	"HEAL": {
+		"name": "HEAL",
+		"desc": "Heals what the attack strikes by 8 once the blow has landed, and 8 more for each one stacked. The blow still lands; one it kills is not healed. Turned round by INVERT, it is 8 more damage instead."
+	},
+	"DAMAGE": {
+		"name": "DAMAGE +",
+		"desc": "Raises damage, and each one stacked raises it by more than the last. Stable and simple, but interacts with little else."
+	},
+	"SIZE": {
+		"name": "SIZE x",
+		"desc": "Scales the attack by 1.6. Melee arcs widen and reach further. Stacks up to 3."
+	},
+	"SPEED": {
+		"name": "SPEED x",
+		"desc": "Bolts leave 1.5x faster. They also carry further before they fade, and are harder to dodge. Does nothing to any other attack. Stacks up to 4, and at 4 a bolt flies at laser speed."
+	},
+	"RANGE": {
+		"name": "RANGE x",
+		"desc": "Bolts carry 1.75x as far before they fade, and SWIFT STRIKE lunges 1.75x as far. Does nothing to any other attack. Stacks up to 3, which is the most range there is."
+	},
+	"SHATTER": {
+		"name": "SHATTER",
+		"desc": "Breaks the frost on an enemy slowed by it: the hit lands far harder, and the enemy thaws. Each one stacked breaks harder still. Worth nothing on its own — pair it with ICE, or with a board that lands twice."
+	},
+	"PIERCE": {
+		"name": "PIERCE",
+		"desc": "The attack passes through one enemy and carries on to the next. Each one stacked is one more enemy it passes through."
+	},
+	"HOMING": {
+		"name": "HOMING",
+		"desc": "Tracks the nearest enemy. Bolts curve and find their way round walls; melee forms re-aim themselves. Each one stacked turns a bolt tighter, so it holds a winding path it would otherwise fly wide of."
+	},
+	"KNOCKBACK": {
+		"name": "PUSH",
+		"desc": "Hits throw the enemy back the way the attack was going. Thrown hard into a wall, it cracks the wall and is hurt and stunned. Buys room, but can put it out of reach. Each one stacked throws harder."
+	},
+	"NEAR": {
+		"name": "NEAR",
+		"desc": "Every part after it reaches the enemies round the one the attack strikes too: FIRE burns them, STUN stuns them, DAMAGE hurts them. The blow itself lands on the enemy struck alone. Each one stacked reaches further."
+	},
+	"PULL": {
+		"name": "PULL",
+		"desc": "Hits drag the enemy toward whoever struck it, and it stops just short of them. Brings an enemy into reach, but brings it close. Each one stacked drags it from further off."
+	},
+	"MANA_DRAIN": {
+		"name": "MANA DRAIN",
+		"desc": "Every enemy this attack connects with gives mana back to the caster. What pays for the next charge is landing hits, not waiting. Each one stacked drains more."
+	},
+	"HEALTH_DRAIN": {
+		"name": "HEALTH DRAIN",
+		"desc": "Every enemy this attack hurts gives health back to the caster: a fifth of the damage dealt, and a fifth more for each one stacked. What keeps you standing is landing hits."
+	},
+	"STUN": {
+		"name": "STUN",
+		"desc": "Struck enemies are stunned: for a moment they stand where they are and cannot attack. Each one stacked holds them longer. Once it wears off, an enemy shrugs off the next stun for a while."
+	},
+	"POSSESS": {
+		"name": "POSSESS",
+		"desc": "Takes over the monster struck for 5 seconds, unharmed, longer for each one stacked. Your keys move it; it fights with its own attack, or your weapon once it takes it from your body, left behind and still hunted. Bosses resist it."
+	},
+	"AUTO_AIM": {
+		"name": "AUTO-AIM",
+		"desc": "Aims the attack at the nearest enemy, wherever you point: bolts go straight at it and SWIFT STRIKE lunges through it, as far as each reaches, and a swing turns to it. Each one stacked looks further for one."
+	},
+	"DUPLICATE": {
+		"name": "DUPLICATE x3",
+		"desc": "Produces the same result three times at full damage. Generates a lot of heat."
+	},
+	"OVERCLOCK": {
+		"name": "OVERCLOCK",
+		"desc": "Runs the whole board on a faster clock. Each one cuts the wait between casts by the same 5%; twelve bring it down to 40%, and it goes no lower. A flow goes through it without spending a tick."
+	},
+	"DELAY": {
+		"name": "DELAY",
+		"desc": "Makes every cast that passes through it wait longer before the next, and each one more adds as much again. It does nothing else: it turns a flow and leaves it as it was."
+	},
+	"TIME_DILATION": {
+		"name": "TIME DILATION",
+		"desc": "Slows the world and the board alike. Not a speed buff — a change in the pace of the fight."
+	},
+	"INVERT": {
+		"name": "INVERT",
+		"desc": "Turns the part right before it inside out: DAMAGE heals what it strikes and HEAL harms it, FIRE, ICE and STUN cleanse it, PUSH pulls and PULL pushes, and SIZE, SPEED and RANGE shrink. After anything else it does nothing."
+	},
+	"ANTI_GRAVITY": {
+		"name": "ANTI-GRAVITY",
+		"desc": "Bolts fly with no weight on them: a lobbed shot — the rock, the rune, a shuriken, a Lobber's — goes straight instead of arcing. One is all it takes."
+	},
+	"BOUNCE": {
+		"name": "BOUNCE",
+		"desc": "Bolts come back off walls and floors instead of ending there, once. Each one stacked is one more bounce. A thrown stone bounces with its throw still in it."
+	},
+	"RETURN": {
+		"name": "BOOMERANG",
+		"desc": "Bolts turn back toward you at the end of their range, or off a wall, and strike again on the way. The rock, the rune and a shuriken fly back into your hand. One is all it takes."
+	},
+	"CHAIN": {
+		"name": "CHAIN",
+		"desc": "On a hit, a fresh bolt leaves the enemy struck for the nearest other one, with the same numbers. Each one stacked is one more jump."
+	},
+	"SUMMON_PET": {
+		"name": "SUMMON PET",
+		"desc": "Summons a pet that follows you about. On its own it does nothing else. One at a time: a cast while it is there summons no other, but tells it again what it does."
+	},
+	"OFFENSIVE": {
+		"name": "OFFENSIVE",
+		"desc": "A pet summoned with it goes for the nearest enemy near you and strikes it with the attack's numbers. Each one stacked strikes more often. Does nothing without a SUMMON PET."
+	},
+	"KAMIKAZE": {
+		"name": "KAMIKAZE",
+		"desc": "A pet summoned with it flies at the nearest enemy near you and blows itself up against it: everything round it takes the attack's numbers, and the pet is gone. Each one stacked bursts wider. Does nothing without a SUMMON PET."
+	},
+	"BRIDGE": {
+		"name": "BRIDGE",
+		"desc": "Carries a flow one cell and does nothing else: it turns the flow and leaves it as it was. Steer a flow round to the way out with it, or walk a trigger's branch round a ring and back."
+	},
+	"ON_HIT": {
+		"name": "ON HIT",
+		"desc": "Runs the branch flow as a payload when this skill connects."
+	},
+	"ON_KILL": {
+		"name": "ON KILL",
+		"desc": "Runs the branch flow as a payload only when this skill kills."
+	},
+	"ON_PARRY": {
+		"name": "ON PARRY",
+		"desc": "Opens a brief guard window as the flow passes. Absorbing a hit there runs the branch flow."
+	},
+	"tag": {
+		"ranged": "ranged",
+		"melee": "melee",
+		"area": "area",
+		"mobility": "mobility",
+		"trigger": "trigger",
+		"utility": "utility"
+	},
+	"direction": {
+		"east": "east",
+		"south": "south",
+		"west": "west",
+		"north": "north"
+	}
+}

@@ -1,0 +1,77 @@
+{
+	"title": {
+		"start": "시작",
+		"sandbox": "연습장",
+		"map_maker": "맵 제작",
+		"story_maker": "스토리 제작",
+		"quit": "종료"
+	},
+	"save_slots": {
+		"heading": "저장 슬롯 선택",
+		"slot": "슬롯 %d",
+		"slot_empty": "비어 있음",
+		"slot_delete": "삭제할까요?",
+		"back": "뒤로"
+	},
+	"settings": {
+		"heading": "설정",
+		"music": "음악",
+		"sound": "효과음",
+		"language": "언어",
+		"back": "뒤로"
+	},
+	"general": {
+		"heading": "일반 설정",
+		"back": "뒤로"
+	},
+	"controls": {
+		"heading": "조작 설정",
+		"back": "뒤로"
+	},
+	"video": {
+		"screen": "화면",
+		"windowed": "창 모드",
+		"fullscreen": "전체 화면",
+		"shake": "화면 흔들림",
+		"icons": "아이콘 애니메이션",
+		"on": "켜짐",
+		"off": "꺼짐"
+	},
+	"pause": {
+		"heading": "일시정지",
+		"resume": "게임으로 돌아가기",
+		"title": "메인 메뉴",
+		"park": "메인 메뉴",
+		"abandon": "레이드 포기",
+		"arrow": "<"
+	},
+	"park": {
+		"heading": "메인 메뉴로 나갈까요?",
+		"note": "레이드는 떠난 자리에 그대로 남습니다.",
+		"back": "취소",
+		"confirm": "메인 메뉴"
+	},
+	"abandon": {
+		"heading": "레이드를 포기할까요?",
+		"note": "장비를 모두 잃습니다.",
+		"back": "취소",
+		"confirm": "레이드 포기"
+	},
+	"results": {
+		"won": "탈출 성공",
+		"lost": "레이드에서 사망",
+		"won_sub": "%s(으)로 빠져나와 전리품을 챙겼습니다.",
+		"lost_sub": "장비는 그대로 남았습니다. 가져오지 못한 것은 여전히 금고 안에 있습니다.",
+		"default_exit": "정문",
+		"weapon": "무기 %s",
+		"weapons": "무기 %s",
+		"scrap": "골드 %d",
+		"build_lost": "무기에 짜 넣었다가 잃은 것: %s",
+		"kit_waits": "모두 쓰러진 자리에 남아 있습니다. 다시 출격하면 같은 지형으로 들어갑니다.",
+		"recovered": "들고 나온 것: %s",
+		"components": "부품",
+		"none": "없음",
+		"haul": "%s x%d",
+		"back": "은신처로 돌아가기"
+	}
+}

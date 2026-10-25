@@ -1,0 +1,41 @@
+{
+	"TOUGHNESS": {
+		"name": "TOUGHNESS",
+		"desc": "More health: 10 more for every step."
+	},
+	"ENDURANCE": {
+		"name": "ENDURANCE",
+		"desc": "More stamina: every step is one more dash before the bar runs dry."
+	},
+	"SWIFTNESS": {
+		"name": "SWIFTNESS",
+		"desc": "Runs and sprints faster: every step adds 6%."
+	},
+	"FOCUS": {
+		"name": "FOCUS",
+		"desc": "More mana to charge a cast with: 20 more for every step."
+	},
+	"QUICK_CHARGE": {
+		"name": "QUICK CHARGE",
+		"desc": "Holding the cast button charges faster: every step adds 20%. The mana goes as fast as the charge builds."
+	},
+	"DEEP_CHARGE": {
+		"name": "DEEP CHARGE",
+		"desc": "A hold charges further before it is full: every step adds a quarter more, and costs the mana it buys."
+	},
+	"QUICK_HANDS": {
+		"name": "QUICK HANDS",
+		"desc": "A shorter wait between casts: every step takes off 6%."
+	},
+	"SCAVENGER": {
+		"name": "SCAVENGER",
+		"desc": "More gold from everything found in a raid: every step adds 15%."
+	},
+	"page": {
+		"row": "%s %d/%d",
+		"all": "ALL BOUGHT",
+		"on": "ON",
+		"off": "OFF",
+		"trial": "FREE IN THE SANDBOX"
+	}
+}

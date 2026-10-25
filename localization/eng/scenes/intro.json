@@ -1,0 +1,38 @@
+{
+	"cast": {
+		"you": "Knight",
+		"tinker": "Old Tinker"
+	},
+	"beats": {
+		"0": {
+			"text": "The seal held for a thousand years."
+		},
+		"1": {
+			"text": "It held because nothing on the far side had ever thought to knock."
+		},
+		"3": {
+			"text": "Someone has now."
+		},
+		"5": {
+			"text": "You're late. The kettle's been through two wars."
+		},
+		"6": {
+			"text": "Every skill you'll ever carry is a circuit. Parts, wire, and a way out."
+		},
+		"7": {
+			"text": "And if I wire it wrong?"
+		},
+		"8": {
+			"text": "Then it does something. Rarely the something you drew."
+		},
+		"10": {
+			"text": "Bench is yours. Break whatever you like — nothing in here stays broken."
+		},
+		"11": {
+			"text": "The seal is still holding."
+		},
+		"12": {
+			"text": "It has not been asked a question in a thousand years."
+		}
+	}
+}

@@ -1,0 +1,77 @@
+{
+	"title": {
+		"start": "START",
+		"sandbox": "SANDBOX",
+		"map_maker": "MAP CREATOR",
+		"story_maker": "STORY MAKER",
+		"quit": "QUIT"
+	},
+	"save_slots": {
+		"heading": "SELECT SAVE SLOT",
+		"slot": "SLOT %d",
+		"slot_empty": "EMPTY",
+		"slot_delete": "DELETE?",
+		"back": "BACK"
+	},
+	"settings": {
+		"heading": "SETTINGS",
+		"music": "Music",
+		"sound": "Sound",
+		"language": "Language",
+		"back": "BACK"
+	},
+	"general": {
+		"heading": "GENERAL SETTINGS",
+		"back": "BACK"
+	},
+	"controls": {
+		"heading": "CONTROL SETTINGS",
+		"back": "BACK"
+	},
+	"video": {
+		"screen": "Screen",
+		"windowed": "WINDOWED",
+		"fullscreen": "FULL SCREEN",
+		"shake": "Camera shake",
+		"icons": "Icon animation",
+		"on": "ON",
+		"off": "OFF"
+	},
+	"pause": {
+		"heading": "PAUSED",
+		"resume": "BACK TO GAME",
+		"title": "MAIN MENU",
+		"park": "MAIN MENU",
+		"abandon": "ABANDON RAID",
+		"arrow": "<"
+	},
+	"park": {
+		"heading": "MAIN MENU?",
+		"note": "The raid is kept where you left it.",
+		"back": "CANCEL",
+		"confirm": "MAIN MENU"
+	},
+	"abandon": {
+		"heading": "ABANDON RAID?",
+		"note": "You will forfeit the kit.",
+		"back": "CANCEL",
+		"confirm": "ABANDON RAID"
+	},
+	"results": {
+		"won": "EXTRACTED",
+		"lost": "LOST IN THE RAID",
+		"won_sub": "You carried it home through %s.",
+		"lost_sub": "The kit stayed behind. What you never took is still in the vault.",
+		"default_exit": "the gate",
+		"weapon": "weapon %s",
+		"weapons": "weapons %s",
+		"scrap": "gold %d",
+		"build_lost": "built onto it and lost: %s",
+		"kit_waits": "It is all lying where you fell. Deploy again and the floor is the one you know.",
+		"recovered": "carried back out: %s",
+		"components": "COMPONENTS",
+		"none": "none",
+		"haul": "%s x%d",
+		"back": "BACK TO THE HIDEOUT"
+	}
+}
