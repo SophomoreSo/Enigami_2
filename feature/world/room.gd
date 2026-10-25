@@ -10,7 +10,10 @@ extends Node2D
 ## against it, where the floor puts it (`origin_of`), and the way runs on
 ## through the seam (`neighbours`). There is no up and no down in a room: a
 ## wall is walked round, and a thing on the floor is at the point on the floor
-## it stands on.
+## it stands on. A pit is a hole in the floor (`pits`): a body that walks into
+## one falls, and is stood back on the floor it left (`Player`); a monster
+## will not walk into one, since to it a pit is as solid as a wall
+## (`PIT_LAYER`); a dash carries the player over, and a bolt flies over.
 ##
 ## Everything in the room — its cells, its records, what it puts down — is in
 ## the room's own coordinates; what is handed to a body outside it is in the
@@ -46,6 +49,11 @@ const DOOR_COLS := [19, 20, 21]
 ## How far either side of a doorway's mouth nothing is put down when a room
 ## is filled — no box, no ground to dig, no monster — so the way in is clear.
 const DOOR_CLEAR := 3
+## The collision layer the pits stand on, and its bit: a monster that walks
+## has it in its mask and is stopped at a pit's edge; the player and anything
+## that flies do not.
+const PIT_LAYER := 7
+const PIT_BIT := 1 << (PIT_LAYER - 1)
 
 ## How many cells across and down this room is. Every room a raid builds is
 ## `W` by `H`, one screen; a room laid by hand (`HandLaidRoom`) is as wide as
@@ -53,12 +61,17 @@ const DOOR_CLEAR := 3
 var cols: int = W
 var rows: int = H
 var solid: PackedByteArray = PackedByteArray()
+## The pits, a cell each, the grid `solid` is: a pit is an open cell with no
+## floor in it.
+var pits: PackedByteArray = PackedByteArray()
 ## dir -> true, a doorway in that wall: any of the four.
 var doors: Dictionary = {}
 var coord: Vector2i = Vector2i.ZERO
 var data: Dictionary = {}           ## live room record owned by RaidMap
 var rng := RandomNumberGenerator.new()
 var body: StaticBody2D
+## The pits' edges, for the monsters that walk (`PIT_LAYER`).
+var pit_body: StaticBody2D
 var player: Player = null
 var danger: int = 1
 ## The rooms stood up beside this one, by side (`Raid`): a query that falls
@@ -130,6 +143,24 @@ func is_solid_at(gp: Vector2) -> bool:
 	if n != null:
 		return n.is_solid_at(gp)
 	return is_solid(int(floor(l.x / CELL)), int(floor(l.y / CELL)))
+
+## Whether cell (x, y) is a pit: open, with no floor in it.
+func is_pit(x: int, y: int) -> bool:
+	if x < 0 or y < 0 or x >= cols or y >= rows or pits.size() != solid.size():
+		return false
+	return pits[_idx(x, y)] == 1
+
+## Whether the world point `gp` is over a pit — here, or in the room beside.
+func is_pit_at(gp: Vector2) -> bool:
+	var l := to_local(gp)
+	var n := _beside(l)
+	if n != null:
+		return n.is_pit_at(gp)
+	return is_pit(int(floor(l.x / CELL)), int(floor(l.y / CELL)))
+
+## Whether a body stands on floor at the world point `gp`: open, and no pit.
+func is_floor_at(gp: Vector2) -> bool:
+	return not is_solid_at(gp) and not is_pit_at(gp)
 
 ## Whether the room's own point `l` is in rock — here, or in the room beside.
 func _solid_local(l: Vector2) -> bool:
@@ -281,12 +312,15 @@ func clamp_dash(from: Vector2, to: Vector2) -> Vector2:
 ## --- generation -------------------------------------------------------------
 ## A plain room, cut from the rock: a wall a cell thick round the floor, a
 ## doorway in it on each side a room stands beyond (`doors`), and a few
-## blocks of rock standing on the floor to fight round — unless the record
-## asks for a flat room. The bench does: it is somewhere to stand and try
-## things, and a pillar through the middle of it is scenery nobody can use.
+## blocks of rock standing on the floor to fight round, and now and then a
+## pit in it — unless the record asks for a flat room. The bench does: it is
+## somewhere to stand and try things, and a pillar through the middle of it is
+## scenery nobody can use.
 func _generate() -> void:
 	solid.resize(W * H)
 	solid.fill(0)
+	pits.resize(W * H)
+	pits.fill(0)
 	for x in W:
 		for y in H:
 			_set_cell(x, y, 1 if x == 0 or y == 0 or x == W - 1 or y == H - 1 else 0)
@@ -318,6 +352,16 @@ func _generate() -> void:
 			for x in range(px, px + wide):
 				for y in range(py, py + tall):
 					_set_cell(x, y, 1)
+		# A pit or two, two cells each way, in the open.
+		for i in rng.randi_range(0, 2):
+			var px := rng.randi_range(4, W - 7)
+			var py := rng.randi_range(4, H - 7)
+			if _by_a_door(px, py) or _by_a_door(px + 1, py + 1):
+				continue
+			for x in range(px, px + 2):
+				for y in range(py, py + 2):
+					if not is_solid(x, y):
+						pits[_idx(x, y)] = 1
 
 	# An exit must always be reachable: clear a pocket around it.
 	if not extraction.is_empty():
@@ -329,21 +373,33 @@ func _generate() -> void:
 			for y in range(ey - 3, ey + 4):
 				if x > 0 and x < W - 1 and y > 0 and y < H - 1:
 					_set_cell(x, y, 0)
+					pits[_idx(x, y)] = 0
 
 func _build_collision() -> void:
 	body = StaticBody2D.new()
 	body.collision_layer = 1
 	body.collision_mask = 0
 	add_child(body)
-	# Merge each row's solid cells into runs, so a room is a handful of shapes.
+	_shapes(body, is_solid)
+	# The pits, on their own layer: a wall to a monster that walks, and
+	# nothing to the player, who falls in.
+	pit_body = StaticBody2D.new()
+	pit_body.collision_layer = PIT_BIT
+	pit_body.collision_mask = 0
+	add_child(pit_body)
+	_shapes(pit_body, is_pit)
+
+## The cells `held` answers for, as collision shapes on `on`: each row's run
+## of them merged into one, so a room is a handful of shapes.
+func _shapes(on: StaticBody2D, held: Callable) -> void:
 	for y in rows:
 		var x := 0
 		while x < cols:
-			if not is_solid(x, y):
+			if not held.call(x, y):
 				x += 1
 				continue
 			var start := x
-			while x < cols and is_solid(x, y):
+			while x < cols and held.call(x, y):
 				x += 1
 			var run := x - start
 			var shape := CollisionShape2D.new()
@@ -351,7 +407,7 @@ func _build_collision() -> void:
 			rect.size = Vector2(run * CELL, CELL)
 			shape.shape = rect
 			shape.position = Vector2(start * CELL + run * CELL * 0.5, y * CELL + CELL * 0.5)
-			body.add_child(shape)
+			on.add_child(shape)
 
 ## --- contents ---------------------------------------------------------------
 func _spawn_contents() -> void:
@@ -429,13 +485,13 @@ func _roll_loot() -> Array:
 			out.append({"id": cid, "pos": [p.x, p.y]})
 	return out
 
-## An open cell to put something down in: in from the walls, open, and clear
+## An open cell to put something down in: in from the walls, floor, and clear
 ## of every doorway.
 func _random_open_point() -> Vector2:
 	for attempt in 60:
 		var x := rng.randi_range(2, cols - 3)
 		var y := rng.randi_range(2, rows - 3)
-		if not is_solid(x, y) and not _by_a_door(x, y):
+		if not is_solid(x, y) and not is_pit(x, y) and not _by_a_door(x, y):
 			return cell_center(x, y)
 	@warning_ignore("integer_division")
 	return cell_center(int(cols / 2), int(rows / 2))
@@ -466,7 +522,7 @@ func _spawn_enemy(e: Dictionary) -> Enemy:
 	n.position = Vector2(float(e["pos"][0]), float(e["pos"][1]))
 	n.room = self
 	n.collision_layer = 4
-	n.collision_mask = 1
+	n.collision_mask = 1 | (0 if n.ai() == "flyer" else PIT_BIT)
 	n.set_meta("record", e)
 	add_child(n)
 	# After the node is in the tree, because `Actor._ready` fills the bar: a
@@ -755,11 +811,11 @@ func standing_near(at: Vector2) -> Vector2:
 					return cell_center(c.x, c.y)
 	return at
 
-## Room to stand: the cell open, and in from the edge.
+## Room to stand: the cell floor, and in from the edge.
 func _standable(c: Vector2i) -> bool:
 	if c.x < 1 or c.x >= cols - 1 or c.y < 1 or c.y >= rows - 1:
 		return false
-	return not is_solid(c.x, c.y)
+	return not is_solid(c.x, c.y) and not is_pit(c.x, c.y)
 
 func extraction_rect() -> Rect2:
 	if extraction.is_empty():

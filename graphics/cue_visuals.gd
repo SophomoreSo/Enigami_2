@@ -77,6 +77,10 @@ func _on_cue(cue: StringName, d: Dictionary) -> void:
 			# from. The body is drawn at its feet, so the dust is at `pos`.
 			var way: Vector2 = d.get("dir", Vector2.DOWN)
 			Fx.burst(pos - way * 6.0, Style.FOOT_DUST, 4, 70.0)
+		&"fell":
+			# Down a pit: dust up off its edge, and the screen jolts.
+			Fx.burst(pos, Style.WALL_DUST, 6, 80.0)
+			Fx.shake(5.0)
 		&"refused":
 			# The rule names what refused the press, and the word for it is the
 			# picture's: WINDED, in the language being played. A weapon's

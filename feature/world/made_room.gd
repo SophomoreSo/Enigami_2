@@ -16,7 +16,8 @@ extends HandLaidRoom
 ##             A cell of it is open floor, or a wall (`GROUND`, by the kind of
 ##             wall it is), which is solid whatever kind it is, or magic stone
 ##             (`MAGIC`), which is a wall while magic is on and nothing while
-##             it is off; or what stands on the floor in it — `P` where the
+##             it is off, or a pit (`PIT`), a hole in the floor a body falls
+##             into; or what stands on the floor in it — `P` where the
 ##             player starts, `T` the room's treasure box, `x` ground worth
 ##             digging, `_` a bench, and a letter of `MONSTERS` a monster's
 ##             post. Everything stands on the middle of its cell.
@@ -55,6 +56,8 @@ const GROUND := {"#": "stone", "%": "earth", "|": "bark", "=": "wood", "*": "lea
 ## nothing at all while it is off. The one kind of wall that is not in
 ## `GROUND`, since `GROUND` is what is always there.
 const MAGIC := "~"
+## A pit: a hole in the floor (`Room.pits`).
+const PIT := "O"
 ## A monster's post, by the letter that marks it.
 const MONSTERS := {
 	"c": "CRAWLER", "s": "SENTRY", "l": "LOBBER", "h": "HOPPER", "d": "DRIFTER",
@@ -131,10 +134,11 @@ static func creatures() -> PackedStringArray:
 	return out
 
 ## Everything else that can be put in a cell of the plan that is not a wall, in
-## the order the map creator offers it under THINGS: the box, the ground to dig,
-## a bench, and the ways out.
+## the order the map creator offers it under THINGS: a pit, the box, the ground
+## to dig, a bench, and the ways out.
 static func things() -> PackedStringArray:
 	var out := PackedStringArray()
+	out.append(PIT)
 	out.append(BOX)
 	out.append(DIG)
 	out.append(BENCH)
@@ -146,16 +150,21 @@ static func things() -> PackedStringArray:
 static func monster_of(mark: String) -> String:
 	return String(MONSTERS.get(mark, ""))
 
-## Solid wherever the plan has a wall of any kind, and off the end of a row.
+## Solid wherever the plan has a wall of any kind, and off the end of a row;
+## a pit wherever it has one.
 func _generate() -> void:
 	_measure()
 	solid.resize(cols * rows)
 	solid.fill(0)
+	pits.resize(cols * rows)
+	pits.fill(0)
 	for y in rows:
 		var row := plan[y] if y < plan.size() else ""
 		for x in cols:
 			if x >= row.length() or is_ground(row[x]):
 				solid[_idx(x, y)] = 1
+			elif row[x] == PIT:
+				pits[_idx(x, y)] = 1
 
 func _ready() -> void:
 	super._ready()
@@ -171,9 +180,10 @@ func _on_magic(_on: bool) -> void:
 	if solid.is_empty():
 		return
 	_generate()
-	if body != null and is_instance_valid(body):
-		body.collision_layer = 0
-		body.queue_free()
+	for b in [body, pit_body]:
+		if b != null and is_instance_valid(b):
+			b.collision_layer = 0
+			b.queue_free()
 	_build_collision()
 	_paths = null
 	ground_changed.emit()
@@ -229,7 +239,7 @@ func spawn_point() -> Vector2:
 	var best := Vector2i(-1, -1)
 	for y in rows:
 		for x in cols:
-			if is_solid(x, y):
+			if is_solid(x, y) or is_pit(x, y):
 				continue
 			if best.x < 0 or Vector2(x, y).distance_squared_to(middle) < Vector2(best).distance_squared_to(middle):
 				best = Vector2i(x, y)

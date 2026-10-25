@@ -70,9 +70,12 @@ func _build_sprite() -> void:
 ## atlas's characters have the three (`ActorView.play`), and a dash out of
 ## those is the run, quickened.
 func _animate() -> void:
+	_show_fall()
 	if player.forced_anim != "" and has_anim(player.forced_anim):
 		# A pose a story's line holds them in, over whatever the body is doing.
 		play(player.forced_anim)
+	elif player.falling():
+		play("hit", 1.0, 0)
 	elif flash > 0.55:
 		# The recoil pose, held for the front of the flash.
 		play("hit", 1.0, 0)
@@ -93,6 +96,25 @@ func _animate() -> void:
 		play("idle")
 	_update_weapon()
 
+## The drop into a pit (`Player.fell`): for the first half of the fall the
+## sprite is drawn over the pit, shrinking into it; for the second it comes
+## back up on the body, where it was stood again.
+func _show_fall() -> void:
+	if not player.falling():
+		if sprite.scale != Vector2.ONE * Sprites.PIXEL_SCALE:
+			sprite.scale = Vector2.ONE * Sprites.PIXEL_SCALE
+			sprite.position.x = 0.0
+		return
+	var t := 1.0 - player.fell / Player.FALL_TIME
+	var s := Sprites.PIXEL_SCALE
+	if t < 0.5:
+		var into := to_local(player.fell_at)
+		sprite.position = Vector2(into.x, _stand_y + into.y)
+		sprite.scale = Vector2.ONE * s * (1.0 - t * 1.6)
+	else:
+		sprite.position.x = 0.0
+		sprite.scale = Vector2.ONE * s * clampf((t - 0.5) * 2.0, 0.2, 1.0)
+
 func _update_weapon() -> void:
 	if weapon_sprite == null:
 		return
@@ -109,7 +131,7 @@ func _update_weapon() -> void:
 	# dimmed — through the sprite's shader, which draws it in the skin's own
 	# colours and so takes no modulate — and holds nothing once the monster
 	# has the weapon.
-	var lit := player.invuln <= 0.0 or int(player.invuln * 24.0) % 2 == 0
+	var lit := player.invuln <= 0.0 or int(player.invuln * 24.0) % 2 == 0 or player.falling()
 	tint = Style.POSSESS_BODY if player.vessel() != player else Color.WHITE
 	sprite.self_modulate.a = 1.0 if lit else 0.35
 	weapon_sprite.self_modulate.a = 0.0 if player.weapon_hands() != player else sprite.self_modulate.a

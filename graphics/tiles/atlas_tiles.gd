@@ -28,6 +28,8 @@ const WALL_FRONT_RIGHT := "wall_right"
 const WALL_TOP := "wall_top_mid"
 const WALL_TOP_LEFT := "wall_top_left"
 const WALL_TOP_RIGHT := "wall_top_right"
+## A pit: the hole in the floor.
+const PIT := "hole"
 ## Every tile the set holds, by its name in the atlas: the floors, the walls,
 ## and a few more a room may put on them.
 const TILES := ["floor_1", "floor_2", "floor_3", "floor_4", "floor_5", "floor_6", "floor_7", "floor_8",

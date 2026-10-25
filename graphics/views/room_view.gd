@@ -1,8 +1,8 @@
 class_name RoomView
 extends Node2D
 
-## A room, drawn from above: its floor, its walls, whatever exit it holds, and
-## the foliage growing on its floor.
+## A room, drawn from above: its floor, its walls, the pits in the floor,
+## whatever exit it holds, and the foliage growing on its floor.
 ##
 ## The floor and the walls are tiles cut from the atlas (`AtlasTiles`), on two
 ## layers: the floor under everything, and the walls sorted among the bodies by
@@ -93,6 +93,9 @@ func _lay_tiles() -> void:
 	for y in range(-out.y, room.rows + out.y):
 		for x in range(-out.x, room.cols + out.x):
 			var cell := Vector2i(x, y)
+			if room.is_pit(x, y):
+				_floor.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(AtlasTiles.PIT))
+				continue
 			if not _rock(x, y):
 				_floor.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(AtlasTiles.floor_at(x, y, salt)))
 				continue
@@ -158,7 +161,7 @@ func _ground() -> Dictionary:
 	var out := {}
 	for y in range(1, room.rows - 1):
 		for x in range(1, room.cols - 1):
-			if not room.is_solid(x, y) and not room._by_a_door(x, y):
+			if not room.is_solid(x, y) and not room.is_pit(x, y) and not room._by_a_door(x, y):
 				out[Vector2i(x, y)] = true
 	return out
 

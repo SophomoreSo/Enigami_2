@@ -768,6 +768,7 @@ down are nearer the eye.
 | `#` `%` `\|` `=` `*` | A wall: stone, earth, bark, planks, leaves. Every kind is as solid as the next; the kind is how it looks. In `rock` every kind is the rock. |
 | `o` `@` | Glass, in every tileset and as solid: clear glass, and a mirror. |
 | `~` | Magic stone: a wall while magic is on, and nothing while it is off. |
+| `O` | A pit: a hole in the floor. A body that walks into one falls, loses a little health and is stood back where it was; a dash carries it over; a monster that walks will not step in. |
 | `P` | Where the player starts. One a map. With none, the open floor nearest the middle. |
 | `T` | The room's treasure box, standing on its cell. One a map. |
 | `x` | Ground worth digging. |

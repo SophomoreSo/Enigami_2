@@ -146,7 +146,7 @@ func _spawn(kind: String, danger: int, at: Vector2) -> void:
 	e.position = at
 	e.room = room
 	e.collision_layer = 4
-	e.collision_mask = 1
+	e.collision_mask = 1 | (0 if e.ai() == "flyer" else Room.PIT_BIT)
 	e.damaged.connect(_on_damage)
 	add_child(e)
 

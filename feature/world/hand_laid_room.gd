@@ -29,6 +29,8 @@ func _generate() -> void:
 	_measure()
 	solid.resize(cols * rows)
 	solid.fill(0)
+	pits.resize(cols * rows)
+	pits.fill(0)
 	for y in rows:
 		for x in cols:
 			_set_cell(x, y, 1 if mark_at(x, y) == "#" else 0)

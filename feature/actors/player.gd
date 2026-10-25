@@ -44,6 +44,10 @@ extends Actor
 ## A bench (`Bench`) is somewhere to sit: interact at one sits the body down on
 ## it, and it stays sat until it is asked to do anything else (`sit`).
 ##
+## A pit in the room's floor (`Room.pits`) is fallen into: the body walks over
+## its edge, drops, loses a little health, and is stood back on the floor it
+## left, held for a moment (`_mind_pits`). A dash carries it over.
+##
 ## A hit carrying POSSESS puts the player's hands into the monster it strikes
 ## (`possess`). The body stays where it was, standing still, and the monsters go
 ## on hunting it — it dies, and the raid is lost. The input line drives the
@@ -137,6 +141,12 @@ const STICK_AIM_REACH := 2000.0
 ## How far the right stick has to be pushed before it aims at all. Past it, how
 ## much further says how far the attack reaches (`reach_of`).
 const STICK_DEAD := 0.35
+
+## A fall into a pit: what it costs in health, how long the body is held
+## before it stands again, and the grace after it.
+const PIT_DAMAGE := 8.0
+const FALL_TIME := 0.6
+const FALL_GRACE := 0.5
 
 ## Stamina is what a dash spends. The dash keeps its short cooldown, which is
 ## what makes chaining feel responsive; stamina is the separate question of how
@@ -247,6 +257,14 @@ var _sat_holding: bool = false
 var _dash_time: float = 0.0
 var _dash_cd: float = 0.0
 var _dash_dir: Vector2 = Vector2.DOWN
+## How much longer the body is held after a fall, and where it fell: the pit
+## it dropped into, for the picture to show it drop there.
+var fell: float = 0.0
+var fell_at: Vector2 = Vector2.ZERO
+## The last place the body stood on floor, which is where it is stood again
+## after a fall.
+var _footing: Vector2 = Vector2.ZERO
+var _held_by_fall := HandsOff.new()
 var stamina: float = MAX_STAMINA
 var _stamina_pause: float = 0.0
 ## The player's own numbers with what the profile adds to them
@@ -1001,6 +1019,44 @@ func _physics_process(delta: float) -> void:
 	# The state that just ran set `velocity` from the controls; a knockback is
 	# not something the player asked for, so it moves them on its own.
 	apply_shove(delta)
+	_mind_pits(delta)
+
+## A frame on the floor: where the body last stood on floor, and whether it
+## has walked over a pit's edge — not in a dash, which carries it over, and
+## not while it is already falling — which drops it, costs it, and stands it
+## back where it last stood.
+func _mind_pits(delta: float) -> void:
+	if fell > 0.0:
+		fell -= delta
+		if fell <= 0.0:
+			fell = 0.0
+			input.remove(_held_by_fall)
+		return
+	if room == null or not is_instance_valid(room) or not room.has_method("is_pit_at"):
+		return
+	if room.is_pit_at(global_position):
+		if not is_dashing():
+			_fall_in()
+		return
+	if not room.is_solid_at(global_position):
+		_footing = global_position
+
+## Into the pit: the fall's damage, which gets through whatever grace was
+## running, the body back on its footing, held for the fall, and a moment's
+## grace after it.
+func _fall_in() -> void:
+	fell_at = global_position
+	fell = FALL_TIME
+	stand_up()
+	input.add(_held_by_fall)
+	_dash_time = 0.0
+	velocity = Vector2.ZERO
+	Cues.at(&"fell", fell_at, {"team": team})
+	apply_damage(PIT_DAMAGE, [], null, false)
+	if dead:
+		return
+	global_position = _footing
+	invuln = maxf(invuln, FALL_TIME + FALL_GRACE)
 
 func _change_state(new_state: FSMNode) -> void:
 	if debug_mode:
@@ -1133,6 +1189,10 @@ func seated() -> bool:
 ## --- read by the view -------------------------------------------------------
 func is_dashing() -> bool:
 	return _dash_time > 0.0
+
+## Whether the body is down a pit, between falling in and standing again.
+func falling() -> bool:
+	return fell > 0.0
 
 ## Whether the body is walking: a way is held, and it is not sat down.
 func is_walking() -> bool:
