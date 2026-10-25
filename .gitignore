@@ -1,0 +1,10 @@
+# Godot
+.godot/
+*.import.tmp
+
+# Test runs
+.test-home/
+.test-logs/
+
+# macOS
+.DS_Store
