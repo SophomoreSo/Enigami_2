@@ -13,12 +13,11 @@ nothing. Run it after an edit.
 
 ```json
 {
-	"floor": 420,
 	"defaults": {"speed": 34, "voice": "low"},
 	"marks": {
-		"door":   [90, 420],
+		"door":   [90, 440],
 		"middle": [330, 420],
-		"bench":  [520, 420]
+		"bench":  [520, 400]
 	},
 	"cast": {
 		"you":    {"name": "Knight", "sprite": "player", "at": "door"},
@@ -34,8 +33,7 @@ nothing. Run it after an edit.
 
 | Key | Meaning |
 |---|---|
-| `floor` | The y the stage floor sits at. Everyone stands on it. Default 420. |
-| `marks` | Named places, `[x, y]`. Anywhere a direction names a place it can use one of these instead of writing the numbers out. |
+| `marks` | Named places, `[x, y]`: points on the floor, which is seen from above — further down the screen is nearer the front of the stage. Anywhere a direction names a place it can use one of these instead of writing the numbers out. A scene of its own lays a floor of flagstones round the middle of them, with a wall along its far side. |
 | `cast` | Everyone who can appear, by the name the directions call them. |
 | `defaults` | Keys every beat gets unless it sets them itself. Any beat key can go here. |
 | `beats` | The scene, played top to bottom. |
@@ -47,7 +45,7 @@ nothing. Run it after an edit.
 | `name` | The name on the tab when they speak. Defaults to their key. |
 | `sprite` | Their character: one from the sprite atlas — `knight_m`, `wizzard_m`, `elf_f`… — or the game's own, `player`. An unknown one draws as the bystander fallback. |
 | `at` | The mark they start on. **Leave it out and they start off stage**, waiting for an `enter`. |
-| `facing` | `left` · `right`. Which way they start. Default `right`. |
+| `facing` | `left` · `right` · `up` · `down`. Which way they start. Default `right`. |
 
 ## A beat
 
@@ -80,11 +78,11 @@ about, so `{"move": "you", "to": "bench"}` reads as "move you to bench".
 
 | Direction | Keys | What it does |
 |---|---|---|
-| `move` | `to` (a place), or `near` (a cast name) with `gap` (px short of them), or `by` (px along, left for less than nothing); `speed` (px/s, default 70) | Walks them there along the floor, facing the way they go. The beat waits until they arrive. |
+| `move` | `to` (a place), or `near` (a cast name) with `gap` (px short of them, on the side they come from), or `by` (px across, left for less than nothing — or `[x, y]`, across and down); `speed` (px/s, default 70) | Walks them there across the floor, any way, facing the way they go. The beat waits until they arrive. |
 | `place` | `at` (a place) | Puts them there at once, no walking. |
 | `enter` | `at` (a place), and optionally `to` and `speed` | Brings someone on stage at `at`. With `to` they walk on from there. |
 | `exit` | — | Takes them off stage. They stop being drawn. |
-| `face` | `dir`: `left` · `right`, or `toward` (a cast name) | Turns them. |
+| `face` | `dir`: `left` · `right` · `up` · `down`, or `toward` (a cast name) | Turns them. |
 | `anim` | `play`: `idle` · `run` · `hit` | Holds them in an animation until something else is asked for. `""` hands them back to walking and standing on their own. |
 | `wait` | seconds, as the value | Holds the beat open this long. |
 | `sfx` | a sound id, as the value | Plays it once. |
@@ -122,7 +120,7 @@ which is usually right; give it a `focus` and a `zoom` when it is not.
 ### Sounds
 
 Every sound is synthesised, so `sfx` names one from the bank in
-`app/audio/audio.gd`: `shoot` `slash` `hit` `explode` `jump` `dash` `hurt`
+`app/audio/audio.gd`: `shoot` `slash` `hit` `explode` `dash` `hurt`
 `death` `pickup` `place` `erase` `ui` `deny` `extract` `parry` `boss` `voice`.
 An unknown id plays nothing and warns in the output.
 

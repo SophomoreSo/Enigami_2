@@ -1,8 +1,9 @@
 -- APPRENTICE, the Old Tinker's apprentice, by the wall at the bench's far end
 -- (feature/world/sandbox.gd). They only talk free: every line below is a rule,
 -- said in a bubble while the player goes on playing (see ../README.md, "Free
--- talk"). What they teach is footwork, and they watch for it: each lesson waits
--- for the move it asks for, and the move is what moves the lesson on.
+-- talk"). What they teach is footwork — the dash, a blow, a parry — and they
+-- watch for it: each lesson waits for the move it asks for, and the move is
+-- what moves the lesson on.
 --
 -- The rules are grouped by the event they answer. Within an event, the one
 -- with the most criteria that all hold is said, and a tie goes to the one
@@ -84,31 +85,31 @@ INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
 -- so asking again always gets the lesson they are on.
 
 INSERT INTO rules (character_id, id, listens, text) VALUES
-	('APPRENTICE', 'teach_double', 'lesson', 'Jump, then jump again while you''re still in the air.');
+	('APPRENTICE', 'teach_dash', 'lesson', 'Dash. One tap, any way you like, and for a moment nothing can touch you.');
 INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
-	('APPRENTICE', 'teach_double', 'double_jump', '=', 0);
-
-INSERT INTO rules (character_id, id, listens, text) VALUES
-	('APPRENTICE', 'teach_wall', 'lesson', 'Now a wall. Jump at one, and jump again as you touch it.');
-INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
-	('APPRENTICE', 'teach_wall', 'double_jump', '>=', 1),
-	('APPRENTICE', 'teach_wall', 'wall_kick', '=', 0);
-
-INSERT INTO rules (character_id, id, listens, text) VALUES
-	('APPRENTICE', 'teach_dash', 'lesson', 'Last one: dash. Sideways only, mind. Never up.');
-INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
-	('APPRENTICE', 'teach_dash', 'double_jump', '>=', 1),
-	('APPRENTICE', 'teach_dash', 'wall_kick', '>=', 1),
 	('APPRENTICE', 'teach_dash', 'dash', '=', 0);
+
+INSERT INTO rules (character_id, id, listens, text) VALUES
+	('APPRENTICE', 'teach_strike', 'lesson', 'Now hit something. The dummy over there won''t mind.');
+INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
+	('APPRENTICE', 'teach_strike', 'dash', '>=', 1),
+	('APPRENTICE', 'teach_strike', 'strike', '=', 0);
+
+INSERT INTO rules (character_id, id, listens, text) VALUES
+	('APPRENTICE', 'teach_parry', 'lesson', 'Last one: a parry. Swing just as a blow lands, and it''s theirs that breaks.');
+INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
+	('APPRENTICE', 'teach_parry', 'dash', '>=', 1),
+	('APPRENTICE', 'teach_parry', 'strike', '>=', 1),
+	('APPRENTICE', 'teach_parry', 'parry', '=', 0);
 
 -- The end, taught all the way through...
 INSERT INTO rules (character_id, id, listens, once, text, emotion) VALUES
 	('APPRENTICE', 'lessons_done', 'lesson', 1, 'That''s everything I know. The Tinker knows the rest.', 'happy');
 INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
-	('APPRENTICE', 'lessons_done', 'double_jump', '>=', 1),
-	('APPRENTICE', 'lessons_done', 'wall_kick', '>=', 1),
 	('APPRENTICE', 'lessons_done', 'dash', '>=', 1),
-	('APPRENTICE', 'lessons_done', 'APPRENTICE.teach_dash', '>=', 1);
+	('APPRENTICE', 'lessons_done', 'strike', '>=', 1),
+	('APPRENTICE', 'lessons_done', 'parry', '>=', 1),
+	('APPRENTICE', 'lessons_done', 'APPRENTICE.teach_parry', '>=', 1);
 INSERT INTO changes (character_id, rule_id, fact, op, value) VALUES
 	('APPRENTICE', 'lessons_done', 'apprentice_taught', 'set', 1);
 
@@ -116,9 +117,9 @@ INSERT INTO changes (character_id, rule_id, fact, op, value) VALUES
 INSERT INTO rules (character_id, id, listens, once, text, emotion) VALUES
 	('APPRENTICE', 'knew_it_all', 'lesson', 1, 'You know all this already, don''t you? Never mind me, then.', 'sad');
 INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
-	('APPRENTICE', 'knew_it_all', 'double_jump', '>=', 1),
-	('APPRENTICE', 'knew_it_all', 'wall_kick', '>=', 1),
-	('APPRENTICE', 'knew_it_all', 'dash', '>=', 1);
+	('APPRENTICE', 'knew_it_all', 'dash', '>=', 1),
+	('APPRENTICE', 'knew_it_all', 'strike', '>=', 1),
+	('APPRENTICE', 'knew_it_all', 'parry', '>=', 1);
 INSERT INTO changes (character_id, rule_id, fact, op, value) VALUES
 	('APPRENTICE', 'knew_it_all', 'apprentice_taught', 'set', 1);
 
@@ -126,31 +127,30 @@ INSERT INTO changes (character_id, rule_id, fact, op, value) VALUES
 
 -- A move they asked for: praise, and the next lesson.
 INSERT INTO rules (character_id, id, listens, once, text, emotion, triggers) VALUES
-	('APPRENTICE', 'nice_double', 'double_jump', 1, 'There you go! The air holds you once.', 'happy', 'lesson');
-INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
-	('APPRENTICE', 'nice_double', 'APPRENTICE.teach_double', '>=', 1);
-
-INSERT INTO rules (character_id, id, listens, once, text, emotion, triggers) VALUES
-	('APPRENTICE', 'nice_wall', 'wall_kick', 1, 'Ha! Walls are only floors standing up.', 'happy', 'lesson');
-INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
-	('APPRENTICE', 'nice_wall', 'APPRENTICE.teach_wall', '>=', 1);
-
-INSERT INTO rules (character_id, id, listens, once, text, emotion, triggers) VALUES
 	('APPRENTICE', 'nice_dash', 'dash', 1, 'Quick! Too quick to hit, for a moment.', 'surprised', 'lesson');
 INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
 	('APPRENTICE', 'nice_dash', 'APPRENTICE.teach_dash', '>=', 1);
 
+INSERT INTO rules (character_id, id, listens, once, text, emotion, triggers) VALUES
+	('APPRENTICE', 'nice_strike', 'strike', 1, 'That''s it! Hit it like it owes you scrap.', 'happy', 'lesson');
+INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
+	('APPRENTICE', 'nice_strike', 'APPRENTICE.teach_strike', '>=', 1);
+
+INSERT INTO rules (character_id, id, listens, once, text, emotion, triggers) VALUES
+	('APPRENTICE', 'nice_parry', 'parry', 1, 'A parry! Where did you learn that?', 'surprised', 'lesson');
+INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
+	('APPRENTICE', 'nice_parry', 'APPRENTICE.teach_parry', '>=', 1);
+
 -- A move they had not got round to yet.
 INSERT INTO rules (character_id, id, listens, once, text, emotion, next) VALUES
-	('APPRENTICE', 'show_off', 'double_jump', 1, 'Show-off.', 'angry', 'show_off_reply');
+	('APPRENTICE', 'show_off', 'dash', 1, 'Show-off.', 'angry', 'show_off_reply');
 INSERT INTO criteria (character_id, rule_id, fact, op, value) VALUES
-	('APPRENTICE', 'show_off', 'APPRENTICE.teach_double', '=', 0);
+	('APPRENTICE', 'show_off', 'APPRENTICE.teach_dash', '=', 0);
 INSERT INTO rules (character_id, id, text, speaker, voice) VALUES
 	('APPRENTICE', 'show_off_reply', 'Just stretching.', 'player', 'high');
 
 INSERT INTO rules (character_id, id, listens, once, text, emotion) VALUES
-	('APPRENTICE', 'winded', 'winded', 1, 'Out of breath? Four dashes to a full bar. Watch it under your health.', 'thinking'),
-	('APPRENTICE', 'parried', 'parry', 1, 'A parry! Where did you learn that?', 'surprised');
+	('APPRENTICE', 'winded', 'winded', 1, 'Out of breath? Four dashes to a full bar. Watch it under your health.', 'thinking');
 
 INSERT INTO rules (character_id, id, listens, text, emotion) VALUES
 	('APPRENTICE', 'ouch', 'hurt', 'Ouch! Keep moving, it helps.', 'scared');

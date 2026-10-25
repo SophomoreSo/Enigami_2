@@ -1,15 +1,14 @@
 {
-	"floor": 420,
 	"defaults": {"speed": 34, "voice": "low"},
 
 	"camera": {"focus": "middle", "zoom": 1.9},
 
 	"marks": {
-		"offstage": [-80, 420],
-		"door": [90, 420],
+		"offstage": [-80, 440],
+		"door": [90, 440],
 		"middle": [330, 420],
-		"bench": [520, 420],
-		"far_bench": [610, 420]
+		"bench": [520, 400],
+		"far_bench": [610, 400]
 	},
 
 	"cast": {
@@ -44,7 +43,7 @@
 		{
 			"say": "tinker",
 			"text": "You're late. The kettle's been through two wars.",
-			"do": [{"face": "tinker", "dir": "left"}]
+			"do": [{"face": "tinker", "toward": "you"}]
 		},
 		{
 			"say": "tinker",
@@ -54,7 +53,7 @@
 		{
 			"say": "you",
 			"text": "And if I wire it wrong?",
-			"do": [{"face": "you", "dir": "right"}]
+			"do": [{"face": "you", "toward": "tinker"}]
 		},
 		{
 			"say": "tinker",

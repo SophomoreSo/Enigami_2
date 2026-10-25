@@ -336,8 +336,13 @@ func side() -> int:
 ## a side — whichever of the two axes the facing has more of, the side on a
 ## tie, as a body walking a diagonal reads as walking across.
 func facing_name() -> String:
-	if absf(facing.y) > absf(facing.x):
-		return FACE_DOWN if facing.y > 0.0 else FACE_UP
+	return face_name_of(facing)
+
+## The same for any way on the floor: what a body that is not an actor — an
+## NPC, a cutscene's cast — asks, so every body picks its strip by one rule.
+static func face_name_of(dir: Vector2) -> String:
+	if absf(dir.y) > absf(dir.x):
+		return FACE_DOWN if dir.y > 0.0 else FACE_UP
 	return FACE_SIDE
 
 ## Adds the footprint: a flat collider round the feet, as wide as the

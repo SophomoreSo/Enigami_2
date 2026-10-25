@@ -172,9 +172,6 @@ INSERT INTO events (id) VALUES ('talk'), ('near'), ('leave');
 -- tests/story/free_talk_test fails on one it does not. When a cue is more
 -- than one of these, the one that matches more of it is answered first.
 INSERT INTO events (id, cue, match) VALUES
-	('jump',        'jump',    '{"kind": "ground"}'),
-	('double_jump', 'jump',    '{"kind": "air"}'),
-	('wall_kick',   'jump',    '{"kind": "wall"}'),
 	('dash',        'dash',    NULL),
 	('winded',      'refused', '{"kind": "stamina"}'),
 	('parry',       'parry',   NULL),

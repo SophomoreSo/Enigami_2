@@ -1,420 +1,423 @@
 {
-	"health": "%d / %d",
-	"burning": "BURNING",
-	"chilled": "CHILLED",
-	"wet": "WET",
-	"frozen": "FROZEN",
-	"stunned": "STUNNED",
-	"magic_off": "MAGIC OFF",
-	"possessing": "IN THE %s %ds",
-	"thrown": "%s (THROWN)",
-	"stock": "%s x%d",
-	"rune": "%s READY",
-	"rune_spent": "%s SPENT %d%%",
-	"empty_hand": "EMPTY",
-	"fx": {
-		"winded": "WINDED",
-		"parry": "PARRY",
-		"boss_phase": "%s: SECOND FORM",
-		"no_weapon": "NO %s"
-	},
-	"map": {
-		"title": "MAP",
-		"clock": "%02d:%02d  •  %s",
-		"pressure": [
-			"quiet",
-			"stirring",
-			"alert",
-			"hunting",
-			"swarming"
-		],
-		"legend": {
-			"you": "YOU",
-			"entry": "ENTRY",
-			"boss": "ARBITER",
-			"treasure": "CACHE",
-			"exit": "EXIT",
-			"unseen": "UNSEEN",
-			"kit": "YOUR KIT"
-		},
-		"close": "%s OR ESC TO CLOSE",
-		"none": "NO MAP AVAILABLE"
-	},
-	"tabs": {
-		"graph": "GRAPH",
-		"map": "MAP",
-		"dex": "FOES",
-		"perks": "PERKS"
-	},
-	"dex": {
-		"title": "MONSTERS",
-		"found": "%d OF %d MET",
-		"number": "No.%02d",
-		"unknown": "??",
-		"unmet": "Not met yet",
-		"unseen": "Not seen used yet",
-		"skills": "SKILLS",
-		"skill": {
-			"board": "ATTACK",
-			"board_phase2": "SECOND FORM"
-		},
-		"stat": {
-			"health": "HEALTH %d",
-			"speed": "SPEED %d",
-			"reach": "REACH %d",
-			"scrap": "SCRAP %d"
-		},
-		"elite": "ELITE",
-		"boss": "BOSS"
-	},
-	"extracting": "EXTRACTING",
-	"extract": {
-		"hold": "hold %s to extract",
-		"no_exit": "no exit",
-		"needs_scrap": "needs %d gold (have %d)",
-		"sealed": "sealed until the Arbiter falls"
-	},
-	"dialogue": {
-		"choose": "%s/%s choose  ·  %s answer",
-		"choose_touch": "tap to answer",
-		"next_touch": "tap to continue",
-		"player": "You"
-	},
-	"cutscene": {
-		"hint": "%s continue  ·  %s skip",
-		"hint_touch": "tap to continue"
-	},
-	"sandbox": {
-		"swap_weapon": "SWAP WEAPON",
-		"dragon_test": "DRAGON TEST >",
-		"jean_grey_test": "JEAN GREY TEST >",
-		"lighting_test": "LIGHTING TEST >",
-		"samples": "SAMPLE SKILLS",
-		"sample": {
-			"dragon": "chains a lunge on every hit",
-			"jean_grey": "possesses what it hits, 10s",
-			"seeker": "laser speed, turns after anything"
-		},
-		"seeker": "Seeker Arrow",
-		"spawn": "spawn %s",
-		"spawn_dummy": "spawn dummy",
-		"clear": "clear",
-		"leave": "leave",
-		"dps": "damage/sec (3s avg): %.1f"
-	},
-	"maker": {
-		"title": "MAP CREATOR",
-		"name": "MAP NAME",
-		"save": "SAVE",
-		"load": "LOAD",
-		"new": "NEW",
-		"map": "MAP",
-		"undo": "UNDO",
-		"redo": "REDO",
-		"play": "PLAY",
-		"back": "BACK",
-		"tool": {
-			"move": "MOVE",
-			"erase": "ERASE"
-		},
-		"tab": {
-			"ground": "GROUND",
-			"back": "BACK",
-			"creatures": "CREATURES",
-			"things": "THINGS",
-			"props": "PROPS"
-		},
-		"mark": {
-			"start": "START",
-			"box": "TREASURE BOX",
-			"dig": "DIG SPOT",
-			"bench": "BENCH",
-			"door_west": "DOORWAY WEST",
-			"door_east": "DOORWAY EAST",
-			"gate_up": "GATE UP",
-			"gate_down": "GATE DOWN",
-			"exit": "EXIT"
-		},
-		"tiles": {
-			"grove": {
-				"stone": "STONE",
-				"earth": "EARTH",
-				"bark": "BARK",
-				"wood": "PLANKS",
-				"leaves": "LEAVES",
-				"wall": "RUIN WALL",
-				"column": "COLUMN",
-				"lintel": "LINTEL",
-				"tree": "TREE",
-				"brush": "UNDERGROWTH",
-				"rail": "RAIL"
-			},
-			"rock": {
-				"title": "ROCK",
-				"rock": "ROCK",
-				"wall": "ROCK WALL"
-			}
-		},
-		"glass": {
-			"clear": "TRANSPARENT GLASS",
-			"mirror": "REFLECTIVE GLASS"
-		},
-		"magic": "MAGIC STONE",
-		"prop": {
-			"lantern": "LANTERN",
-			"lightbulb": "LIGHTBULB",
-			"fire": "CAMPFIRE",
-			"fireplace": "FIREPLACE",
-			"mushrooms": "GLOWING CAPS",
-			"fireflies": "FIREFLIES",
-			"grass": "GRASS",
-			"flowers": "FLOWERS",
-			"bush": "BUSH",
-			"fern": "FERN",
-			"vine": "VINE",
-			"rope": "ROPE"
-		},
-		"width": "WIDTH",
-		"height": "HEIGHT",
-		"region": "ROCK %d",
-		"weapon": "WEAPON: %s",
-		"zoom": "ZOOM %d%%",
-		"hint": "LMB LAY  RMB ERASE  SHIFT+DRAG BOX  MMB OR MOVE KEYS PAN  WHEEL ZOOM",
-		"hint_touch": "DRAG TO LAY  TAKE MOVE TO PAN",
-		"edge": "DRAG THE EDGE TO MAKE THE MAP BIGGER OR SMALLER",
-		"unsaved": "NOT SAVED",
-		"saved": "SAVED  %s",
-		"loaded": "LOADED %s",
-		"deleted": "%s THROWN AWAY",
-		"replace": "%s IS KEPT ALREADY. SAVE AGAIN TO REPLACE IT",
-		"refused": {
-			"name": "NAME THE MAP FIRST: LETTERS AND DIGITS",
-			"write": "THE MAP COULD NOT BE WRITTEN",
-			"read": "THE MAP COULD NOT BE READ"
-		},
-		"load_heading": "LOAD A MAP",
-		"map_heading": "MAP SETTINGS",
-		"tileset": "TILESET",
-		"none": "NO MAPS KEPT YET",
-		"delete": "DELETE",
-		"sure": "SURE?",
-		"keys": "R RESET  TAB SKILL BOARD  ESC BACK TO THE MAP"
-	},
-	"story": {
-		"title": "STORY MAKER",
-		"name": "STORY NAME",
-		"save": "SAVE",
-		"load": "LOAD",
-		"new": "NEW",
-		"play": "PLAY",
-		"back": "BACK",
-		"add_node": "+ NODE",
-		"map": "MAP",
-		"no_map": "NO MAP",
-		"mode": "PLAYED AS",
-		"modes": {
-			"free": "FREE MOVEMENT",
-			"frozen": "FROZEN MOVEMENT",
-			"novel": "NOVEL"
-		},
-		"modes_hint": {
-			"free": "FREE MOVEMENT: THE PLAYER GOES ON PLAYING, EACH LINE IN A BUBBLE; A QUESTION IS ASKED IN THE BOX",
-			"frozen": "FROZEN MOVEMENT: THE PLAYER WALKS UP, PRESSES TO TALK, AND IS HELD STILL WHILE THE BOX RUNS",
-			"novel": "NOVEL: NOBODY PLAYS. THE STORY IS READ A PRESS AT A TIME, LIKE A SCENE"
-		},
-		"player": "PLAYER",
-		"npc": "CHARACTER",
-		"you": "YOU",
-		"node": "NODE %s",
-		"nothing_picked": "PICK A NODE ON THE SHEET, OR PRESS + NODE",
-		"start_here": "START HERE",
-		"is_start": "START",
-		"line": "WHAT IS SAID",
-		"emotion": {
-			"neutral": "NEUTRAL",
-			"happy": "HAPPY",
-			"sad": "SAD",
-			"angry": "ANGRY",
-			"surprised": "SURPRISED",
-			"thinking": "THINKING",
-			"scared": "SCARED"
-		},
-		"effect": {
-			"none": "STILL",
-			"wave": "WAVE",
-			"shake": "SHAKE",
-			"bounce": "BOUNCE"
-		},
-		"leads_to": "LEADS TO NODE %s",
-		"leads_end": "LEADS TO THE END",
-		"unlink": "CUT",
-		"answer": "AN ANSWER",
-		"add_answer": "+ ANSWER",
-		"action_count_one": "%d ACTION",
-		"action_count": "%d ACTIONS",
-		"do": {
-			"walk": "WALKS",
-			"run": "RUNS",
-			"pose": "POSES",
-			"face": "TURNS"
-		},
-		"to_whom": "TO %s",
-		"to": {
-			"left": "LEFT",
-			"right": "RIGHT"
-		},
-		"steps": "%d CELLS",
-		"dir": {
-			"left": "LEFT",
-			"right": "RIGHT",
-			"toward": "TOWARD THE OTHER"
-		},
-		"pose": {
-			"idle": "STANDING",
-			"run": "RUNNING",
-			"crouch": "CROUCHING",
-			"hit": "STRUCK",
-			"rise": "RISING",
-			"fall": "FALLING",
-			"wall_slide": "WALL SLIDE",
-			"dash": "DASHING"
-		},
-		"delete_node": "DELETE NODE",
-		"remove_asks": "DELETE AGAIN TO TAKE NODE %s OFF THE DESK",
-		"sure": "SURE?",
-		"saved": "SAVED  %s",
-		"loaded": "LOADED %s",
-		"deleted": "%s THROWN AWAY",
-		"replace": "%s IS KEPT ALREADY. SAVE AGAIN TO REPLACE IT",
-		"refused": {
-			"name": "NAME THE STORY FIRST: LETTERS AND DIGITS",
-			"write": "THE STORY COULD NOT BE WRITTEN",
-			"read": "THE STORY COULD NOT BE READ",
-			"empty": "WRITE A LINE FIRST, AND LEAD THE START TO IT",
-			"map": "THERE IS NO MAP TO PLAY IT ON: MAKE ONE IN THE MAP CREATOR"
-		},
-		"load_heading": "LOAD A STORY",
-		"map_heading": "IMPORT A MAP",
-		"none": "NO STORIES KEPT YET",
-		"no_maps": "NO MAPS KEPT YET",
-		"delete": "DELETE",
-		"keys": "F TALK  ESC BACK TO THE DESK",
-		"end": "END",
-		"add_property": "+ PROPERTY",
-		"property": {
-			"line": "LINE",
-			"emotion": "EXPRESSION",
-			"effect": "LETTERS",
-			"action": "ACTION",
-			"choices": "ANSWERS"
-		},
-		"action_n": "ACTION %d",
-		"empty": "NO PROPERTIES"
-	},
-	"dragon": {
-		"play": "PLAY",
-		"guards": "GUARDS",
-		"chain": "CHAIN %d / %d",
-		"hold": "HOLD TO CHARGE",
-		"release": "RELEASE TO CAST",
-		"keys": "R RESET  TAB EDIT  ESC BACK",
-		"title": "DRAGON TEST",
-		"subtitle": "%d GUARDS   ONE CAST",
-		"rewind": "REWIND",
-		"one_cast": "ALL %d IN ONE CAST",
-		"clear": "FLOOR CLEAR   BEST CAST %d OF %d",
-		"board": "Dragon Dash"
-	},
-	"jean": {
-		"title": "JEAN GREY TEST",
-		"subtitle": "STEAL THE DIAMOND WITHOUT GOING IN YOURSELF",
-		"body": "BODY %d / %d",
-		"take": "TAKE THE DIAMOND",
-		"down": "PICK THE DIAMOND BACK UP",
-		"carry": "BRING IT TO YOUR BODY",
-		"home": "BACK TO THE PIT WITH IT",
-		"unseen": "UNSEEN",
-		"seen": "SEEN BY %d",
-		"best": "%s  BEST %s",
-		"stolen": "DIAMOND STOLEN  %s",
-		"fell": "YOUR BODY FELL",
-		"again": "AGAIN",
-		"rock_out": "ROCK ON THE FLOOR",
-		"keys": "R RESET  TAB EDIT  %s LEAVE MONSTER  ESC BACK",
-		"board": "Psychic Throw"
-	},
-	"light": {
-		"title": "LIGHTING TEST",
-		"subtitle": "WALK THROUGH THE LIGHTS",
-		"behind": "LANTERN BEHIND YOU",
-		"front": "LANTERN IN FRONT OF YOU",
-		"fire": "FIRE AND FIREPLACE",
-		"spot": "SPOTLIGHT, AS IT WAS",
-		"time": "LIGHT  %s",
-		"times": {
-			"night": "NIGHT",
-			"grove": "MOONLIGHT",
-			"day": "DAY"
-		},
-		"crosshair": "ON THE CROSSHAIR  %s",
-		"held": {
-			"nothing": "NOTHING",
-			"lantern": "LANTERN",
-			"bulb": "SPOTLIGHT",
-			"tube": "LIGHT TUBE"
-		},
-		"in_front": "%s, IN FRONT",
-		"in_back": "%s, BEHIND",
-		"count": "%d LIGHTS  %d THROWING SHADOWS",
-		"keys": "T LIGHT  C CROSSHAIR  L FRONT/BEHIND  R AGAIN  ESC BACK"
-	},
-	"exit": {
-		"sign": "EXIT",
-		"entry": "ENTRY GATE",
-		"arbiter": "ARBITER GATE",
-		"toll": "TOLL GATE",
-		"crack": "CRACK IN THE WALL"
-	},
-	"phone": {
-		"app": {
-			"gallery": "GALLERY",
-			"camera": "CAMERA",
-			"alarm": "ALARM",
-			"settings": "SETTINGS"
-		},
-		"gallery": {
-			"empty": "NO PHOTOS YET",
-			"count": "%d PHOTOS",
-			"delete": "DELETE"
-		},
-		"camera": {
-			"snap": "SNAP",
-			"saved": "SAVED"
-		},
-		"alarm": {
-			"pick": "SET AN ALARM. IT RINGS WHERE THE PHONE IS, AND WHATEVER IS NEAR COMES TO SEE.",
-			"set": "SET",
-			"stop": "STOP",
-			"down": "PUT IT DOWN",
-			"ringing": "RINGING",
-			"lying": "LYING ON THE FLOOR"
-		},
-		"hud": {
-			"alarm": "ALARM %s",
-			"ringing": "RINGING",
-			"down": "PHONE ON THE FLOOR"
-		}
-	},
-	"heroes": {
-		"title": "SELECT YOUR CHARACTER",
-		"confirm": "CONFIRM",
-		"back": "BACK",
-		"playing": "PLAYING AS",
-		"name": {
-			"dren_repus": "DREN REPUS",
-			"legna_dennis": "LEGNA DENNIS",
-			"reniart_lamina": "RENIART LAMINA",
-			"sett_eragic": "SETT ERAGIC"
-		}
-	}
+  "health": "%d / %d",
+  "burning": "BURNING",
+  "chilled": "CHILLED",
+  "wet": "WET",
+  "frozen": "FROZEN",
+  "stunned": "STUNNED",
+  "magic_off": "MAGIC OFF",
+  "possessing": "IN THE %s %ds",
+  "thrown": "%s (THROWN)",
+  "stock": "%s x%d",
+  "rune": "%s READY",
+  "rune_spent": "%s SPENT %d%%",
+  "empty_hand": "EMPTY",
+  "fx": {
+    "winded": "WINDED",
+    "parry": "PARRY",
+    "boss_phase": "%s: SECOND FORM",
+    "no_weapon": "NO %s"
+  },
+  "map": {
+    "title": "MAP",
+    "clock": "%02d:%02d  •  %s",
+    "pressure": [
+      "quiet",
+      "stirring",
+      "alert",
+      "hunting",
+      "swarming"
+    ],
+    "legend": {
+      "you": "YOU",
+      "entry": "ENTRY",
+      "boss": "ARBITER",
+      "treasure": "CACHE",
+      "exit": "EXIT",
+      "unseen": "UNSEEN",
+      "kit": "YOUR KIT"
+    },
+    "close": "%s OR ESC TO CLOSE",
+    "none": "NO MAP AVAILABLE"
+  },
+  "tabs": {
+    "graph": "GRAPH",
+    "map": "MAP",
+    "dex": "FOES",
+    "perks": "PERKS"
+  },
+  "dex": {
+    "title": "MONSTERS",
+    "found": "%d OF %d MET",
+    "number": "No.%02d",
+    "unknown": "??",
+    "unmet": "Not met yet",
+    "unseen": "Not seen used yet",
+    "skills": "SKILLS",
+    "skill": {
+      "board": "ATTACK",
+      "board_phase2": "SECOND FORM"
+    },
+    "stat": {
+      "health": "HEALTH %d",
+      "speed": "SPEED %d",
+      "reach": "REACH %d",
+      "scrap": "SCRAP %d"
+    },
+    "elite": "ELITE",
+    "boss": "BOSS"
+  },
+  "extracting": "EXTRACTING",
+  "extract": {
+    "hold": "hold %s to extract",
+    "no_exit": "no exit",
+    "needs_scrap": "needs %d gold (have %d)",
+    "sealed": "sealed until the Arbiter falls"
+  },
+  "dialogue": {
+    "choose": "%s/%s choose  ·  %s answer",
+    "choose_touch": "tap to answer",
+    "next_touch": "tap to continue",
+    "player": "You"
+  },
+  "cutscene": {
+    "hint": "%s continue  ·  %s skip",
+    "hint_touch": "tap to continue"
+  },
+  "sandbox": {
+    "swap_weapon": "SWAP WEAPON",
+    "dragon_test": "DRAGON TEST >",
+    "jean_grey_test": "JEAN GREY TEST >",
+    "lighting_test": "LIGHTING TEST >",
+    "samples": "SAMPLE SKILLS",
+    "sample": {
+      "dragon": "chains a lunge on every hit",
+      "jean_grey": "possesses what it hits, 10s",
+      "seeker": "laser speed, turns after anything"
+    },
+    "seeker": "Seeker Arrow",
+    "spawn": "spawn %s",
+    "spawn_dummy": "spawn dummy",
+    "clear": "clear",
+    "leave": "leave",
+    "dps": "damage/sec (3s avg): %.1f"
+  },
+  "maker": {
+    "title": "MAP CREATOR",
+    "name": "MAP NAME",
+    "save": "SAVE",
+    "load": "LOAD",
+    "new": "NEW",
+    "map": "MAP",
+    "undo": "UNDO",
+    "redo": "REDO",
+    "play": "PLAY",
+    "back": "BACK",
+    "tool": {
+      "move": "MOVE",
+      "erase": "ERASE"
+    },
+    "tab": {
+      "ground": "GROUND",
+      "back": "BACK",
+      "creatures": "CREATURES",
+      "things": "THINGS",
+      "props": "PROPS"
+    },
+    "mark": {
+      "start": "START",
+      "box": "TREASURE BOX",
+      "dig": "DIG SPOT",
+      "bench": "BENCH",
+      "door_west": "DOORWAY WEST",
+      "door_east": "DOORWAY EAST",
+      "gate_up": "GATE UP",
+      "gate_down": "GATE DOWN",
+      "exit": "EXIT"
+    },
+    "tiles": {
+      "grove": {
+        "stone": "STONE",
+        "earth": "EARTH",
+        "bark": "BARK",
+        "wood": "PLANKS",
+        "leaves": "LEAVES",
+        "wall": "RUIN WALL",
+        "column": "COLUMN",
+        "lintel": "LINTEL",
+        "tree": "TREE",
+        "brush": "UNDERGROWTH",
+        "rail": "RAIL"
+      },
+      "rock": {
+        "title": "ROCK",
+        "rock": "ROCK",
+        "wall": "ROCK WALL"
+      }
+    },
+    "glass": {
+      "clear": "TRANSPARENT GLASS",
+      "mirror": "REFLECTIVE GLASS"
+    },
+    "magic": "MAGIC STONE",
+    "prop": {
+      "lantern": "LANTERN",
+      "lightbulb": "LIGHTBULB",
+      "fire": "CAMPFIRE",
+      "fireplace": "FIREPLACE",
+      "mushrooms": "GLOWING CAPS",
+      "fireflies": "FIREFLIES",
+      "grass": "GRASS",
+      "flowers": "FLOWERS",
+      "bush": "BUSH",
+      "fern": "FERN",
+      "vine": "VINE",
+      "rope": "ROPE"
+    },
+    "width": "WIDTH",
+    "height": "HEIGHT",
+    "region": "ROCK %d",
+    "weapon": "WEAPON: %s",
+    "zoom": "ZOOM %d%%",
+    "hint": "LMB LAY  RMB ERASE  SHIFT+DRAG BOX  MMB OR MOVE KEYS PAN  WHEEL ZOOM",
+    "hint_touch": "DRAG TO LAY  TAKE MOVE TO PAN",
+    "edge": "DRAG THE EDGE TO MAKE THE MAP BIGGER OR SMALLER",
+    "unsaved": "NOT SAVED",
+    "saved": "SAVED  %s",
+    "loaded": "LOADED %s",
+    "deleted": "%s THROWN AWAY",
+    "replace": "%s IS KEPT ALREADY. SAVE AGAIN TO REPLACE IT",
+    "refused": {
+      "name": "NAME THE MAP FIRST: LETTERS AND DIGITS",
+      "write": "THE MAP COULD NOT BE WRITTEN",
+      "read": "THE MAP COULD NOT BE READ"
+    },
+    "load_heading": "LOAD A MAP",
+    "map_heading": "MAP SETTINGS",
+    "tileset": "TILESET",
+    "none": "NO MAPS KEPT YET",
+    "delete": "DELETE",
+    "sure": "SURE?",
+    "keys": "R RESET  TAB SKILL BOARD  ESC BACK TO THE MAP"
+  },
+  "story": {
+    "title": "STORY MAKER",
+    "name": "STORY NAME",
+    "save": "SAVE",
+    "load": "LOAD",
+    "new": "NEW",
+    "play": "PLAY",
+    "back": "BACK",
+    "add_node": "+ NODE",
+    "map": "MAP",
+    "no_map": "NO MAP",
+    "mode": "PLAYED AS",
+    "modes": {
+      "free": "FREE MOVEMENT",
+      "frozen": "FROZEN MOVEMENT",
+      "novel": "NOVEL"
+    },
+    "modes_hint": {
+      "free": "FREE MOVEMENT: THE PLAYER GOES ON PLAYING, EACH LINE IN A BUBBLE; A QUESTION IS ASKED IN THE BOX",
+      "frozen": "FROZEN MOVEMENT: THE PLAYER WALKS UP, PRESSES TO TALK, AND IS HELD STILL WHILE THE BOX RUNS",
+      "novel": "NOVEL: NOBODY PLAYS. THE STORY IS READ A PRESS AT A TIME, LIKE A SCENE"
+    },
+    "player": "PLAYER",
+    "npc": "CHARACTER",
+    "you": "YOU",
+    "node": "NODE %s",
+    "nothing_picked": "PICK A NODE ON THE SHEET, OR PRESS + NODE",
+    "start_here": "START HERE",
+    "is_start": "START",
+    "line": "WHAT IS SAID",
+    "emotion": {
+      "neutral": "NEUTRAL",
+      "happy": "HAPPY",
+      "sad": "SAD",
+      "angry": "ANGRY",
+      "surprised": "SURPRISED",
+      "thinking": "THINKING",
+      "scared": "SCARED"
+    },
+    "effect": {
+      "none": "STILL",
+      "wave": "WAVE",
+      "shake": "SHAKE",
+      "bounce": "BOUNCE"
+    },
+    "leads_to": "LEADS TO NODE %s",
+    "leads_end": "LEADS TO THE END",
+    "unlink": "CUT",
+    "answer": "AN ANSWER",
+    "add_answer": "+ ANSWER",
+    "action_count_one": "%d ACTION",
+    "action_count": "%d ACTIONS",
+    "do": {
+      "walk": "WALKS",
+      "run": "RUNS",
+      "pose": "POSES",
+      "face": "TURNS"
+    },
+    "to_whom": "TO %s",
+    "to": {
+      "left": "LEFT",
+      "right": "RIGHT",
+      "up": "UP",
+      "down": "DOWN"
+    },
+    "steps": "%d CELLS",
+    "dir": {
+      "left": "LEFT",
+      "right": "RIGHT",
+      "toward": "TOWARD THE OTHER",
+      "up": "UP",
+      "down": "DOWN"
+    },
+    "pose": {
+      "idle": "STANDING",
+      "walk": "WALKING",
+      "run": "RUNNING",
+      "hit": "STRUCK",
+      "dash": "DASHING",
+      "sit": "SITTING",
+      "cast": "CASTING"
+    },
+    "delete_node": "DELETE NODE",
+    "remove_asks": "DELETE AGAIN TO TAKE NODE %s OFF THE DESK",
+    "sure": "SURE?",
+    "saved": "SAVED  %s",
+    "loaded": "LOADED %s",
+    "deleted": "%s THROWN AWAY",
+    "replace": "%s IS KEPT ALREADY. SAVE AGAIN TO REPLACE IT",
+    "refused": {
+      "name": "NAME THE STORY FIRST: LETTERS AND DIGITS",
+      "write": "THE STORY COULD NOT BE WRITTEN",
+      "read": "THE STORY COULD NOT BE READ",
+      "empty": "WRITE A LINE FIRST, AND LEAD THE START TO IT",
+      "map": "THERE IS NO MAP TO PLAY IT ON: MAKE ONE IN THE MAP CREATOR"
+    },
+    "load_heading": "LOAD A STORY",
+    "map_heading": "IMPORT A MAP",
+    "none": "NO STORIES KEPT YET",
+    "no_maps": "NO MAPS KEPT YET",
+    "delete": "DELETE",
+    "keys": "F TALK  ESC BACK TO THE DESK",
+    "end": "END",
+    "add_property": "+ PROPERTY",
+    "property": {
+      "line": "LINE",
+      "emotion": "EXPRESSION",
+      "effect": "LETTERS",
+      "action": "ACTION",
+      "choices": "ANSWERS"
+    },
+    "action_n": "ACTION %d",
+    "empty": "NO PROPERTIES"
+  },
+  "dragon": {
+    "play": "PLAY",
+    "guards": "GUARDS",
+    "chain": "CHAIN %d / %d",
+    "hold": "HOLD TO CHARGE",
+    "release": "RELEASE TO CAST",
+    "keys": "R RESET  TAB EDIT  ESC BACK",
+    "title": "DRAGON TEST",
+    "subtitle": "%d GUARDS   ONE CAST",
+    "rewind": "REWIND",
+    "one_cast": "ALL %d IN ONE CAST",
+    "clear": "FLOOR CLEAR   BEST CAST %d OF %d",
+    "board": "Dragon Dash"
+  },
+  "jean": {
+    "title": "JEAN GREY TEST",
+    "subtitle": "STEAL THE DIAMOND WITHOUT GOING IN YOURSELF",
+    "body": "BODY %d / %d",
+    "take": "TAKE THE DIAMOND",
+    "down": "PICK THE DIAMOND BACK UP",
+    "carry": "BRING IT TO YOUR BODY",
+    "home": "BACK TO THE PIT WITH IT",
+    "unseen": "UNSEEN",
+    "seen": "SEEN BY %d",
+    "best": "%s  BEST %s",
+    "stolen": "DIAMOND STOLEN  %s",
+    "fell": "YOUR BODY FELL",
+    "again": "AGAIN",
+    "rock_out": "ROCK ON THE FLOOR",
+    "keys": "R RESET  TAB EDIT  %s LEAVE MONSTER  ESC BACK",
+    "board": "Psychic Throw"
+  },
+  "light": {
+    "title": "LIGHTING TEST",
+    "subtitle": "WALK THROUGH THE LIGHTS",
+    "behind": "LANTERN BEHIND YOU",
+    "front": "LANTERN IN FRONT OF YOU",
+    "fire": "FIRE AND FIREPLACE",
+    "spot": "SPOTLIGHT, AS IT WAS",
+    "time": "LIGHT  %s",
+    "times": {
+      "night": "NIGHT",
+      "grove": "MOONLIGHT",
+      "day": "DAY"
+    },
+    "crosshair": "ON THE CROSSHAIR  %s",
+    "held": {
+      "nothing": "NOTHING",
+      "lantern": "LANTERN",
+      "bulb": "SPOTLIGHT",
+      "tube": "LIGHT TUBE"
+    },
+    "in_front": "%s, IN FRONT",
+    "in_back": "%s, BEHIND",
+    "count": "%d LIGHTS  %d THROWING SHADOWS",
+    "keys": "T LIGHT  C CROSSHAIR  L FRONT/BEHIND  R AGAIN  ESC BACK"
+  },
+  "exit": {
+    "sign": "EXIT",
+    "entry": "ENTRY GATE",
+    "arbiter": "ARBITER GATE",
+    "toll": "TOLL GATE",
+    "crack": "CRACK IN THE WALL"
+  },
+  "phone": {
+    "app": {
+      "gallery": "GALLERY",
+      "camera": "CAMERA",
+      "alarm": "ALARM",
+      "settings": "SETTINGS"
+    },
+    "gallery": {
+      "empty": "NO PHOTOS YET",
+      "count": "%d PHOTOS",
+      "delete": "DELETE"
+    },
+    "camera": {
+      "snap": "SNAP",
+      "saved": "SAVED"
+    },
+    "alarm": {
+      "pick": "SET AN ALARM. IT RINGS WHERE THE PHONE IS, AND WHATEVER IS NEAR COMES TO SEE.",
+      "set": "SET",
+      "stop": "STOP",
+      "down": "PUT IT DOWN",
+      "ringing": "RINGING",
+      "lying": "LYING ON THE FLOOR"
+    },
+    "hud": {
+      "alarm": "ALARM %s",
+      "ringing": "RINGING",
+      "down": "PHONE ON THE FLOOR"
+    }
+  },
+  "heroes": {
+    "title": "SELECT YOUR CHARACTER",
+    "confirm": "CONFIRM",
+    "back": "BACK",
+    "playing": "PLAYING AS",
+    "name": {
+      "dren_repus": "DREN REPUS",
+      "legna_dennis": "LEGNA DENNIS",
+      "reniart_lamina": "RENIART LAMINA",
+      "sett_eragic": "SETT ERAGIC"
+    }
+  }
 }

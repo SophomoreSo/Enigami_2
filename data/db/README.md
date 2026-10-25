@@ -243,7 +243,7 @@ with how long it is kept:
 
 Every rule and every event is a fact as well, and needs no declaring: how
 many times the line has been said — `APPRENTICE.intro` — or the event raised
-— `double_jump`. That is what `once` reads, and it is how talk is **picked up
+— `dash`. That is what `once` reads, and it is how talk is **picked up
 again**. A line counts only once it is all the way out, so a line the player
 walked out on was never said, and the next press finds the first thing not
 yet said. Nothing else remembers where a conversation got to.
@@ -255,11 +255,11 @@ yet said. Nothing else remembers where a conversation got to.
 | `talk` | A press of interact beside them while nothing is being said. |
 | `near` | The player coming into earshot — eight cells. |
 | `leave` | The player going out of earshot halfway through talk they started, which cuts it off. |
-| a moment | A cue the game sends (`app/cues.gd`) while the player is in earshot: `jump` `double_jump` `wall_kick` `dash` `winded` `parry` `strike` `kill` `hurt`. Counted once, however many hear it. |
+| a moment | A cue the game sends (`app/cues.gd`) while the player is in earshot: `dash` `winded` `parry` `strike` `kill` `hurt`. Counted once, however many hear it. |
 | their own | Declared in the character's file — `INSERT INTO events (id) VALUES ('lesson')` — and raised by a rule's `triggers`. |
 
 A new kind of moment is a row of `events` in `schema.sql`, naming the cue and
-what it has to carry: `('double_jump', 'jump', '{"kind": "air"}')`.
+what it has to carry: `('winded', 'refused', '{"kind": "stamina"}')`.
 `tests/story/free_talk_test` fails on one the game never sends. When one cue
 is more than one event — a blow that kills is `strike` and `kill` — the one
 that asks more of it is answered first.
