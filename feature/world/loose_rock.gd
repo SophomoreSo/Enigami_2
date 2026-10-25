@@ -240,7 +240,7 @@ func _unstick() -> void:
 	if not _solid(global_position):
 		return
 	for ring in range(1, Room.CELL * 3):
-		for way in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:
+		for way: Vector2 in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:
 			var at := global_position + way * float(ring)
 			if not _solid(at):
 				global_position = at
