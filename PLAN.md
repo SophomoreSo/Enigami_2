@@ -79,7 +79,7 @@ wants it otherwise:
 
 Left to the user:
 
-- The folder's name. `Enigami2` is a placeholder, a `mv` away.
+- ~~The folder's name.~~ `Enigami_2`, by the user's word (2026-10-25).
 - Which of the five hideout looks, if any, the top-down hideout takes
   after.
 - Whether the four 3D pipeline folders beside v1's checkouts are deleted
