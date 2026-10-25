@@ -199,14 +199,16 @@ func _bounces() -> void:
 	var c := await fire(bolt(600.0), p.global_position, Vector2.RIGHT)
 	await until(gone(c), 2.0)
 	check(heard(&"impact", "wall") == 1 and heard(&"impact", "bounce") == 0, "without it the wall ends the bolt")
-	# Two of them, into the floor first and then the wall: two bounces.
+	# Two of them, fired low across the room: into the wall, and back off it
+	# into the room's own wall along its foot — two bounces.
 	cues.clear()
 	var twice := bolt(600.0)
 	twice.bounce = 2
-	var d := await fire(twice, p.global_position, Vector2(1.0, 0.35))
+	var low := Vector2(face - 120.0, float(Room.H - 1) * Room.CELL - 112.0)
+	var d := await fire(twice, low, Vector2(1.0, 0.6))
 	await until(gone(d), 3.0)
 	check(heard(&"impact", "bounce") == 2,
-		"two stacked are two bounces, off the floor and the wall (%d)" % heard(&"impact", "bounce"))
+		"two stacked are two bounces, off the wall and the room's foot (%d)" % heard(&"impact", "bounce"))
 
 ## --- BOOMERANG: back the way it came, striking again -----------------------------------
 func _comes_back() -> void:

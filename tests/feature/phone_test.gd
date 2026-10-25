@@ -134,7 +134,7 @@ func _ring_and_lure() -> void:
 	check(Phone.ringing == 0.0 and not crawler.lured(), "the ringing over, it is no longer called")
 	# One that has somebody in sight is not called away from them.
 	crawler.global_position = player.global_position + Vector2(-120.0, 0.0)
-	crawler.face(1)
+	crawler.face(Vector2.RIGHT)
 	await phys(4)
 	check(crawler.aggro, "a Crawler that has noticed the player hunts them")
 	Phone.call_monsters(here)

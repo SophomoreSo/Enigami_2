@@ -206,9 +206,14 @@ func _process(delta: float) -> void:
 ## is stood up — half a screen, so it is there before the screen reaches it —
 ## and how far from the seam they go before it is taken down again: further,
 ## so a player at a doorway does not have the room beyond built and torn down
-## with every step.
+## with every step. Across, by the room's width; up and down the floor, by its
+## depth, which is little more than half its width — measured by the width,
+## every point of a room is within LOAD_NEAR of both the seam above it and the
+## one below, and both rooms would stand all the time.
 const LOAD_NEAR := Room.W * Room.CELL * 0.5
 const UNLOAD_FAR := Room.W * Room.CELL * 1.5
+const LOAD_NEAR_DOWN := Room.H * Room.CELL * 0.5
+const UNLOAD_FAR_DOWN := Room.H * Room.CELL * 1.5
 
 ## Which room on the floor the world point `gp` is in.
 static func coord_at(gp: Vector2) -> Vector2i:
@@ -244,7 +249,8 @@ func _sweep_air() -> void:
 ## Stands up the rooms the player is near and takes down the ones they have
 ## left behind: the room they are in, always; a room beside it through a
 ## doorway, on any side, once they are within LOAD_NEAR of the seam, kept
-## until they are UNLOAD_FAR from it; and nothing else.
+## until they are UNLOAD_FAR from it — LOAD_NEAR_DOWN and UNLOAD_FAR_DOWN for
+## a seam above or below; and nothing else.
 func _update_window() -> void:
 	if player == null or not is_instance_valid(player):
 		return
@@ -270,10 +276,11 @@ func _update_window() -> void:
 			Components.E: away = absf(player.global_position.x - (origin.x + float(Room.W * Room.CELL)))
 			Components.N: away = absf(player.global_position.y - origin.y)
 			Components.S: away = absf(player.global_position.y - (origin.y + float(Room.H * Room.CELL)))
+		var down := dir == Components.N or dir == Components.S
 		if rooms.has(beside):
-			if away <= UNLOAD_FAR:
+			if away <= (UNLOAD_FAR_DOWN if down else UNLOAD_FAR):
 				keep.append(beside)
-		elif away <= LOAD_NEAR:
+		elif away <= (LOAD_NEAR_DOWN if down else LOAD_NEAR):
 			_load_room(beside)
 			keep.append(beside)
 	for c in rooms.keys():

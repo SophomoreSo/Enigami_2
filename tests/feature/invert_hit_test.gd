@@ -52,7 +52,7 @@ func monster(kind: String, at: Vector2) -> Enemy:
 	e.collision_mask = 1
 	add_child(e)
 	e.global_position = at
-	e._patrol_dir = 1
+	e._patrol_dir = Vector2.RIGHT
 	return e
 
 ## A slab of floor centred on `centre`.

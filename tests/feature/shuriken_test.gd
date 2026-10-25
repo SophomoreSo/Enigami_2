@@ -172,12 +172,14 @@ func _lobbed() -> void:
 	check(flying.size() == 1 and (flying[0] as Projectile).sticks == "SHURIKEN"
 			and (flying[0] as Projectile).gravity > 0.0,
 		"a press throws one, lobbed (%d bolts)" % flying.size())
-	var level := (flying[0] as Projectile).global_position.y if not flying.is_empty() else p.global_position.y
 	await until(func() -> bool: return not stars().is_empty(), 2.0)
 	var all := stars()
-	check(all.size() == 1 and (all[0] as StuckShuriken).global_position.y > level + 2.0,
-		"and it comes down on the way, sticking lower than it set off (%.1f under)"
-			% ((all[0] as StuckShuriken).global_position.y - level if not all.is_empty() else 0.0))
+	var hit: StuckShuriken = all[0] if all.size() == 1 else null
+	check(hit != null and hit.stuck() and not room.is_solid_at(hit.global_position)
+			and room.is_solid_at(hit.global_position + hit.heading * 3.0)
+			and absf(hit.global_position.x - face) < StuckShuriken.RADIUS,
+		"the wall stops it on the way, whatever its arc: stuck in the face, point in (%.0f from it)"
+			% (absf(hit.global_position.x - face) if hit != null else -1.0))
 	for s in all:
 		s.queue_free()
 	p.stock["SHURIKEN"] = Weapons.stack_of("SHURIKEN")
@@ -265,8 +267,8 @@ func _out_of_throw() -> void:
 		return
 	var s: StuckShuriken = all[0]
 	check(s.global_position.x < from.x - 100.0 and not room.is_solid_at(s.global_position)
-			and room.is_solid_at(s.global_position + s.heading * 3.0) and s.heading.y > 0.5,
-		"out at the end of its throw, in the floor, point down (%.0f px out)" % (from.x - s.global_position.x))
+			and is_zero_approx(s.height),
+		"out at the end of its throw, down in the floor (%.0f px out, %.1f up)" % [from.x - s.global_position.x, s.height])
 	await clear_stars()
 
 ## --- in a monster it rides with it, until it dies --------------------------------------

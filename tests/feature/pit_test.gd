@@ -38,15 +38,16 @@ func heard(cue: StringName) -> int:
 func _ready() -> void:
 	Arena.register(self)
 	Cues.fired.connect(func(cue: StringName, _d: Dictionary) -> void: cues.append(cue))
-	# A room with a pit three cells wide across its middle, floor either side.
+	# A room with a pit across its middle, floor either side: two cells across,
+	# the most a room rolls (`Room`), which a dash from its edge carries over.
 	var room := MadeRoom.new()
 	room.plan = PackedStringArray([
 		"################",
 		"#..............#",
 		"#..............#",
-		"#.....OOO......#",
-		"#.....OOO......#",
-		"#.....OOO......#",
+		"#.....OO.......#",
+		"#.....OO.......#",
+		"#.....OO.......#",
 		"#..............#",
 		"#..............#",
 		"################",
@@ -94,8 +95,9 @@ func _ready() -> void:
 	check(p.global_position.x < room.cell_center(6, 4).x - 8.0,
 		"and stands clear of the edge, where it last stood on floor (%.0f)" % p.global_position.x)
 
-	# Dashed across: no fall.
-	p.global_position = room.cell_center(4, 4)
+	# Dashed across from its edge: no fall. A dash is DASH_SPEED for DASH_TIME,
+	# a little more than the pit is wide.
+	p.global_position = Vector2(float(6 * Room.CELL) - 6.0, room.cell_center(4, 4).y)
 	p.invuln = 0.0
 	await phys(2)
 	await until(func() -> bool: return p.can_dash())
@@ -108,7 +110,7 @@ func _ready() -> void:
 	await until(func() -> bool: return not p.is_dashing())
 	hands.move = Vector2.ZERO
 	await phys(4)
-	check(heard(&"fell") == 0 and is_equal_approx(p.health, hp) and p.global_position.x > room.cell_center(8, 4).x,
+	check(heard(&"fell") == 0 and is_equal_approx(p.health, hp) and p.global_position.x > float(8 * Room.CELL),
 		"a dash carries the player over the pit to the floor beyond (%.0f)" % p.global_position.x)
 
 	# A monster that walks is stopped at the edge; one that flies crosses.
@@ -131,8 +133,9 @@ func _ready() -> void:
 	add_child(drifter)
 	drifter.global_position = room.cell_center(3, 3)
 	drifter.hunt(p)
-	await until(func() -> bool: return drifter.global_position.x > room.cell_center(9, 4).x, 300)
-	check(drifter.global_position.x > room.cell_center(9, 4).x, "a drifter flies over it (%.0f)" % drifter.global_position.x)
+	await until(func() -> bool: return drifter.global_position.x > float(6 * Room.CELL) + 8.0, 300)
+	check(drifter.global_position.x > float(6 * Room.CELL) + 8.0,
+		"a drifter is not stopped at the edge: it flies out over the pit (%.0f)" % drifter.global_position.x)
 
 	# A bolt flies over.
 	var bolt := Payload.new()

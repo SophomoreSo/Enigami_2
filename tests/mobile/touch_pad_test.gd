@@ -864,7 +864,7 @@ func _the_skills() -> void:
 	await frames(2)
 
 	# A tap with no throw in it still goes somewhere: forwards.
-	player.face(-1)
+	player.face(Vector2.LEFT)
 	await frames(2)
 	check(pad.aim().is_equal_approx(Vector2.LEFT),
 		"with nothing held the pad aims the way the player faces (%s)" % str(pad.aim()))

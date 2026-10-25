@@ -214,11 +214,12 @@ func _ready() -> void:
 			and maker.actions_of(b)[0] == {"who": player, "do": "walk", "to": "left", "steps": StoryMaker.NEW_STEPS},
 		"a walk left goes so many cells")
 	check(maker.set_action(b, 0, "steps", 3) and int(maker.actions_of(b)[0]["steps"]) == 3
-			and not maker.set_action(b, 0, "to", "up") and not maker.set_action(b, 0, "who", "cat"),
-		"and only so many, and only one of the ways there are, and only one of the two")
+			and maker.set_action(b, 0, "to", "up") and not maker.set_action(b, 0, "to", "sideways")
+			and not maker.set_action(b, 0, "who", "cat"),
+		"and only so many, any of the four ways on the floor and none other, and only one of the two")
 	check(maker.set_action(b, 0, "do", "face") and maker.actions_of(b)[0] == {"who": player, "do": "face", "dir": "toward"},
 		"a turn keeps what a turn takes and nothing of a walk's")
-	check(maker.set_action(b, 0, "dir", "left") and not maker.set_action(b, 0, "dir", "up")
+	check(maker.set_action(b, 0, "dir", "up") and not maker.set_action(b, 0, "dir", "sideways")
 			and maker.set_action(b, 0, "do", "pose") and maker.actions_of(b)[0] == {"who": player, "do": "pose", "pose": "idle"},
 		"and a pose starts standing")
 	check(maker.set_action(b, 0, "pose", "sit") and not maker.set_action(b, 0, "pose", "") and not maker.set_action(b, 0, "hat", "x")
@@ -287,7 +288,7 @@ func _ready() -> void:
 	var in_box := Dialogue.problems_in({"start": def["start"], "nodes": def["nodes"]})
 	check(in_box.size() == 1 and String(in_box[0]).contains("no text"),
 		"the conversations' own checker passes the box's half of it but for the beat of staging, which has nothing to say on purpose (%s)" % str(in_box))
-	var scene := maker.scene_script(Vector2(300, 400), Vector2(200, 400), 414.0)
+	var scene := maker.scene_script(Vector2(300, 400), Vector2(200, 400))
 	var beats: Array = scene["beats"]
 	check(beats.size() == 5 and String(beats[0]["id"]) == a and String(beats[0]["next"]) == g
 			and String(beats[0]["do"][0]["fade"]) == "in"
@@ -306,9 +307,9 @@ func _ready() -> void:
 		"with the two of them cast facing each other, the camera in close, and the scenes' own checker passes it (%s)" % str(CutsceneScript.problems_in(scene)))
 	maker.set_action(b, 0, "do", "walk")
 	maker.set_action(b, 0, "to", "right")
-	check(beat_called(scene_wrap(maker.scene_script(Vector2.ZERO, Vector2.ZERO, 0.0)), b)["do"]
-			== [{"move": player, "speed": StoryMaker.WALK_SPEED, "by": float(StoryMaker.NEW_STEPS * Room.CELL)}],
-		"a walk right is a move by so many cells")
+	check(beat_called(scene_wrap(maker.scene_script(Vector2.ZERO, Vector2.ZERO)), b)["do"]
+			== [{"move": player, "speed": StoryMaker.WALK_SPEED, "by": [float(StoryMaker.NEW_STEPS * Room.CELL), 0.0]}],
+		"a walk right is a move by so many cells across the floor")
 	maker.set_action(b, 0, "do", "pose")
 	maker.set_action(b, 0, "pose", "sit")
 
@@ -536,9 +537,9 @@ func _ready() -> void:
 	maker.scene.skip()
 	await frames(3)
 	check(not maker.playing and maker.scene == null, "and skipped, it is over at once")
-	# A story with a spot the map has no room in puts the character along the
-	# floor from the start instead.
-	maker.set_spot(Vector2i(3, 3))
+	# A story with a spot the map has no room in — in the wall down its left —
+	# puts the character along the floor from the start instead.
+	maker.set_spot(Vector2i(0, 3))
 	maker.set_mode(StoryMaker.Mode.FROZEN)
 	maker.play()
 	await frames(2)
@@ -580,7 +581,7 @@ func _ready() -> void:
 		var found := StoryMaker.problems_in(Stories.load_story(id))
 		check(found.is_empty(), "%s.json reads clean%s" % [id, "" if found.is_empty() else " — " + "; ".join(found)])
 		maker.open(id)
-		var as_scene := CutsceneScript.problems_in(maker.scene_script(Vector2(300, 400), Vector2(200, 400), 414.0))
+		var as_scene := CutsceneScript.problems_in(maker.scene_script(Vector2(300, 400), Vector2(200, 400)))
 		var told := maker.character()
 		var as_talk := Dialogue.problems_in({"start": told["start"], "nodes": told["nodes"]})
 		check(as_scene.is_empty() and as_talk.is_empty(), "and plays as a scene and as a conversation (%s %s)" % [str(as_scene), str(as_talk)])

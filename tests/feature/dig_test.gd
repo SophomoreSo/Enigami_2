@@ -135,7 +135,7 @@ func _digging() -> void:
 	room.add_child(e)
 	e.global_position = spot.global_position + Vector2(160.0, -2.0)
 	await frames(2)
-	e.face(1)
+	e.face(Vector2.RIGHT)
 	e._glance = 30.0
 
 	# Held a moment and let go: it starts over.

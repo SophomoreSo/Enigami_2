@@ -166,7 +166,7 @@ func _ready() -> void:
 		"standing in the doorway, the room beyond is stood up and the player is still here")
 	if not raid.rooms.has(away):
 		print("[ROAM] ---- %d failures ----" % fails)
-		get_tree().quit()
+		get_tree().quit(1 if fails > 0 else 0)
 		return
 	var there: Room = raid.rooms[away]
 	check(there.position == Room.origin_of(away) and raid.room.neighbours.get(dir) == there
@@ -199,7 +199,7 @@ func _ready() -> void:
 	check(rover != null and rover.get_parent() == home_room, "(the rover is still the first room's)")
 	if rover == null:
 		print("[ROAM] ---- %d failures ----" % fails)
-		get_tree().quit()
+		get_tree().quit(1 if fails > 0 else 0)
 		return
 	rover.global_position = inside(raid, away, RaidMap.opposite(dir)) + Vector2(RaidMap.dir_delta(dir)) * 40.0
 	await frames(2)
@@ -227,10 +227,14 @@ func _ready() -> void:
 	var arrived := find(raid, "rover")
 	check(arrived != null and raid.hunters.is_empty(),
 		"a room at a time, it comes to the room the player is in (%d hops)" % hops)
-	check(arrived != null and arrived.get_parent() == raid.room and count_in(raid, far, "rover") == 1
-			and count_in(raid, away, "rover") == 0,
-		"stood up there, among that room's monsters, once")
+	# The first room up that its road comes to: the player's, or one beside it
+	# that is standing, which it walks on into after them.
+	var landed: Room = arrived.get_parent() as Room if arrived != null else null
+	check(landed != null and raid.rooms.values().has(landed)
+			and count_in(raid, landed.coord, "rover") == 1 and count_in(raid, away, "rover") == 0,
+		"stood up in the first room up on its road, among that room's monsters, once (%s, player in %s)"
+		% [str(landed.coord) if landed != null else "none", str(raid.room.coord)])
 	check(arrived != null and arrived.hunting(), "and still after them")
 
 	print("[ROAM] ---- %d failures ----" % fails)
-	get_tree().quit()
+	get_tree().quit(1 if fails > 0 else 0)

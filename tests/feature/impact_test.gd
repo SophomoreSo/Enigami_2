@@ -55,7 +55,7 @@ func monster(kind: String, at: Vector2) -> Enemy:
 	e.global_position = at
 	# A patroller picks its heading with a coin toss in `_ready`, and the two
 	# halves of `pull_travel` only subtract cleanly if both walked the same way.
-	e._patrol_dir = 1
+	e._patrol_dir = Vector2.RIGHT
 	return e
 
 ## Rooms for the live-monster checks, kept well apart so one test's pull field

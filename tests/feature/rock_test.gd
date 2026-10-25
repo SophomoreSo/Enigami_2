@@ -83,7 +83,19 @@ func heard(cue: StringName, kind: String = "") -> int:
 func hands_on(p: Player) -> void:
 	bot = ComputerHands.new()
 	p.input.add(bot)
-	bot.point_at(p.global_position + Vector2(260.0, -120.0))
+	# Along the floor to the right: from where the hall's player stands, up
+	# and to the right is the pillar over them, which a throw strikes at once.
+	bot.point_at(p.global_position + Vector2(260.0, 0.0))
+
+## Points the hands at `at`, and waits until the body is aiming there: the body
+## takes its aim at the end of a frame, after whatever the frame threw, so a
+## press in the frame the hands were pointed would go where they pointed before.
+func point(a: Actor, at: Vector2) -> void:
+	bot.point_at(at)
+	var p := a as Player if a is Player else null
+	await until(func() -> bool:
+		var who: Player = p if p != null else (a as Enemy).pilot
+		return who != null and who.aim.dot((at - a.global_position).normalized()) > 0.99, 1.0)
 
 ## A press of attack, as a hand does it.
 func throw() -> void:
@@ -138,6 +150,7 @@ func _thrown_and_fetched() -> void:
 	p.global_position.x = 400.0
 	await frames(3)
 	hands_on(p)
+	await point(p, p.global_position + Vector2(260.0, 0.0))
 	cues.clear()
 	await throw()
 	var flying := bolts(h)
@@ -183,7 +196,7 @@ func _thrown_and_fetched() -> void:
 	check(rocks().is_empty() and heard(&"rock_back") == 1, "and off the floor")
 	p.global_position.x = 400.0
 	await frames(3)
-	bot.point_at(p.global_position + Vector2(260.0, -120.0))
+	await point(p, p.global_position + Vector2(260.0, 0.0))
 	await throw()
 	check(bolts(h).filter(func(b: Projectile) -> bool: return b.is_rock()).size() == 1 and not p.holds("ROCK"),
 		"and it can be thrown again")
@@ -196,6 +209,9 @@ func _thrown_and_fetched() -> void:
 		await stand_on(p, near)
 	p.global_position.x = 300.0
 	await frames(3)
+	# Out of the hand, as a throw has it, and coming down at the feet.
+	p.let_go("ROCK")
+	check(not p.holds("ROCK"), "(out of the hand)")
 	var dropped := LooseRock.drop("ROCK", p.global_position, Vector2.ZERO, p.room, p, 40.0)
 	await frames(3)
 	check(not p.holds("ROCK"), "one coming down on top of the hand that threw it is not caught")
@@ -281,7 +297,7 @@ func _in_a_monster() -> void:
 			and p.weapon_hands() == e and p.can_cast(),
 		"walked over in the monster, it is in the monster's hand")
 	cues.clear()
-	bot.point_at(e.global_position + Vector2(-220.0, -120.0))
+	await point(e, e.global_position + Vector2(-220.0, -120.0))
 	await throw()
 	var from: Vector2 = Vector2.INF
 	for c in cues:
@@ -424,7 +440,7 @@ func _left_in_a_room() -> void:
 	# Thrown, and the room left before it is down.
 	p.global_position = raid.room.to_global(raid.room.spawn_point())
 	await frames(2)
-	bot.point_at(p.global_position + Vector2(200.0, -300.0))
+	await point(p, p.global_position + Vector2(200.0, -300.0))
 	await throw()
 	raid.go_to(far)
 	await frames(3)
