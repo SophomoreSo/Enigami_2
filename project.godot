@@ -39,15 +39,6 @@ Sprites="*res://graphics/sprites.gd"
 Fx="*res://graphics/fx.gd"
 Views="*res://graphics/views.gd"
 CueVisuals="*res://graphics/cue_visuals.gd"
-TimeCtl="*res://feature/core/time_control.gd"
-Phone="*res://feature/core/phone.gd"
-Perks="*res://perks/rules/perks.gd"
-Sprites="*res://graphics/sprites.gd"
-Fx="*res://graphics/fx.gd"
-Views="*res://graphics/views.gd"
-CueVisuals="*res://graphics/cue_visuals.gd"
-Fx="*res://graphics/fx.gd"
-CueVisuals="*res://graphics/cue_visuals.gd"
 
 [display]
 

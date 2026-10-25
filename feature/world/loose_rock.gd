@@ -153,7 +153,7 @@ func _travel(delta: float) -> void:
 	var step := travel / float(hops)
 	for i in hops:
 		var next := global_position + step
-		if _solid(next + step.normalized() * radius):
+		if _solid(next + step.normalized() * RADIUS):
 			_spend_on_rock()
 			velocity = -velocity * BOUNCE
 			return
@@ -173,7 +173,7 @@ func _strike() -> void:
 	for a in reached:
 		if _hit.has(a) or not is_instance_valid(a):
 			continue
-		if global_position.distance_to(a.global_position) <= radius + a.hurt_radius:
+		if global_position.distance_to(a.global_position) <= RADIUS + a.hurt_radius:
 			_hit.append(a)
 			var dir := velocity.normalized() if velocity.length() > 1.0 else Vector2.DOWN
 			Attacks.resolve_hit(strikes, a, global_position, dir, _attacker, room, _team)
@@ -267,7 +267,7 @@ func _hands_on(hands: Node2D, reach: float) -> bool:
 	if hands == null or not is_instance_valid(hands):
 		return false
 	var theirs := float(hands.get("hurt_radius")) if hands.get("hurt_radius") != null else 0.0
-	return global_position.distance_to(hands.global_position) <= radius + theirs + reach
+	return global_position.distance_to(hands.global_position) <= RADIUS + theirs + reach
 
 ## What a room writes down for it when the player walks out leaving it there.
 func record() -> Dictionary:
