@@ -668,13 +668,13 @@ CREATE TABLE maps (
 	height  INTEGER NOT NULL CHECK (height >= 1)
 );
 
--- A map's layers: `plan`, the ground and what stands on it; `back`, what
--- stands behind; `dressing`, what is put about. `level` is the layer's place
--- from the back forward — back 0, plan 1, dressing 2 — and `reference` the
--- picture the layer was laid over, a res:// or user:// path, NULL for none.
+-- A map's layers: `plan`, the floor plan — the walls, and what stands on the
+-- floor; `dressing`, what is put about it. `level` is the layer's place, the
+-- plan first — plan 0, dressing 1 — and `reference` the picture the layer was
+-- laid over, a res:// or user:// path, NULL for none.
 CREATE TABLE map_layers (
 	map_id    TEXT NOT NULL REFERENCES maps (id) ON DELETE CASCADE,
-	layer     TEXT NOT NULL CHECK (layer IN ('plan', 'back', 'dressing')),
+	layer     TEXT NOT NULL CHECK (layer IN ('plan', 'dressing')),
 	level     INTEGER NOT NULL,
 	reference TEXT CHECK (reference IS NULL OR reference <> ''),
 	PRIMARY KEY (map_id, layer)

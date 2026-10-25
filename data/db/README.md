@@ -713,7 +713,7 @@ own.
 
 ## A map
 
-A room made in the map creator (title → **MAP CREATOR**): its level, its three
+A room made in the map creator (title → **MAP CREATOR**): its level, its two
 layers and each layer's grid of cells, in three tables. The ones the game
 ships with are built in from `maps/`, a file a map, named for it —
 `maps/moonlit_grove.sql` is the map `moonlit_grove`, the hideout's Moonlit
@@ -730,13 +730,12 @@ INSERT INTO maps (id, tileset, region, width, height) VALUES
 	('keep', 'grove', 0, 40, 22);
 
 INSERT INTO map_layers (map_id, layer, level, reference) VALUES
-	('keep', 'back', 0, 'res://graphics/assets/references/keep_back.png'),
-	('keep', 'plan', 1, NULL),
-	('keep', 'dressing', 2, NULL);
+	('keep', 'plan', 0, 'res://graphics/assets/references/keep_plan.png'),
+	('keep', 'dressing', 1, NULL);
 
 INSERT INTO map_rows (map_id, layer, y, cells) VALUES
-	('keep', 'plan', 0, '****************************************'),
-	('keep', 'plan', 1, '||.....................................|');
+	('keep', 'plan', 0, '#######################UUU##############'),
+	('keep', 'plan', 1, '#......................................#');
 	-- … a row of every layer's grid, as tall as `height`
 ```
 
@@ -749,89 +748,67 @@ INSERT INTO map_rows (map_id, layer, y, cells) VALUES
 | `region` | 0 to 3: which region's rock the plain rock is. Only `rock` reads it. |
 | `width` `height` | Its size in cells: every layer's grid is this size. |
 
-`map_layers` — a row a layer, all three of them:
+`map_layers` — a row a layer, both of them:
 
 | Column | Meaning |
 |---|---|
-| `layer` | `plan`, the ground and what stands on it — the one layer the rules read; `back`, what stands behind; `dressing`, what is put about. |
-| `level` | The layer's place from the back forward: `back` 0, `plan` 1, `dressing` 2. |
+| `layer` | `plan`, the floor plan — the walls and what stands on the floor, the one layer the rules read; `dressing`, what is put about the floor. |
+| `level` | The layer's place: `plan` 0, `dressing` 1. |
 | `reference` | The picture the layer was laid over, a `res://` or `user://` path — kept with the map, and NULL for a layer with none. The path rather than the picture: the picture stays a file Godot imports, and the database stays text a merge can read. |
 
 `map_rows` — each layer's grid, a row of cells a row, `y` from 0 at the top,
-a character a cell. `.` is nothing, in every layer.
+a character a cell. `.` is nothing, in every layer. The map is seen from
+above: a row is a stretch of floor across the screen, and the rows further
+down are nearer the eye.
 
 #### The plan
 
 | Cell | Meaning |
 |---|---|
-| `#` `%` `\|` `=` `*` | Ground: stone, earth, bark, planks, leaves. Every kind is as solid as the next; the kind is how it looks. In `rock` every kind is the rock. |
-| `o` `@` | Glass, in every tileset and as solid: clear glass, which shows what stands behind it, and a mirror, which shows what stands in front of it across its face to the open air. |
-| `P` | Where the player starts. One a map. With none, the floor nearest the middle. |
-| `T` | The room's treasure box. One a map. It is put down on the first floor under its cell. |
-| `x` | Ground worth digging, put down the same way. |
-| `_` | A bench to sit on, put down the same way. |
+| `#` `%` `\|` `=` `*` | A wall: stone, earth, bark, planks, leaves. Every kind is as solid as the next; the kind is how it looks. In `rock` every kind is the rock. |
+| `o` `@` | Glass, in every tileset and as solid: clear glass, and a mirror. |
+| `~` | Magic stone: a wall while magic is on, and nothing while it is off. |
+| `P` | Where the player starts. One a map. With none, the open floor nearest the middle. |
+| `T` | The room's treasure box, standing on its cell. One a map. |
+| `x` | Ground worth digging. |
+| `_` | A bench to sit on. |
 | `c` `s` `l` `h` `d` `b` | A post for a Crawler, a Sentry, a Lobber, a Hopper, a Drifter, a Bomber. |
 | `w` `g` `u` `y` `a` | And for a Warden, a Gunman, a Grunt, a Test Dummy, the Arbiter. |
-| `<` `>` | A raid room's doorway in its west or east wall: the cells of its mouth, against that edge, walked through into the room beside it on the floor. |
-| `U` `D` | Its gate up or down, standing in the cell marked, gone through with interact into the room above or below. One each. |
+| `<` `>` `U` `D` | A raid room's doorway in its west, east, north or south wall: the cells of its mouth, against that edge, walked through into the room beside it on the floor. |
 | `E` | Where its way out of the raid stands, if the floor gives it one. One. |
 
-Anything else is open. A monster stands in its cell, on whatever is under it;
-one that flies holds the middle of it. What the box and the ground hold is
-rolled from the plan, so the same map always hides the same things.
+Anything else is open floor. Everything stands on the middle of its cell.
+What the box and the ground hold is rolled from the plan, so the same map
+always hides the same things.
 
-Past the plan's edge there is ground on every side, drawn and solid, so a map
-does not need a wall of its own to keep a body in. A grove has leaves over its
-top and earth under it, and beside it, row by row, the kind of ground its
-outermost cell is, or bark where that cell is open; `rock` has the rock.
-
-#### What stands behind
-
-A cell behind is drawn as it meets its neighbours: a column ends in a foot
-where it stops going down, and in a capital under what it carries — or broken
-off, carrying nothing — and glass is framed wherever it meets anything but
-more of the same glass. Glass behind a cell of ground is hidden by it, as
-anything behind is.
-
-| Cell | In `grove` | In `rock` |
-|---|---|---|
-| `#` | A ruin's wall | A wall of the rock, darker |
-| `\|` | A column | |
-| `-` | A stone lintel, carved | |
-| `!` | A tree's trunk | |
-| `~` | Undergrowth | |
-| `=` | A rail, to hang lanterns from | |
-| `o` | A pane of clear glass: a window on what is out beyond | The same |
-| `@` | A mirror on the back wall, which shows whoever stands in front of it a little off | The same |
+Past the plan's edge there is rock on every side, drawn and solid, so a map
+does not need a wall of its own to keep a body in — but for the mouth of a
+doorway, where the raid stands another room against this one.
 
 #### What is put about
 
-The same in every tileset. A lantern, a vine and a rope hang from the
-underside of the first ground over them, or from a rail or a lintel behind or
-over them, as far as eight cells up; with nothing there, from the top of their
-own cell.
+The same in every tileset. Everything stands on the floor of its cell.
 
 | Cell | Meaning |
 |---|---|
-| `L` | A lantern with a lamp in it, on a line that moves like a rope's wherever it is touched. |
-| `F` | A campfire, and its light. |
+| `L` `B` | A lantern on a post, a lightbulb: each with its light. |
+| `F` `H` | A campfire, a fireplace, and its light. |
 | `m` | Glowing caps, and their light. |
 | `*` | Fireflies, and their light. |
-| `g` `f` `b` | Grass, flowers, a bush: the floor's foliage. A run of one along a row is one patch, standing on the floor of its cells. |
+| `g` `f` `b` | Grass, flowers, a bush: the floor's foliage. A run of one along a row is one patch. |
 | `n` | A fern. |
-| `v` `r` | A vine, a rope. A run of one down a column is one line, hanging from what is over its top cell to the foot of its last. Either is also one to take hold of and swing on, as a raid room's ropes are: the marks of this layer the rules read (`MadeRoom.LINES`). It swings from the top of its run, so lay it from right under what it hangs from. |
 
 A map is text, a row of cells a line, so it reads in a diff and can be
-mended by hand in its .sql. The creator squares off whatever it loads: rows made one length, every layer the
-plan's size, and the whole kept between 8 cells by 6 and four screens (40 by
-22 each) each way.
+mended by hand in its .sql. The creator squares off whatever it loads: rows
+made one length, every layer the plan's size, and the whole kept between 8
+cells by 6 and four screens (40 by 22 each) each way.
 
 #### Picking one up
 
 ```gdscript
 var room := Maps.load_room("moonlit_grove")
 add_child(room)
-room.stand()                                  # the ground, and whatever its plan says is in it
+room.stand()                                  # the walls, and whatever its plan says is in it
 player.room = room
 player.global_position = room.spawn_point()
 ```
@@ -840,7 +817,7 @@ Set `room.player` before `stand()` if the box and the ground to dig are to
 answer to somebody. `MapMaker._stand` (`feature/world/map_maker.gd`) is the
 whole of it, as PLAY does it. A map is a `Room`, so everything that takes one
 takes it; the view the game gives it (`graphics/views/made_room_view.gd`)
-draws it in its tileset.
+draws it.
 
 ## A floor
 
@@ -861,22 +838,21 @@ INSERT INTO raid_rooms (x, y, map_id, kind, danger, exit) VALUES
 | `danger` | 1 to 5: how much harder its monsters are. |
 | `exit` | The way out it offers, standing on its map's `E`: `entry` and `crack`, free; `toll`, for gold; `arbiter`, once the Arbiter is down — or NULL. Their terms are `RaidMap.EXITS`. |
 
-Two rooms side by side are joined where both are on the floor and the one
-marks a doorway toward the other (`>` in the west room, `<` in the east one);
-two one over the other where the lower marks `U` and the upper `D`. A room
+Two rooms are joined where both are on the floor and the one marks a doorway
+toward the other: `>` in the west room and `<` in the east one, `D` in the
+upper room and `U` in the lower, the mouths lined up across the seam. A room
 holds what its map lays in it and nothing rolled.
 
 In play each room stands where the floor puts it, a room's size along for
 every column and row, and only the rooms round the player are stood up: the
-one they are in, and the one beside it through a doorway once they are near
-the seam — never more than three (`Raid.rooms`). A doorway is walked through,
-the picture following; a gate is gone through with interact, and is the one
-cut. A room left behind is written back into its record and taken down, and
-a monster that was after the player in it travels the floor a room at a time
-to find them again (`Raid.hunters`). The build cannot see a map's
-marks, so `tests/feature/floor_test` holds the floor together: one way in with a
-start and an exit, the Arbiter's room with the Arbiter in it, every doorway and
-gate matched the way back, and every room reached from the way in.
+one they are in, and a room beside it through a doorway once they are near
+the seam (`Raid.rooms`). A doorway is walked through, the picture following.
+A room left behind is written back into its record and taken down, and a
+monster that was after the player in it travels the floor a room at a time
+to find them again (`Raid.hunters`). The build cannot see a map's marks, so
+`tests/feature/floor_test` holds the floor together: one way in with a start
+and an exit, the Arbiter's room with the Arbiter in it, every doorway matched
+the way back, and every room reached from the way in.
 
 ## A perk
 

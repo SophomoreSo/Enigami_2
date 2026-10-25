@@ -10,7 +10,8 @@ extends Node2D
 ## A lobbed one — a thrown stone, a shuriken, a Lobber's shot — flies the same
 ## line on the floor and an arc over it (`height`, `lob`): thrown up out of
 ## the hand, it comes down where it was aimed, strikes nothing it passes over
-## while it is up, and flies over a wall that is under it. Where it comes down
+## while it is up. A wall stops it as it stops anything: the walls stand taller
+## than any throw. Where it comes down
 ## is the end of it: a stone lies there, a shuriken sticks there, and anything
 ## else bursts there (`Attacks.land`).
 ##
@@ -55,9 +56,6 @@ const LOB_GRAVITY := 620.0
 ## about a body's height. Higher than that, it passes over.
 const HAND_HEIGHT := 14.0
 const STRIKE_HEIGHT := 36.0
-## How high a wall stands, in world units — a cell of the room, seen from in
-## front: a lobbed bolt higher than that flies over it.
-const WALL_HEIGHT := 32.0
 ## How long a lobbed throw may stay in the air. Its arc is what brings it down,
 ## not its range (`lobbed`), and this is the backstop under that: a throw over
 ## a pit, or out over nothing, still ends.
@@ -399,10 +397,9 @@ static func furthest_clear(rm, from: Vector2, way: PackedVector2Array) -> Vector
 		out = point
 	return out
 
-## Whether the room's rock stands at `at`, as high as this bolt is: a lobbed
-## bolt over the top of a wall flies on over it.
+## Whether the room's rock stands at `at`. A wall is as tall as any throw.
 func _wall_at(at: Vector2) -> bool:
-	return room != null and room.has_method("is_solid_at") and room.is_solid_at(at) and height < WALL_HEIGHT
+	return room != null and room.has_method("is_solid_at") and room.is_solid_at(at)
 
 ## One collision sample where the bolt is standing. Returns true once the
 ## caller is to stop walking it: the bolt is gone, or it has turned — off a
@@ -504,7 +501,7 @@ func _fall_out() -> void:
 	queue_free()
 
 ## Whether this is a thrown thing in an arc over the floor, which flies its arc
-## out: nothing ends it but what it meets — a wall under it, a body in its
+## out: nothing ends it but what it meets — a wall, a body in its
 ## way low enough — or the floor it comes down on, where the throw goes off
 ## (`Attacks.land`). Its range is a flat shot's, and ANTI-GRAVITY makes it one.
 func lobbed() -> bool:

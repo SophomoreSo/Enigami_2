@@ -5,34 +5,9 @@ INSERT INTO maps (id, tileset, region, width, height) VALUES
 	('moonlit_grove', 'grove', 0, 40, 22);
 
 INSERT INTO map_layers (map_id, layer, level, reference) VALUES
-	('moonlit_grove', 'back', 0, NULL),
-	('moonlit_grove', 'plan', 1, NULL),
-	('moonlit_grove', 'dressing', 2, NULL);
+	('moonlit_grove', 'plan', 0, NULL),
+	('moonlit_grove', 'dressing', 1, NULL);
 
--- back
-INSERT INTO map_rows (map_id, layer, y, cells) VALUES
-	('moonlit_grove', 'back', 0, '........................................'),
-	('moonlit_grove', 'back', 1, '........................................'),
-	('moonlit_grove', 'back', 2, '................................!!!!!!!.'),
-	('moonlit_grove', 'back', 3, '................................!!!!!!!.'),
-	('moonlit_grove', 'back', 4, '.................-----------....!!!!!!!.'),
-	('moonlit_grove', 'back', 5, '..................|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 6, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 7, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 8, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 9, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 10, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 11, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 12, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 13, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 14, '..========|=======|=======|=====!!!!!!!.'),
-	('moonlit_grove', 'back', 15, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 16, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 17, '..........|.......|.......|.....!!!!!!!.'),
-	('moonlit_grove', 'back', 18, '...~~..~..|..~~~..|...~~..|..~..!!!!!!!.'),
-	('moonlit_grove', 'back', 19, '..~~~~~~~~|~~~~~~~|~~~~~~~|~~~~~!!!!!!!.'),
-	('moonlit_grove', 'back', 20, '........................................'),
-	('moonlit_grove', 'back', 21, '........................................');
 
 -- plan
 INSERT INTO map_rows (map_id, layer, y, cells) VALUES
@@ -63,11 +38,11 @@ INSERT INTO map_rows (map_id, layer, y, cells) VALUES
 INSERT INTO map_rows (map_id, layer, y, cells) VALUES
 	('moonlit_grove', 'dressing', 0, '........................................'),
 	('moonlit_grove', 'dressing', 1, '........................................'),
-	('moonlit_grove', 'dressing', 2, '.....v.................v..........v.....'),
-	('moonlit_grove', 'dressing', 3, '.....v.................v..........v.....'),
-	('moonlit_grove', 'dressing', 4, '.....v.................v..........v.....'),
-	('moonlit_grove', 'dressing', 5, '.....v................L...........v.....'),
-	('moonlit_grove', 'dressing', 6, '............L.....................v.....'),
+	('moonlit_grove', 'dressing', 2, '........................................'),
+	('moonlit_grove', 'dressing', 3, '........................................'),
+	('moonlit_grove', 'dressing', 4, '........................................'),
+	('moonlit_grove', 'dressing', 5, '......................L.................'),
+	('moonlit_grove', 'dressing', 6, '............L...........................'),
 	('moonlit_grove', 'dressing', 7, '........................................'),
 	('moonlit_grove', 'dressing', 8, '........................*....L..........'),
 	('moonlit_grove', 'dressing', 9, '...............*...................*....'),

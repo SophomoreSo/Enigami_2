@@ -56,6 +56,26 @@ func view_script_for(n: Node) -> GDScript:
 		return LooseRockView
 	if n is StuckShuriken:
 		return StuckShurikenView
+	if n is Pickup:
+		return PickupView
+	if n is LostKit:
+		return LostKitView
+	if n is TreasureBox:
+		return TreasureBoxView
+	if n is Bench:
+		return BenchView
+	if n is DigSpot:
+		return DigSpotView
+	if n is PhoneProp:
+		return PhonePropView
+	if n is MadeRoom:
+		return MadeRoomView
+	if n is Room:
+		return RoomView
+	if n is Raid:
+		return RaidView
+	if n is Sandbox:
+		return SandboxView
 	# The rest of the game's nodes get theirs as each arrives (PLAN.md).
 	# Story keeps its own table, in `story/view/story_views.gd`.
 	return StoryViews.view_script_for(n)

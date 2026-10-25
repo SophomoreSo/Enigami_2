@@ -1,7 +1,8 @@
 -- The raid's floor: which hand-made map stands where on its 7 by 5 grid,
 -- what kind of room it is, how dangerous, and which way out it offers. Two
 -- rooms side by side are joined through doorways their maps mark (`<` `>`),
--- and two one above the other through gates (`U` `D`); an exit stands on the
+-- and one above the other through doorways in the north and south walls
+-- (`U` `D`); an exit stands on the
 -- room's `E`. What each column means is the README's **A floor**. In play a
 -- room stands where its column and row put it, and a doorway is walked
 -- through into the room beside, stood up as the player nears it (`Raid`).
