@@ -18,12 +18,10 @@ extends Node2D
 ## A caster is put wherever the thing that throws the shadow is, by its view:
 ## a room's rock is one (`RoomView`), and a body another (`ActorView`).
 ##
-## A body throws its edges' shadow only in a spot's light or a sun's. A round
-## light — a point's, an area's — is in front of a body or behind it, as the
-## world draws the two, and not beside it in one plane: in front, the body
-## throws its figure on the wall behind it, and behind, a patch of shadow at
-## its feet, and it stands dark against the light but for a rim (`Lighting`).
-## Its figure is what it is drawn as (`figures`).
+## A body throws no edges' shadow: it stands on the floor the lights are on,
+## and leaves a patch of shadow at its feet, away from the light (`Lighting`).
+## Its figure, what it is drawn as (`figures`), is where it stands, which no
+## shadow on the floor darkens.
 
 ## The group every caster in the tree is in, which is how it is found.
 const GROUP := &"shadow_casters"
@@ -41,11 +39,10 @@ var bounds := Rect2()
 ## has the body throw a shadow (`beyond`).
 var body := false
 ## What a body is drawn as — its sprite, and what it holds — which is its
-## figure: what it throws on the wall in a round light in front of it, and
-## where it stands dark against one behind it. With none, its outline is.
+## figure: where it stands, for the lights. With none, its outline is.
 var figures: Array[CanvasItem] = []
-## What it is the body of, when that stands on things: the shadow a light
-## behind it leaves at its feet is there while it stands on something.
+## What it is the body of: the patch a light leaves at its feet is there while
+## it stands on the floor.
 var standing: CharacterBody2D = null
 ## How much of that shadow there is, 0 to 1. A body on a floor seen from above
 ## is always on it, so this is all of it; it is kept for what lifts a thing
@@ -53,10 +50,6 @@ var standing: CharacterBody2D = null
 var feet := 1.0
 
 var _shape := PackedVector2Array()
-
-## How far past a light inside a body what of the body throws its shadow
-## begins, in world units: off the light, so no edge of it runs through it.
-const HAIR := 0.5
 
 func _enter_tree() -> void:
 	add_to_group(GROUP)
@@ -186,65 +179,6 @@ static func _placed(item: CanvasItem, view: Transform2D) -> Transform2D:
 		xf.origin = (xf.origin + Vector2(0.5, 0.5)).floor()
 		xf = xf * own
 	return xf
-
-## What of a body throws its shadow in a light at `at`, inside it, as edges in
-## the world: the light is taken to stand at the body's edge nearest to it,
-## so the body goes on throwing the shadow it threw as the light came in over
-## that edge — all of it from the light on, away from that edge. As the light
-## passes the body's middle it goes over to the far edge, and the shadow over
-## to the other side, as it does going past anything thin. Null for a light
-## that is not inside it.
-func beyond(at: Vector2) -> ArrayMesh:
-	if not holds(at):
-		return null
-	var shape: PackedVector2Array = global_transform * _shape
-	var middle := Vector2.ZERO
-	for p in shape:
-		middle += p
-	middle /= shape.size()
-	var nearest := 0
-	var least := INF
-	for i in shape.size():
-		var off := at.distance_to(Geometry2D.get_closest_point_to_segment(at, shape[i], shape[(i + 1) % shape.size()]))
-		if off < least:
-			least = off
-			nearest = i
-	var a := shape[nearest]
-	var b := shape[(nearest + 1) % shape.size()]
-	# The way out of the body over that edge.
-	var out := (b - a).orthogonal().normalized()
-	if out.dot((a + b) * 0.5 - middle) < 0.0:
-		out = -out
-	# The body behind a line through the light along that edge, a hair the far
-	# side of the light.
-	var cut := at - out * HAIR
-	var kept := PackedVector2Array()
-	for i in shape.size():
-		var p := shape[i]
-		var q := shape[(i + 1) % shape.size()]
-		var dp := (p - cut).dot(out)
-		var dq := (q - cut).dot(out)
-		if dp <= 0.0:
-			_add_corner(kept, p)
-		if (dp <= 0.0) != (dq <= 0.0):
-			_add_corner(kept, p.lerp(q, dp / (dp - dq)))
-	if kept.size() > 1 and kept[0].distance_to(kept[kept.size() - 1]) < 0.001:
-		kept.remove_at(kept.size() - 1)
-	if kept.size() < 3:
-		return null
-	# In the order a clock's hand goes, whichever way the body was turned.
-	var turning := 0.0
-	for i in kept.size():
-		turning += kept[i].cross(kept[(i + 1) % kept.size()])
-	if turning < 0.0:
-		kept.reverse()
-	var edged := _outlined(kept)
-	return _strips(edged[0], edged[1])
-
-## `corner`, after the last of `corners`, unless it is the same corner again.
-static func _add_corner(corners: PackedVector2Array, corner: Vector2) -> void:
-	if corners.is_empty() or corners[corners.size() - 1].distance_to(corner) >= 0.001:
-		corners.append(corner)
 
 ## One closed shape's edges, its corners in the order a clock's hand passes
 ## them: the two ends of each, and the way each faces, out of the shape.

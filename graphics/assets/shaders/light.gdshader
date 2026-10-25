@@ -40,16 +40,11 @@ render_mode unshaded, blend_add;
 // are marked in a picture of their own (shadow.gdshader), one of its colours
 // to a light.
 //
-// A body stands in a round light — a point's, an area's — otherwise: the
-// light is in front of it or behind it, not beside it in one plane, as the
-// world draws them. In front, the body throws its figure on the wall behind
-// it; behind, a patch of shadow at its feet (figure_shadow.gdshader). Either
-// is marked in the same colour of the mask as the rock's shadows, by how dark
-// it is, and darkens whatever is there but a body, by that much. And a body
-// in front of the light (`bodies`, further forward than `rank`) stands dark
-// against it: its face takes `face` of it, and its edge a rim — brightest on
-// the side the light is, and all round as the light comes near — and the air
-// behind it, the light's glow, is not seen through it.
+// A body stands on the floor the light is on, and is lit across its face as
+// the rock is. It leaves a patch of shadow on the floor from its feet, away
+// from the light (figure_shadow.gdshader), marked in the same colour of the
+// mask as the rock's shadows, by how dark it is, and darkening whatever is
+// there but a body (`bodies`) by that much.
 //
 // Everything is read by whole pixels: every buffer is on the picture's grid.
 
@@ -57,10 +52,7 @@ uniform sampler2D base : filter_nearest, repeat_disable;     // the world's colo
 uniform sampler2D normals : filter_nearest, repeat_disable;  // and how it faces (lighting.gdshaderinc)
 uniform sampler2D shade : filter_nearest, repeat_disable;    // where the lights that throw shadows do not reach
 uniform vec3 channel = vec3(0.0);   // which of `shade`'s colours is this light's; none for one that throws no shadow
-uniform sampler2D bodies : filter_nearest, repeat_disable;   // where a body stands, and how far forward it is drawn (bodies.gdshader)
-uniform float rank = 2.0;           // how far forward the light is drawn: a body further forward stands in front of it
-uniform float face = 0.12;          // the share of the light the face of a body in front of it takes
-uniform float rim_near = 24.0;      // how near the light, in world units, the edge of a body in front of it glows all round
+uniform sampler2D bodies : filter_nearest, repeat_disable;   // where a body stands (bodies.gdshader)
 uniform int type = 0;               // Shine.Type: 0 point, 1 sun, 2 spot, 3 area
 uniform vec3 tint = vec3(1.0);
 uniform float power = 1.0;
@@ -91,16 +83,6 @@ vec2 in_world(vec2 v) {
 	return vec2(v.x * turn.x - v.y * turn.y, v.x * turn.y + v.y * turn.x);
 }
 
-// The rim of a body the light is behind, as shares of the light at its edge:
-// all round, as near the light as `rim_near`; on the side that faces the way
-// the light is; and a little everywhere, the glow round it. RIM_LIGHT of the
-// rim is the light's own colour and the rest the body's lit, so a dark body's
-// edge still shows.
-const float RIM_ROUND = 0.9;
-const float RIM_SIDE = 0.7;
-const float RIM_EVEN = 0.12;
-const float RIM_LIGHT = 0.6;
-
 // 1 well inside `edge`, 0 past it, easing down over the last `soft` of it.
 float inside(float off, float edge, float soft) {
 	float fade = max(edge * soft, 0.0001);
@@ -113,10 +95,8 @@ void fragment() {
 	if (marked >= SOLID * 0.5) {
 		discard;
 	}
-	vec4 body = texelFetch(bodies, here, 0);
-	bool on_body = body.g > 0.5;
-	bool in_front = on_body && body.r > rank;
-	// What a body throws out of the light's plane falls on what is not a body.
+	bool on_body = texelFetch(bodies, here, 0).g > 0.5;
+	// The patch a body leaves on the floor falls on what is not a body.
 	float shaded = on_body ? 0.0 : clamp(marked, 0.0, 1.0);
 	float lit = power;
 	// The way to the light from here, in the world; nothing for a pixel inside
@@ -173,23 +153,10 @@ void fragment() {
 	float close_by = type == 1 ? 1.0 : clamp(away / max(close, 0.0001), 0.0, 1.0);
 	float own = beyond && is_out_there(surface) ? 0.0 : glow_of(surface);
 	vec3 colour = texelFetch(base, here, 0).rgb;
-	if (in_front) {
-		// A body with the light behind it: dark against it but for a rim, and
-		// in front of the glow.
-		float edge = length(facing);
-		float near = pow(max(1.0 - away / max(rim_near, 0.0001), 0.0), 2.0);
-		float side = 0.0;
-		if (edge > 0.0 && dot(toward, toward) > 0.25) {
-			side = clamp(dot(toward, normalize(facing)), 0.0, 1.0) * close_by;
-		}
-		float rim = edge * (RIM_ROUND * near + RIM_SIDE * side + RIM_EVEN);
-		COLOR = vec4(tint * lit * (colour * face + mix(colour, vec3(1.0), RIM_LIGHT) * rim) * (1.0 - own), 1.0);
-	} else {
-		float counts = length(facing) * close_by;
-		float faced = 1.0;
-		if (counts > 0.0 && dot(toward, toward) > 0.25) {
-			faced = 1.0 - counts * (1.0 - clamp(dot(toward, normalize(facing)), 0.0, 1.0));
-		}
-		COLOR = vec4(tint * lit * (colour * faced * (1.0 - own) + volume) * (1.0 - shaded), 1.0);
+	float counts = length(facing) * close_by;
+	float faced = 1.0;
+	if (counts > 0.0 && dot(toward, toward) > 0.25) {
+		faced = 1.0 - counts * (1.0 - clamp(dot(toward, normalize(facing)), 0.0, 1.0));
 	}
+	COLOR = vec4(tint * lit * (colour * faced * (1.0 - own) + volume) * (1.0 - shaded), 1.0);
 }

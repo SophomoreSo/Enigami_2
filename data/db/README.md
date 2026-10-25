@@ -471,7 +471,7 @@ its effect's.
 ## A board
 
 The boards the game ships with — each weapon's graph as a new profile gets
-it, every monster's, the dragon test's, the Jean Grey test's — are rows in
+it, every monster's — are rows in
 `boards/`. What a player builds onto a weapon's graph is theirs, and lives in
 the save.
 
@@ -656,14 +656,11 @@ What one thing does with its own light from moment to moment is the thing's,
 and no row's: a sign that stutters, a lamp brighter for somebody at its
 station, set the light's `level`, and where on the thing it is, besides `x`
 and `y`, is said as it is given. The map creator's props give theirs
-(`graphics/views/made_room_view.gd`); so does whatever a look of the hideout
-paints glowing (`HideoutScenery.shine`), and the dragon test's tower's lamps,
-neon and exit sign (`graphics/views/tower_view.gd`). What a look shows out
-past its room — the sky through its arches, the city through its glass — is
-lit by nothing in the room and dimmed by nothing in it, and only by a light
-out there with it, a sign across the street (`HideoutScenery.room`). The
+(`graphics/views/made_room_view.gd`), the hideout's lanterns among them. The
 fight lights with `Lamp` (`graphics/lamp.gd`): a bolt, a blast, a body
-burning and the way out are each a light made in code, a point or a spot.
+burning and the way out are each a light made in code, a point or a spot. A
+body on the floor is lit across its face by the way its edge faces, and
+leaves a patch of shadow at its feet, away from the light.
 `tests/graphics/lighting_test.tscn` makes a light of a kind and finds its
 row's numbers in it, and lights a picture with each type.
 

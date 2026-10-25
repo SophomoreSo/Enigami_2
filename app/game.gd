@@ -9,14 +9,14 @@ extends Node
 ## builds screens out of `graphics/` and drives them with `feature/`. Neither
 ## module reaches the other except through here and through `Cues`.
 
-enum State { TITLE, HIDEOUT, RAID, SANDBOX, RESULTS, INTRO, MAP_MAKER, STORY_MAKER }
+enum State { TITLE, HIDEOUT, RAID, SANDBOX, RESULTS, INTRO, MAP_MAKER, STORY_MAKER, LIGHTING_TEST }
 
 var state: int = State.TITLE:
 	set(v):
 		state = v
-		# On the bench perks are toggled rather than bought; everywhere else
-		# they are the profile's.
-		Perks.set_trial(v == State.SANDBOX)
+		# On the bench, and the test opened from it, perks are toggled rather
+		# than bought; everywhere else they are the profile's.
+		Perks.set_trial(v in [State.SANDBOX, State.LIGHTING_TEST])
 
 var current: Node = null
 var ui_layer: CanvasLayer
@@ -359,16 +359,23 @@ func goto_hideout() -> void:
 ## there any more, that left it emptying into a screen nobody had asked for —
 ## and one showing whatever profile happened to be loaded, since the bench is
 ## reached without picking a save slot at all.
-##
-## The lighting test the bench opens comes back with the light (PLAN.md, step
-## 16); until then its ask goes unanswered.
 func goto_sandbox() -> void:
 	_clear()
 	state = State.SANDBOX
 	var s := Sandbox.new()
 	s.exit_requested.connect(goto_title)
+	s.lighting_test_requested.connect(goto_lighting_test)
 	add_child(s)
 	current = s
+
+## Leaving the lighting test goes back to the sandbox it was opened from.
+func goto_lighting_test() -> void:
+	_clear()
+	state = State.LIGHTING_TEST
+	var l := LightingTest.new()
+	l.exit_requested.connect(goto_sandbox)
+	add_child(l)
+	current = l
 
 ## The map creator is opened from the title, like the bench beside it, and
 ## hands back to it. What was on its table is kept for the next visit
@@ -845,7 +852,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _toggle_magic() -> void:
 	if get_tree().paused:
 		return
-	if state in [State.RAID, State.SANDBOX, State.HIDEOUT, State.MAP_MAKER]:
+	if state in [State.RAID, State.SANDBOX, State.HIDEOUT, State.MAP_MAKER, State.LIGHTING_TEST]:
 		Magic.toggle()
 		get_viewport().set_input_as_handled()
 

@@ -345,10 +345,8 @@
   "light": {
     "title": "조명 테스트",
     "subtitle": "조명 사이를 걸어 보세요",
-    "behind": "뒤에 있는 랜턴",
-    "front": "앞에 있는 랜턴",
     "fire": "모닥불과 벽난로",
-    "spot": "스포트라이트 (기존 방식)",
+    "spot": "바닥을 비추는 스포트라이트",
     "time": "밝기  %s",
     "times": {
       "night": "밤",
@@ -362,10 +360,9 @@
       "bulb": "스포트라이트",
       "tube": "조명관"
     },
-    "in_front": "%s, 앞",
-    "in_back": "%s, 뒤",
     "count": "조명 %d개  그림자 %d개",
-    "keys": "T 밝기  C 조준점  L 앞/뒤  R 다시  ESC 뒤로"
+    "keys": "T 빛  C 조준점  R 다시  ESC 돌아가기",
+    "lantern": "기둥 위의 랜턴"
   },
   "exit": {
     "sign": "비상구",

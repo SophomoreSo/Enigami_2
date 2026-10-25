@@ -45,17 +45,16 @@ extends Node
 ##     (`shadow.gdshader`). There are MASKS of those and three colours in
 ##     each, which is how many lamps can throw shadows at once.
 ##
-## And a body does not stand in a round light — a point's, an area's — the way
-## rock does, in the light's own plane. The world draws the light in front of
-## the body or behind it, and so it is: in a light in front of it, the body
-## throws its figure on the wall behind it, a little bigger about the light;
-## in one behind it, a patch of shadow at its feet, leaning away from the
-## light, and it stands dark against the light but for a rim. Either shadow
-## darkens whatever is there but a body, by WALL_DARK or FEET_DARK, marked in
-## the light's colour of a mask by how dark it is (`figure_shadow.gdshader`),
-## and where a body stands, and how far forward it is drawn, is one more
-## picture the lights read (`bodies.gdshader`). A spot and a sun light bodies
-## and throw their shadows as they light rock.
+## And a body stands on the floor the lights are on, seen a little from the
+## front: it is lit across its face as the rock is, by the way its edge
+## faces, and it throws a patch of shadow on the floor from its feet, away
+## from the light — FEET_LEAN of the way the light is off it, never further
+## than FEET_REACH — darkest at its feet and fading out. The patch darkens
+## whatever is there but a body, by FEET_DARK, marked in the light's colour
+## of a mask by how dark it is (`figure_shadow.gdshader`); where a body
+## stands is one more picture the lights read (`bodies.gdshader`), so no
+## body is darkened by a shadow on the floor under it. A sun throws it the
+## way the sun travels. A body's own light inside it throws none.
 ##
 ## And one thing the video's picture has no place for: what gives its own
 ## light. A bolt in a dark room is not dark. Whatever wears `glow()` is left
@@ -106,25 +105,15 @@ const SHADOWS := MASKS * PER_MASK
 ## plane, marked by how dark they are, ever add up to.
 ## `lighting.gdshaderinc` has the same number.
 const SOLID := 64.0
-## A body in a round light in front of it throws its figure on the wall behind
-## it this much bigger, about the light — how far the light is in front of the
-## wall over how far it is in front of the body — and this dark.
-const WALL_SCALE := 1.35
-const WALL_DARK := 0.8
-## In one behind it, a patch of shadow at its feet: FEET_DEPTH down the
-## ground, leaning away from the light FEET_LEAN of the way it is to the
-## body's side but never more than FEET_REACH, its ends softened over
-## FEET_SOFT, in world units; FEET_DARK at its top and a third of that at its
-## foot.
+## The patch of shadow a body leaves on the floor: FEET_DEPTH down from its
+## feet, leaning away from the light FEET_LEAN of the way the light is off it
+## but never more than FEET_REACH, in world units — and under a sun, half of
+## FEET_REACH the way the sun travels; FEET_DARK at the feet and a third of
+## that at its far end.
 const FEET_DEPTH := 6.0
 const FEET_LEAN := 0.9
 const FEET_REACH := 40.0
-const FEET_SOFT := 3.0
 const FEET_DARK := 0.6
-## And the body stands dark against that light: its face takes FACE of it,
-## and its edge a rim, all round as near the light as RIM_NEAR world units.
-const FACE := 0.12
-const RIM_NEAR := 24.0
 ## How far past a lamp's own reach an edge's shadow is thrown, in reaches:
 ## far enough that the strip's far end is never inside the lamp's square.
 const THROW := 64.0
@@ -286,8 +275,7 @@ func normals() -> Texture2D:
 func shadows(mask: int = 0) -> Texture2D:
 	return _masks[mask].get_texture()
 
-## Where the bodies stand, as a texture: green where one is, and red how far
-## forward it is drawn (`bodies.gdshader`).
+## Where the bodies stand, as a texture: green where one is (`bodies.gdshader`).
 func bodies() -> Texture2D:
 	return _bodies.get_texture()
 
@@ -326,7 +314,6 @@ func follow(at: Vector2, texels: Vector2i, view: Transform2D) -> void:
 		_bodies.render_target_update_mode = SubViewport.UPDATE_DISABLED
 		# Nor anything kept of the bodies, which may be gone by the next light.
 		for cast in _casts:
-			cast.figures.clear()
 			cast.patches.clear()
 		_figures.drawn.clear()
 		return
@@ -339,9 +326,8 @@ func follow(at: Vector2, texels: Vector2i, view: Transform2D) -> void:
 		RenderingServer.global_shader_parameter_set(&"normals_size", Vector2(_normals.size))
 	_all.set_shader_parameter("ambient", Vector3(ambient.r, ambient.g, ambient.b))
 	var casters := _casters(lights)
-	var ranks := _rank(lights, casters)
-	_draw_bodies(casters, ranks, view)
-	_draw_lights(lights, _draw_shadows(lights, casters, ranks, view))
+	_draw_bodies(casters, view)
+	_draw_lights(lights, _draw_shadows(lights, casters, view))
 
 ## The lights that reach the screen this frame: every shining thing's that is
 ## to be seen, and every lamp's.
@@ -408,78 +394,24 @@ func _casters(lights: Array[Lit]) -> Array[ShadowCaster]:
 		break
 	return casters
 
-## Whether a light is round — a point's or an area's — which a body stands in
-## front of or behind, and not in the plane of, as it does a spot's or a sun's.
-static func _round(shine: Shine) -> bool:
-	return shine.type == Shine.Type.POINT or shine.type == Shine.Type.AREA
-
-## How far forward each round light that throws shadows and each body is
-## drawn, from nearly 0 at the back to nearly 1 at the front, as the world
-## draws them: by z, and within one z in the order of the tree. A body drawn
-## further forward than such a light is in front of it. Answers each body's,
-## and puts each light's in it (`Lit.rank`); nothing, with no such light.
-func _rank(lights: Array[Lit], casters: Array[ShadowCaster]) -> Dictionary:
-	var order: Array = []
-	for lit in lights:
-		if lit.shine.shadows and _round(lit.shine) and lit.source is CanvasItem:
-			order.append([lit.source, lit])
-	if order.is_empty():
-		return {}
-	for caster in casters:
-		if caster.body:
-			order.append([caster.drawn(), caster])
-	order.sort_custom(func(a: Array, b: Array) -> bool: return _before(a[0], b[0]))
-	var ranks := {}
-	for i in order.size():
-		var rank := float(i + 1) / float(order.size() + 1)
-		if order[i][1] is Lit:
-			(order[i][1] as Lit).rank = rank
-		else:
-			ranks[order[i][1]] = rank
-	return ranks
-
-## Whether the world draws `a` before `b`, which then stands in front of it:
-## at a lower z, or at the same one and earlier in the tree.
-static func _before(a: CanvasItem, b: CanvasItem) -> bool:
-	var za := _z(a)
-	var zb := _z(b)
-	if za != zb:
-		return za < zb
-	return a != b and b.is_greater_than(a)
-
-## The z the world draws `item` at: its own, and its parents' for as long as
-## it is drawn relative to them.
-static func _z(item: CanvasItem) -> int:
-	var z := 0
-	var n: Node = item
-	while n is CanvasItem:
-		var c := n as CanvasItem
-		z += c.z_index
-		if not c.z_as_relative:
-			break
-		n = c.get_parent()
-	return z
-
-## Where each body stands and how far forward it is drawn, back to front, for
-## the round lights to read: only while one throws shadows (`_rank`).
-func _draw_bodies(casters: Array[ShadowCaster], ranks: Dictionary, view: Transform2D) -> void:
+## Where each body stands, for the lights to read: only while one throws
+## shadows, since that is all it is read for.
+func _draw_bodies(casters: Array[ShadowCaster], view: Transform2D) -> void:
 	_figures.drawn.clear()
 	_figures.view = view
 	for caster in casters:
-		if ranks.has(caster):
-			_figures.drawn.append([caster, ranks[caster]])
-	_figures.drawn.sort_custom(func(a: Array, b: Array) -> bool: return float(a[1]) < float(b[1]))
+		if caster.body:
+			_figures.drawn.append(caster)
 	_figures.queue_redraw()
-	_bodies.render_target_update_mode = SubViewport.UPDATE_DISABLED if ranks.is_empty() \
+	_bodies.render_target_update_mode = SubViewport.UPDATE_DISABLED if _figures.drawn.is_empty() \
 		else SubViewport.UPDATE_ALWAYS
 
 ## The shadows of the lights that throw them — a sun's first, then the widest
 ## and brightest, as far as the masks go round — each given a colour of a mask
-## and what to mark there: the edges near it, and in a round light what the
-## bodies throw out of its plane (`_throw`). Which colour each light got, by
-## light: its number among all the masks' colours.
-func _draw_shadows(lights: Array[Lit], casters: Array[ShadowCaster], ranks: Dictionary,
-		view: Transform2D) -> Dictionary:
+## and what to mark there: the edges near it, and the patch every body leaves
+## on the floor (`_throw`). Which colour each light got, by light: its number
+## among all the masks' colours.
+func _draw_shadows(lights: Array[Lit], casters: Array[ShadowCaster], view: Transform2D) -> Dictionary:
 	var throwing: Array[Lit] = []
 	for lit in lights:
 		if lit.shine.shadows:
@@ -496,13 +428,11 @@ func _draw_shadows(lights: Array[Lit], casters: Array[ShadowCaster], ranks: Dict
 			shade.visible = false
 			cast.visible = false
 			# Nothing kept of bodies for a light it no longer has.
-			cast.figures.clear()
 			cast.patches.clear()
 			continue
 		var lit := throwing[i]
 		given[lit] = i
 		var sun := lit.shine.type == Shine.Type.SUN
-		var round_light := _round(lit.shine)
 		shade.visible = true
 		shade.position = lit.bounds.position
 		shade.size = lit.bounds.size
@@ -514,22 +444,15 @@ func _draw_shadows(lights: Array[Lit], casters: Array[ShadowCaster], ranks: Dict
 		shade.thrown.clear()
 		cast.visible = true
 		cast.view = view
-		cast.figures.clear()
 		cast.patches.clear()
 		for caster in casters:
 			if not caster.covers().intersects(lit.bounds):
 				continue
-			if round_light and caster.body:
+			if caster.body:
 				if not _own(caster, lit.source):
-					_throw(cast, caster, lit, float(ranks.get(caster, 0.0)))
-			elif sun or not caster.holds(lit.at):
+					_throw(cast, caster, lit)
+			else:
 				shade.thrown.append([caster.mesh, caster.global_transform])
-			elif not _own(caster, lit.source):
-				# A spot inside a body, and not its own light: the body throws
-				# the shadow it threw as the light came in (`ShadowCaster.beyond`).
-				var part := caster.beyond(lit.at)
-				if part != null:
-					shade.thrown.append([part, Transform2D.IDENTITY])
 		shade.queue_redraw()
 		cast.queue_redraw()
 	for i in MASKS:
@@ -537,37 +460,41 @@ func _draw_shadows(lights: Array[Lit], casters: Array[ShadowCaster], ranks: Dict
 			if i * PER_MASK < throwing.size() else SubViewport.UPDATE_DISABLED
 	return given
 
-## What a body throws out of a round light's plane, by which of the two the
-## world draws in front: in a light in front of it, its figure on the wall
-## behind it, WALL_SCALE bigger about the light; in one behind it, a patch at
-## its feet as far as it is standing, leaning away from the light.
-func _throw(cast: Cast, caster: ShadowCaster, lit: Lit, body_rank: float) -> void:
-	if lit.rank > body_rank:
-		var thrown := Transform2D(0.0, Vector2.ONE * WALL_SCALE, 0.0, lit.at * (1.0 - WALL_SCALE))
-		cast.figures.append([caster, thrown, Color(WALL_DARK, 0.0, 0.0, 1.0)])
-		return
+## The patch a body leaves on the floor in a light: from its feet, as wide as
+## the body, FEET_DEPTH down, and carried away from the light — FEET_LEAN of
+## the way the light is off the feet, never more than FEET_REACH; under a sun,
+## half of FEET_REACH the way the sun travels — darkest at the feet and a third
+## as dark at its far end. As far as the body is standing on the floor at all
+## (`ShadowCaster.feet`).
+func _throw(cast: Cast, caster: ShadowCaster, lit: Lit) -> void:
 	if caster.feet <= 0.0:
 		return
 	var stood := caster.covers()
-	var lean := clampf((stood.get_center().x - lit.at.x) * FEET_LEAN, -FEET_REACH, FEET_REACH)
-	var left := minf(stood.position.x, stood.position.x + lean)
-	var right := maxf(stood.end.x, stood.end.x + lean)
-	var top := stood.end.y
-	var foot := top + FEET_DEPTH
+	var feet := Vector2(stood.get_center().x, stood.end.y)
+	var half := stood.size.x * 0.5
+	var away := lit.aim * FEET_REACH * 0.5
+	if lit.shine.type != Shine.Type.SUN:
+		away = feet - lit.at
+		var far := away.length()
+		away = Vector2.ZERO if far < 0.001 else away / far * minf(far * FEET_LEAN, FEET_REACH)
 	var dark := FEET_DARK * caster.feet
-	var soft := FEET_SOFT * 0.5
-	# Three pieces: its ends, fading in, and all of it between them.
-	var xs := [left - soft, left + soft, right - soft, right + soft]
-	var ends := [0.0, 1.0, 1.0, 0.0]
-	for k in 3:
-		var a: float = xs[k]
-		var b: float = xs[k + 1]
-		var at_a: float = ends[k] * dark
-		var at_b: float = ends[k + 1] * dark
-		cast.patches.append([
-			PackedVector2Array([Vector2(a, top), Vector2(b, top), Vector2(b, foot), Vector2(a, foot)]),
-			PackedColorArray([Color(at_a, 0, 0), Color(at_b, 0, 0), Color(at_b / 3.0, 0, 0), Color(at_a / 3.0, 0, 0)]),
-		])
+	var near_side := PackedVector2Array([feet + Vector2(-half, 0.0), feet + Vector2(half, 0.0),
+		feet + Vector2(half, FEET_DEPTH), feet + Vector2(-half, FEET_DEPTH)])
+	var all := PackedVector2Array()
+	for p in near_side:
+		all.append(p)
+		all.append(p + away)
+	var shape := Geometry2D.convex_hull(all)
+	if shape.size() > 1 and shape[0].distance_to(shape[shape.size() - 1]) < 0.001:
+		shape.remove_at(shape.size() - 1)
+	if shape.size() < 3:
+		return
+	var reach := maxf(away.length(), 0.001)
+	var shades := PackedColorArray()
+	for p in shape:
+		var along := clampf((p - feet).dot(away) / (reach * reach), 0.0, 1.0)
+		shades.append(Color(dark * lerpf(1.0, 1.0 / 3.0, along), 0.0, 0.0))
+	cast.patches.append([shape, shades])
 
 ## Whether a light given by `source` is the body's `caster` is the shadow of:
 ## given by the body's own view, or by anything of it — a body on fire.
@@ -614,7 +541,6 @@ func _draw_lights(lights: Array[Lit], given: Dictionary) -> void:
 		m.set_shader_parameter("volume", shine.volume)
 		m.set_shader_parameter("close", CLOSE)
 		m.set_shader_parameter("beyond", shine.out_there)
-		m.set_shader_parameter("rank", lit.rank)
 
 func _beam() -> Beam:
 	var beam := Beam.new()
@@ -623,8 +549,6 @@ func _beam() -> Beam:
 	m.set_shader_parameter("base", colour.get_texture())
 	m.set_shader_parameter("normals", _normals.get_texture())
 	m.set_shader_parameter("bodies", _bodies.get_texture())
-	m.set_shader_parameter("face", FACE)
-	m.set_shader_parameter("rim_near", RIM_NEAR)
 	beam.material = m
 	_lit.add_child(beam)
 	return beam
@@ -644,9 +568,6 @@ class Lit extends RefCounted:
 	var turn := 0.0
 	var half := Vector2.ONE
 	var bounds := Rect2()
-	## How far forward it is drawn among the bodies, for a round light that
-	## throws shadows (`Lighting._rank`); in front of all of them for any other.
-	var rank := 2.0
 
 	## How much it matters that it throws a shadow: a sun most, then the
 	## widest and brightest.
@@ -677,38 +598,28 @@ class Shade extends Control:
 		for t in thrown:
 			draw_mesh(t[0], null, back * (t[1] as Transform2D))
 
-## What one round light's bodies throw out of its plane, drawn beside its
-## `Shade` in the same colour of the same mask (`figure_shadow.gdshader`):
-## each figure thrown on the wall, and each patch at a body's feet, marked by
-## how dark it is. Drawn in the world's own space.
+## What the bodies leave on the floor in one light, drawn beside its `Shade`
+## in the same colour of the same mask (`figure_shadow.gdshader`): each
+## body's patch, marked by how dark it is. Drawn in the world's own space.
 class Cast extends Node2D:
-	## How the mask's canvas lies across the world, for a figure to be drawn
-	## where the world draws it.
+	## How the mask's canvas lies across the world.
 	var view := Transform2D.IDENTITY
-	## [caster, how its figure is thrown, how dark], a body to a light in
-	## front of it.
-	var figures: Array = []
-	## [corners, how dark at each], a piece of a patch at a body's feet.
+	## [corners, how dark at each], a body's patch on the floor.
 	var patches: Array = []
 
 	func _draw() -> void:
-		for f in figures:
-			# A body freed since its shadow was gathered throws none.
-			if is_instance_valid(f[0]):
-				(f[0] as ShadowCaster).draw_figure(self, view, f[2], f[1])
 		for p in patches:
 			draw_polygon(p[0], p[1])
 
-## Where the bodies stand, drawn into a picture of their own back to front:
-## each figure where the world draws it, in red how far forward it is drawn
-## (`bodies.gdshader`).
+## Where the bodies stand, drawn into a picture of their own: each figure
+## where the world draws it (`bodies.gdshader`).
 class Figures extends Node2D:
 	var view := Transform2D.IDENTITY
-	## [caster, how far forward it is drawn], back to front.
+	## The bodies' casters.
 	var drawn: Array = []
 
 	func _draw() -> void:
 		for d in drawn:
 			# A body freed since it was gathered stands nowhere.
-			if is_instance_valid(d[0]):
-				(d[0] as ShadowCaster).draw_figure(self, view, Color(float(d[1]), 1.0, 0.0, 1.0))
+			if is_instance_valid(d):
+				(d as ShadowCaster).draw_figure(self, view, Color(1.0, 1.0, 0.0, 1.0))

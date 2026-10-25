@@ -345,10 +345,8 @@
   "light": {
     "title": "LIGHTING TEST",
     "subtitle": "WALK THROUGH THE LIGHTS",
-    "behind": "LANTERN BEHIND YOU",
-    "front": "LANTERN IN FRONT OF YOU",
     "fire": "FIRE AND FIREPLACE",
-    "spot": "SPOTLIGHT, AS IT WAS",
+    "spot": "SPOTLIGHT, DOWN THE FLOOR",
     "time": "LIGHT  %s",
     "times": {
       "night": "NIGHT",
@@ -362,10 +360,9 @@
       "bulb": "SPOTLIGHT",
       "tube": "LIGHT TUBE"
     },
-    "in_front": "%s, IN FRONT",
-    "in_back": "%s, BEHIND",
     "count": "%d LIGHTS  %d THROWING SHADOWS",
-    "keys": "T LIGHT  C CROSSHAIR  L FRONT/BEHIND  R AGAIN  ESC BACK"
+    "keys": "T LIGHT  C CROSSHAIR  R AGAIN  ESC BACK",
+    "lantern": "LANTERN ON A POST"
   },
   "exit": {
     "sign": "EXIT",

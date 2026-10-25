@@ -82,6 +82,8 @@ func view_script_for(n: Node) -> GDScript:
 		return SandboxView
 	if n is MapMaker:
 		return MapMakerView
+	if n is LightingTest:
+		return LightingTestView
 	# The rest of the game's nodes get theirs as each arrives (PLAN.md).
 	# Story keeps its own table, in `story/view/story_views.gd`.
 	return StoryViews.view_script_for(n)
