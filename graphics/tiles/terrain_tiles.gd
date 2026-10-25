@@ -100,7 +100,7 @@ func _read() -> bool:
 					pattern.append(r.map(func(v) -> int: return int(v)))
 			if pattern.size() != 4:
 				pattern = []
-		var face := corners[0] == UPPER and corners[1] == UPPER and corners[2] == TRANSITION and corners[3] == TRANSITION
+		var face: bool = corners[0] == UPPER and corners[1] == UPPER and corners[2] == TRANSITION and corners[3] == TRANSITION
 		if not pattern.is_empty():
 			# A face tile by its pattern: its middle's top upper, bottom transition.
 			face = int(pattern[1][1]) == UPPER and int(pattern[1][2]) == UPPER \
