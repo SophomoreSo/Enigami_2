@@ -68,6 +68,10 @@ func view_script_for(n: Node) -> GDScript:
 		return DigSpotView
 	if n is PhoneProp:
 		return PhonePropView
+	if n is Station:
+		return StationView
+	if n is HideoutWorld:
+		return HideoutWorldView
 	if n is MadeRoom:
 		return MadeRoomView
 	if n is Room:
