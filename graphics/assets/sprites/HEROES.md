@@ -68,7 +68,22 @@ The loader takes however many frames a strip has.
 
 ## Making them
 
-With PixelLab (the `pixellab` MCP tools), from the hero's reference:
+Two ways. From 3D, through the pipeline beside the checkouts
+(`Enigami_2/PIPELINE.md`): a Meshy mesh of the hero, rigged in Blender,
+moved by Kimodo's clips and rendered as pixel art looking down at an
+isometric angle, a strip an animation a facing, straight into this folder:
+
+```sh
+../Blender/run.py rig legna_dennis
+../Blender/run.py render legna_dennis --install    # every animation Kimodo has a clip of, down, up and side
+```
+
+Its frames are 56 pixels with the hero 36 tall, and the ground under the
+hero on the same row in every frame and facing, which is what the game
+stands the body by; the strips' colours are snapped to the hero's present
+idle, so a rendered strip and a drawn one share a palette.
+
+Or with PixelLab (the `pixellab` MCP tools), from the hero's reference:
 
 1. `create_character` in v3 with the reference as `reference_image_url`,
    `view` "low top-down", `n_directions` 4 — south, east, north and west,

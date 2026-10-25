@@ -34,14 +34,17 @@ jumped across.
 
 Decided by the user, 2026-10-25:
 
-1. **2D, with 2D sprites, no 3D models.** No GLB, no `Node3D`, and the
-   `Meshy/`, `Blender/`, `Kimodo/`, `Cascadeur/` folders are not the way
-   a sprite is made any more.
+1. **2D, with 2D sprites, no 3D models in the game.** No GLB, no
+   `Node3D`. A sprite may still be rendered from a 3D model outside the
+   game: v1's `Meshy/`, `Blender/`, `Kimodo/`, `Cascadeur/` pipeline was
+   brought beside these checkouts on 2026-10-25 at the user's word,
+   its camera changed from v1's level side view to looking down at an
+   isometric angle (`../PIPELINE.md`).
 2. **A new folder, this one**, with a commit for every important step. v1
    stays where it is, with its four checkouts and its CI, unfinished.
-   This folder is one repository on one branch until the user says
-   otherwise; the worktree rules in `Enigami/CLAUDE.md` are v1's and do
-   not apply here.
+   Since 2026-10-25, at the user's word, it holds the same four checkouts
+   as v1 — `master`, `feature`, `graphics`, `video` — under the rules in
+   `Enigami_2/CLAUDE.md`.
 
 Fixed here so the work can start, each a one-line change if the user
 wants it otherwise:
@@ -69,9 +72,11 @@ wants it otherwise:
    and charge toward the aim, interact, sit, phone. The skill boards, the
    weapons, the heroes, the pet, the alarm, the raid's loot rule all
    carry; what goes is listed under `feature/` below.
-7. **Where the pictures come from.** PixelLab for the heroes (a
+7. **Where the pictures come from.** The heroes from the 3D pipeline
+   beside the checkouts (`../PIPELINE.md`: a Meshy mesh, Kimodo's motion,
+   rendered by Blender from above in the three facings), or PixelLab (a
    four-direction character from each hero's reference, its animations
-   from the skeleton tool), for monsters that need more than the atlas
+   from the skeleton tool), as their strips are now; PixelLab for monsters that need more than the atlas
    gives, for portraits and for the top-down tilesets; 0x72's 16×16
    DungeonTileset II, already in the game under CC0 and itself a
    top-down three-quarter tileset, for monsters, props and the first
@@ -82,8 +87,9 @@ Left to the user:
 - ~~The folder's name.~~ `Enigami_2`, by the user's word (2026-10-25).
 - Which of the five hideout looks, if any, the top-down hideout takes
   after.
-- Whether the four 3D pipeline folders beside v1's checkouts are deleted
-  or left as a record. Nothing here reads them.
+- ~~Whether the four 3D pipeline folders beside v1's checkouts are
+  deleted.~~ Copied beside v2's checkouts and kept, by the user's word
+  (2026-10-25).
 
 ---
 
@@ -207,7 +213,7 @@ ropes, gates and the hideout theme page; add keys for pits and anything
 
 | Item | Size | Notes |
 |---|---|---|
-| `Meshy/`, `Blender/`, `Kimodo/`, `Cascadeur/`, `PIPELINE.md` | Drop | not read, not run; left where they are until the user says delete |
+| `Meshy/`, `Blender/`, `Kimodo/`, `Cascadeur/`, `PIPELINE.md` | Rework | copied beside v2's checkouts (2026-10-25); the camera looks down at 30 degrees instead of level, and renders `down`, `up` and `side`, a strip each, `<id>.<anim>.<face>.png` at 56 pixels; the animations are v2's, and Kimodo's prompts with them |
 | The heroes' strips (`HEROES.md`) | Rework | a hero's folder holds `<id>.<anim>.<face>.png` for `face` in `down`, `up`, `side`, square frames in a row, the feet at the frame's bottom middle; `ANIMS` becomes `idle`, `walk`, `dash`, `hurt`, `cast`, `hit`, `sit`, each in three faces; `hang`, `climb_*`, `rise`, `fall`, `wall_slide`, `crouch` go. Made with PixelLab: `create_character` (four directions) from each hero's reference, `animate_with_skeleton_v3` or `animate_character` per animation, frames packed into strips by a small script kept in `tools/` |
 | Legna Dennis's present strips | Drop | side view only; remade through the new spec from the same reference. Her `prompt` row carries |
 | The other three heroes | New | the same way, from their rows' prompts |
