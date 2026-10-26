@@ -476,6 +476,8 @@ func name_of(entry: String, in_tab: int = tab) -> String:
 		Tab.PROPS:
 			return MapTiles.prop_name(entry)
 	match entry:
+		MadeRoom.PIT:
+			return Loc.t("hud.maker.pit")
 		MadeRoom.START:
 			return Loc.t("hud.maker.mark.start")
 		MadeRoom.BOX:
