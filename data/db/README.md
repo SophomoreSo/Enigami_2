@@ -678,7 +678,6 @@ of `heroes` each, in `heroes/heroes.sql`, read by `Heroes`
 | `heroes.sprite` | The character of the atlas standing in for them — one `Sprites.has_character` knows: `doc`, `angel`, `elf_m`, `wizzard_m`, `knight_m`, ... — on the bench's screen and in the dialogue box, until their own sprites are made. |
 | `heroes.color` | The colour their card wears, `#rrggbb`. |
 | `heroes.prompt` | Who they are, for the tool their sprites are made with (`graphics/assets/sprites/HEROES.md`). |
-| `heroes.hands` | How far over the middle of their body they hold a rope, in world units: where their hang pose puts its fist, which the rope's line runs into (`Player.rope_hands`). The player's own art holds one at 30; a taller hero's at more. |
 
 A hero's own sprites are `graphics/assets/sprites/<id>/<id>.<animation>.png`,
 a strip an animation, painted straight (`SkinnedCharacter`, "painted"); with
@@ -886,9 +885,8 @@ Db.meta("schema_version")
 into the `FSMNode`s its owner runs, `Components` (`circuit/components.gd`)
 reads the parts, `Boards` (`feature/core/boards.gd`) builds a shipped board
 into the `SkillBoard` the circuit runs, `Menus` (`graphics/ui/menus.gd`)
-hands a screen its menus' items, in the language being played, `Rope.of`
-(`graphics/rope.gd`) makes a line of a kind with its row's numbers, and
-`Foliage.of` (`graphics/foliage.gd`) a patch of a kind, and `Shine.of`
+hands a screen its menus' items, in the language being played,
+`Foliage.of` (`graphics/foliage.gd`) makes a patch of a kind, and `Shine.of`
 (`graphics/shine.gd`) the light of a kind; nothing else needs
 to know any of it came from a table. `Dialogue.reload()` and `Components.reload()` pick up
 a rebuilt file without a restart.
