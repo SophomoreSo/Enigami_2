@@ -1,5 +1,5 @@
 -- The bench's sample skills that are no proving ground's own (feature/world/
--- sandbox.gd, `Sandbox.samples`). The dragon test's and the Jean Grey test's
+-- sandbox.gd, `Sandbox.samples`). The dragon test's and the ghost test's
 -- are in their own files. Named in the code.
 --
 -- seeker: an arrow off the gun that will not be dodged. AUTO-AIM sends it at

@@ -2,7 +2,7 @@ extends Node
 ## The skill boards the game ships with, and the tables they are read from.
 ##
 ## Each weapon's graph as a new profile gets it, every monster's, the dragon
-## test's and the Jean Grey test's boards and the bench's seeker arrow are rows
+## test's and the ghost test's boards and the bench's seeker arrow are rows
 ## in the content database (`data/db/boards/`): a grid, and the parts placed on
 ## it. Which part feeds which follows from their ports and the way each faces,
 ## so a row a cell out of place is a board that quietly does nothing — a monster
@@ -71,7 +71,7 @@ func _ready() -> void:
 			if board_id != "":
 				asked.append(board_id)
 	asked.append("dragon")
-	asked.append("jean_grey")
+	asked.append("ghost")
 	asked.append("seeker")
 	var missing: Array = []
 	for id in asked:

@@ -275,6 +275,70 @@ func _run() -> void:
 	if hp_lost <= 0.0:
 		fail("no damage was dealt")
 
+	# The dragon test, off the bench: a charged cast through the halls, and the
+	# floor setting itself again. What it comes to in numbers is
+	# tests/feature/dragon_test.tscn; this is here to draw the screen.
+	# A beat before the screen swaps. The release above is still the current
+	# frame's edge, and the player the next screen builds reads the same input:
+	# swapping on the same frame handed the dragon test a free uncharged cast
+	# before anyone had touched a button.
+	await frames(6)
+	sb.open_dragon_test()
+	await frames(12)
+	var dragon: DragonTest = game.current
+	# Held for as long as a player would hold it, and let go: the release is what
+	# casts, and what it bought is what the chain is worth.
+	_cast_button(true)
+	var held := 0.0
+	while dragon.player.charge < dragon.charge_to_clear() and held < 8.0:
+		await get_tree().process_frame
+		held += get_process_delta_time()
+	_cast_button(false)
+	await frames(3)
+	say("held the cast button %.2fs for %.0f charge" % [held, dragon.player.charge])
+	for i in 400:
+		await get_tree().process_frame
+		if dragon.guards_left == 0:
+			break
+	say("dragon test ok, %d of %d guards down, best cast %d" % [
+		dragon.total_guards - dragon.guards_left, dragon.total_guards, dragon.best_cast])
+	if dragon.best_cast < dragon.total_guards:
+		fail("one charged cast did not take the whole floor (%d of %d)"
+			% [dragon.best_cast, dragon.total_guards])
+	dragon.set_editing(true)
+	await frames(6)
+	dragon.set_editing(false)
+	dragon.reset_floor()
+	await frames(6)
+	if dragon.guards_left != dragon.total_guards:
+		fail("the dragon test did not set its floor again")
+	dragon.leave()
+	await frames(12)
+	say("left the dragon test, state=%d (3 = sandbox)" % game.state)
+	if game.state != 3:
+		fail("leaving the dragon test did not return to the bench")
+
+	# The ghost test, off the bench the same way: the screen drawn, the editor
+	# opened over it, the ground set again, and back. What it comes to in play
+	# is tests/feature/ghost_test.tscn.
+	var bench: Sandbox = game.current
+	bench.open_ghost_test()
+	await frames(12)
+	var ghost = game.current
+	if not (ghost is GhostTest):
+		fail("the bench did not open the ghost test")
+	else:
+		ghost.set_editing(true)
+		await frames(6)
+		ghost.set_editing(false)
+		ghost.reset_floor()
+		await frames(6)
+		say("ghost test ok, %d guards, diamond at %s" % [ghost.total_guards, ghost.diamond.global_position])
+		ghost.leave()
+		await frames(12)
+		if game.state != 3:
+			fail("leaving the ghost test did not return to the bench")
+
 	# Death path: the weapon and the graph on it go down together.
 	game._deploy("GUN")
 	await frames(6)

@@ -32,6 +32,8 @@ const CHARGE_BAR_Y := -66.0
 const WALKING := 12.0
 
 var player: Player
+## True in the dragon test, where the player is drawn as the Dragon.
+var _dragon: bool = false
 var weapon_sprite: Sprite2D
 var _weapon_art: String = ""
 var _trail: Array = []
@@ -39,6 +41,10 @@ var _spark: float = 0.0
 
 func _configure() -> void:
 	player = actor as Player
+	_dragon = player.get_parent() is DragonTest
+	if _dragon:
+		art = Style.DRAGON_ART
+		return
 	# The hero played as, in their own sprites where they have them; and the
 	# next one picked on a bench, the moment they are.
 	art = Style.hero_play_art(GameState.hero)
@@ -118,14 +124,14 @@ func _show_fall() -> void:
 func _update_weapon() -> void:
 	if weapon_sprite == null:
 		return
-	var blade := Style.weapon_art(player.weapon_id)
+	var blade := Style.DRAGON_BLADE if _dragon else Style.weapon_art(player.weapon_id)
 	if _weapon_art != blade:
 		_weapon_art = blade
 		var tex := Sprites.texture(_weapon_art)
 		weapon_sprite.texture = tex
 		if tex != null:
 			# Pivot at the grip, so aiming rotates the blade around the hand.
-			var grip := Style.weapon_grip(player.weapon_id, WEAPON_GRIP)
+			var grip := WEAPON_GRIP if _dragon else Style.weapon_grip(player.weapon_id, WEAPON_GRIP)
 			weapon_sprite.offset = Vector2(-tex.region.size.x * 0.5, -tex.region.size.y * grip)
 	# I-frames blink the whole rig, weapon included. A body nobody is in is
 	# dimmed — through the sprite's shader, which draws it in the skin's own
@@ -137,7 +143,8 @@ func _update_weapon() -> void:
 	weapon_sprite.self_modulate.a = 0.0 if player.weapon_hands() != player else sprite.self_modulate.a
 	# Held at the middle of the body, out the way the weapon points.
 	weapon_sprite.position = middle() + player.aim * WEAPON_HAND
-	weapon_sprite.rotation = 0.0 if Style.weapon_upright(player.weapon_id) else player.aim.angle() + PI * 0.5
+	weapon_sprite.rotation = 0.0 if not _dragon and Style.weapon_upright(player.weapon_id) \
+		else player.aim.angle() + PI * 0.5
 
 func _process(delta: float) -> void:
 	super._process(delta)

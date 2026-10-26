@@ -56,6 +56,6 @@ INSERT INTO board_parts (board_id, x, y, part, facing, root) VALUES
 	('arbiter_phase2', 3, 3, 'PROJECTILE', 'E', 0), ('arbiter_phase2', 4, 3, 'BRIDGE', 'E', 0),
 	('arbiter_phase2', 5, 3, 'DUPLICATE', 'N', 0),
 
-	-- The Jean Grey test's rifle: one bolt, which the Gunman's kind makes
+	-- The ghost test's rifle: one bolt, which the Gunman's kind makes
 	-- heavy and quick (feature/actors/monsters.gd).
 	('gunman', 6, 2, 'PROJECTILE', 'E', 1);

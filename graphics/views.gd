@@ -70,6 +70,8 @@ func view_script_for(n: Node) -> GDScript:
 		return DigSpotView
 	if n is PhoneProp:
 		return PhonePropView
+	if n is Diamond:
+		return DiamondView
 	if n is Station:
 		return StationView
 	if n is HideoutWorld:
@@ -84,6 +86,10 @@ func view_script_for(n: Node) -> GDScript:
 		return SandboxView
 	if n is MapMaker:
 		return MapMakerView
+	if n is DragonTest:
+		return DragonTestView
+	if n is GhostTest:
+		return GhostTestView
 	if n is LightingTest:
 		return LightingTestView
 	# The rest of the game's nodes get theirs as each arrives (PLAN.md).

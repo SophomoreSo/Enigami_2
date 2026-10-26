@@ -16,7 +16,7 @@ data/
     │   ├── weapons.sql      each weapon's graph, as a new profile gets it
     │   ├── monsters.sql     every monster's
     │   ├── dragon_test.sql  the dragon test's tower's
-    │   ├── jean_grey_test.sql  the Jean Grey test's rock's
+    │   ├── ghost_test.sql   the ghost test's rock's
     │   └── samples.sql      the bench's samples that are no test's own
     ├── dialogue/     the conversations, one file per character, named after their id in lower case
     │   ├── sage.sql         in the box

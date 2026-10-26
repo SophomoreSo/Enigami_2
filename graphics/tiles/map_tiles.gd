@@ -177,12 +177,19 @@ func layers() -> Array:
 ## on each corner of four cells; the walls out of the wall set, straddling two
 ## cells across, the face in the wall's cell and the top above
 ## (`TerrainTiles`). Without: the atlas's floor, walls and hole, a tile a cell.
+##
+## The wall set has a tile for open floor too, all four of its corners floor,
+## and the walls lay none of it: the floor is the floor layer's, the same floor
+## (the pit set's was made from it), and the walls sort among the bodies above
+## it — so a floor laid with them would be laid over everything on the floor
+## under it, the pits and the marks left on it among them.
 func lay(floor_layer: TileMapLayer, walls_layer: TileMapLayer, rock: Callable, pit: Callable, area: Rect2i, salt: int = 0) -> void:
 	if walls == null:
 		_lay_atlas(floor_layer, walls_layer, rock, pit, area, salt)
 		return
 	var floor_set := pits if pits != null else walls
 	var plain := pits.plain_upper() if pits != null else walls.plain_lower()
+	var open_floor := walls.plain_lower()
 	for j in range(area.position.y, area.end.y + 1):
 		for i in range(area.position.x, area.end.x + 1):
 			var cell := Vector2i(i, j)
@@ -190,7 +197,7 @@ func lay(floor_layer: TileMapLayer, walls_layer: TileMapLayer, rock: Callable, p
 			if f >= 0:
 				floor_layer.set_cell(cell, 0, floor_set.coords(f))
 			var w := walls.wall_tile(i, j, rock)
-			if w >= 0:
+			if w >= 0 and w != open_floor:
 				walls_layer.set_cell(cell, 0, walls.coords(w))
 
 func _lay_atlas(floor_layer: TileMapLayer, walls_layer: TileMapLayer, rock: Callable, pit: Callable, area: Rect2i, salt: int) -> void:
@@ -233,9 +240,13 @@ func paint_area(c: CanvasItem, cells: MapCells, area: Rect2i) -> void:
 			for i in range(area.position.x, area.end.x + 1):
 				var f := floor_set.floor_tile(i, j, pit) if pits != null else plain
 				floor_set.draw(c, f, Rect2(Vector2(i - 0.5, j - 0.5) * cell, Vector2.ONE * cell))
+		# The walls, and none of the open floor they have a tile for (`lay`).
+		var open_floor := walls.plain_lower()
 		for j in range(area.position.y, area.end.y + 1):
 			for i in range(area.position.x, area.end.x + 1):
-				walls.draw(c, walls.wall_tile(i, j, rock), Rect2(Vector2(i - 0.5, j) * cell, Vector2.ONE * cell))
+				var w := walls.wall_tile(i, j, rock)
+				if w != open_floor:
+					walls.draw(c, w, Rect2(Vector2(i - 0.5, j) * cell, Vector2.ONE * cell))
 	for y in range(area.position.y, area.end.y):
 		for x in range(area.position.x, area.end.x):
 			if cells.ground(x, y) == MadeRoom.MAGIC:

@@ -13,6 +13,10 @@ extends World
 
 signal exit_requested()
 signal editing_changed(on: bool)
+## The dragon test was asked for: a building of guards to try a chain of lunges on.
+signal dragon_test_requested()
+## The ghost test was asked for: a diamond to steal by possessing its guards.
+signal ghost_test_requested()
 ## The lighting test was asked for: a light of each kind to walk through.
 signal lighting_test_requested()
 ## A sample skill was put on its weapon (`load_sample`).
@@ -158,14 +162,23 @@ func clear_monsters() -> void:
 func leave() -> void:
 	exit_requested.emit()
 
+func open_dragon_test() -> void:
+	dragon_test_requested.emit()
+
+func open_ghost_test() -> void:
+	ghost_test_requested.emit()
+
 func open_lighting_test() -> void:
 	lighting_test_requested.emit()
 
-## The skills the bench has ready to try: the seeker arrow. Each is a graph,
-## the weapon it was built for, and what it is called; `board` builds a fresh
-## one, named in the language being played.
+## The skills the bench has ready to try: the dragon test's graph, the ghost
+## test's and the seeker arrow. Each is a graph, the weapon it was built for,
+## and what it is called; `board` builds a fresh one, named in the language
+## being played.
 static func samples() -> Array:
 	return [
+		{"id": "dragon", "weapon": DragonTest.WEAPON, "board": DragonTest.dragon_board},
+		{"id": "ghost", "weapon": GhostTest.WEAPON, "board": GhostTest.ghost_board},
 		{"id": "seeker", "weapon": "GUN", "board": seeker_board},
 	]
 

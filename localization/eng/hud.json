@@ -87,12 +87,12 @@
   "sandbox": {
     "swap_weapon": "SWAP WEAPON",
     "dragon_test": "DRAGON TEST >",
-    "jean_grey_test": "JEAN GREY TEST >",
+    "ghost_test": "GHOST TEST >",
     "lighting_test": "LIGHTING TEST >",
     "samples": "SAMPLE SKILLS",
     "sample": {
       "dragon": "chains a lunge on every hit",
-      "jean_grey": "possesses what it hits, 10s",
+      "ghost": "possesses what it hits, 10s",
       "seeker": "laser speed, turns after anything"
     },
     "seeker": "Seeker Arrow",
@@ -325,14 +325,14 @@
     "clear": "FLOOR CLEAR   BEST CAST %d OF %d",
     "board": "Dragon Dash"
   },
-  "jean": {
-    "title": "JEAN GREY TEST",
+  "ghost": {
+    "title": "GHOST TEST",
     "subtitle": "STEAL THE DIAMOND WITHOUT GOING IN YOURSELF",
     "body": "BODY %d / %d",
     "take": "TAKE THE DIAMOND",
     "down": "PICK THE DIAMOND BACK UP",
     "carry": "BRING IT TO YOUR BODY",
-    "home": "BACK TO THE PIT WITH IT",
+    "home": "BACK TO YOUR HIDING PLACE WITH IT",
     "unseen": "UNSEEN",
     "seen": "SEEN BY %d",
     "best": "%s  BEST %s",
