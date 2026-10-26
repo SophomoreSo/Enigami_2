@@ -109,7 +109,7 @@ func _targets_now() -> Array:
 	var room = body.get("room")
 	var counted: Array = _layers[-1]["ids"] if not _layers.is_empty() else []
 	var ids: Array = []
-	for a: Actor in Attacks.targets(int(body.get("team"))):
+	for a: Actor in Attacks.quarries(int(body.get("team"))):
 		var id := a.get_instance_id()
 		_seen[id] = [a.global_position, a.hurt_radius]
 		var d := from.distance_to(a.global_position)

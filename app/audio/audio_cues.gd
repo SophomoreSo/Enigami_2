@@ -78,6 +78,9 @@ func _on_cue(cue: StringName, d: Dictionary) -> void:
 			Audio.play("deny", 0.85 if String(d.get("kind", "")) == "stamina" else 1.0)
 		&"pickup":
 			Audio.play("pickup")
+		&"crate_break":
+			# A crack of wood: a hit's sound, low.
+			Audio.play("hit", 0.7 + randf_range(-0.05, 0.05))
 		&"box_open":
 			# A pickup's chime, lower: several things at once, out of a box.
 			Audio.play("pickup", 0.8)

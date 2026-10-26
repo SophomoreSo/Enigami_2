@@ -13,10 +13,15 @@ extends RefCounted
 static func targets(team: int) -> Array:
 	return Arena.against(team)
 
+## Of those, what is worth going after (`Arena.sought`): a crate is struck by
+## whatever reaches it, and turned toward by nothing.
+static func quarries(team: int) -> Array:
+	return Arena.sought(team)
+
 static func nearest_target(pos: Vector2, team: int, max_dist: float = 1e9) -> Actor:
 	var best: Actor = null
 	var best_d := max_dist
-	for a in targets(team):
+	for a in quarries(team):
 		var d: float = pos.distance_to(a.global_position)
 		if d < best_d:
 			best_d = d
@@ -976,7 +981,7 @@ static func _hit_hitstop(h: Hit) -> bool:
 ## brought down by their own NEAR or their own thrown stone.
 static func _hit_heard(h: Hit) -> bool:
 	h.killed = h.target.dead
-	if h.killed and h.atk != null and h.atk.team == 0 and h.target.team != 0:
+	if h.killed and h.atk != null and h.atk.team == 0 and h.target.team != 0 and not (h.target is Crate):
 		GameState.register_kill()
 	Cues.at(&"hit", h.pos, {"payload": h.p, "killed": h.killed, "target_team": h.target.team})
 	return true

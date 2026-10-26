@@ -19,8 +19,9 @@ extends HandLaidRoom
 ##             it is off, or a pit (`PIT`), a hole in the floor a body falls
 ##             into; or what stands on the floor in it — `P` where the
 ##             player starts, `T` the room's treasure box, `x` ground worth
-##             digging, `_` a bench, and a letter of `MONSTERS` a monster's
-##             post. Everything stands on the middle of its cell.
+##             digging, `C` a crate with gold in it, `_` a bench, and a letter
+##             of `MONSTERS` a monster's post. Everything stands on the middle
+##             of its cell.
 ##   dressing  what is put about the floor: a lantern, a fire, a patch of
 ##             grass.
 ##
@@ -46,7 +47,10 @@ const OPEN := "."
 const START := "P"
 const BOX := "T"
 const DIG := "x"
+const CRATE := "C"
 const BENCH := "_"
+## The gold in a crate (`Crate`): a little, less than a dig turns up.
+const CRATE_GOLD := Vector2i(2, 5)
 ## The kinds of wall, by the mark that lays each. All of them are solid,
 ## glass as much as stone: clear glass and a mirror are walls a body cannot go
 ## through, and what either shows is the picture's.
@@ -135,12 +139,13 @@ static func creatures() -> PackedStringArray:
 
 ## Everything else that can be put in a cell of the plan that is not a wall, in
 ## the order the map creator offers it under THINGS: a pit, the box, the ground
-## to dig, a bench, and the ways out.
+## to dig, a crate, a bench, and the ways out.
 static func things() -> PackedStringArray:
 	var out := PackedStringArray()
 	out.append(PIT)
 	out.append(BOX)
 	out.append(DIG)
+	out.append(CRATE)
 	out.append(BENCH)
 	for mark in [DOOR_WEST, DOOR_EAST, DOOR_NORTH, DOOR_SOUTH, EXIT]:
 		out.append(mark)
@@ -202,7 +207,7 @@ func record() -> Dictionary:
 	var dice := RandomNumberGenerator.new()
 	dice.seed = hash(plan)
 	var rec := {"kind": "entry", "danger": 1, "region": region, "variant": hash(plan) % 65536,
-		"enemies": monster_records(), "loot": [], "digs": [], "benches": []}
+		"enemies": monster_records(), "loot": [], "digs": [], "benches": [], "crates": []}
 	var boxes := cells_marked(BOX)
 	if not boxes.is_empty():
 		var at := stand_point(boxes[0])
@@ -216,6 +221,10 @@ func record() -> Dictionary:
 		var buried: Array = [{"scrap": dice.randi_range(5, 18)}]
 		buried.append_array(_parts(dice, 2 if dice.randf() < 0.3 else 1))
 		(rec["digs"] as Array).append({"pos": [at.x, at.y], "loot": buried, "dug": false})
+	for c in cells_marked(CRATE):
+		var at := stand_point(c)
+		(rec["crates"] as Array).append({"pos": [at.x, at.y],
+			"gold": dice.randi_range(CRATE_GOLD.x, CRATE_GOLD.y), "broken": false})
 	return rec
 
 ## One enemy record per post, in the shape `Room` spawns from: a monster

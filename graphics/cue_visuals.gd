@@ -131,6 +131,11 @@ func _on_cue(cue: StringName, d: Dictionary) -> void:
 				[Monsters.name_for(String(d.get("kind", ""))).to_upper()]), Style.BOSS_TEXT)
 		&"pickup":
 			Fx.burst(pos, Style.loot_color(String(d.get("id", "")), int(d.get("scrap", 0))), 6, 120.0)
+		&"crate_break":
+			# Splinters off the planks, and a glint of the gold coming out.
+			Fx.burst(pos + Vector2(0, -8), CrateView.WOOD_LIT, 12, 170.0)
+			Fx.burst(pos + Vector2(0, -8), CrateView.GOLD, 4 + int(d.get("gold", 0)), 120.0)
+			Fx.shake(2.0)
 		&"box_open":
 			Fx.burst(pos + Vector2(0, -8), Style.TREASURE_BAND, 10 + 3 * int(d.get("count", 0)), 160.0)
 		&"kit_back":

@@ -101,6 +101,9 @@ var _paths_span: Rect2i = Rect2i()
 var box: TreasureBox = null
 ## The ground worth digging in this room, dug or not.
 var digs: Array[DigSpot] = []
+## The crates standing in it, unbroken (`Crate`): the ones its record names,
+## `crates`, each `{"pos": [x, y], "gold": n, "broken": bool}`.
+var crates: Array[Crate] = []
 ## How far apart two spots of it are kept, and how far from the box: one dug
 ## should not be one stood on while opening something else.
 const DIG_APART := 96.0
@@ -466,6 +469,7 @@ func _spawn_contents() -> void:
 	if not data.has("digs"):
 		data["digs"] = _roll_digs()
 	_spawn_digs()
+	_spawn_crates()
 	for rec in data.get("benches", []):
 		var p: Array = rec.get("pos", [])
 		if p.size() == 2:
@@ -665,6 +669,31 @@ func _spawn_digs() -> void:
 		d.dug.connect(func(s: DigSpot, items: Array) -> void: spot_dug.emit(s, items))
 		add_child(d)
 		digs.append(d)
+
+## The crates the record names, those not broken yet. None are rolled: a room
+## has the ones its map laid (`MadeRoom.CRATE`).
+func _spawn_crates() -> void:
+	crates.clear()
+	for rec in data.get("crates", []):
+		if bool(rec.get("broken", false)):
+			continue
+		var c := Crate.new()
+		c.setup(rec)
+		c.broke.connect(_on_crate_broke)
+		add_child(c)
+		crates.append(c)
+
+## A crate broke: the gold in it spills out where it stood, as a kill's does,
+## and it is broken in the record, so it is not standing there next time.
+func _on_crate_broke(c: Crate) -> void:
+	crates.erase(c)
+	if c.gold() <= 0:
+		return
+	var sp := Pickup.new()
+	sp.setup_scrap(c.gold(), c.position)
+	sp.room = self
+	sp.collected.connect(_on_pickup_collected)
+	add_child(sp)
 
 ## A bench standing at `at` — the middle of a cell on the floor, the way a
 ## treasure box stands — for whoever plays this room to sit on.

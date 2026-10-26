@@ -355,7 +355,7 @@ func _home(delta: float) -> void:
 func _quarry() -> Actor:
 	var best: Actor = null
 	var best_d := maxf(HOMING_SIGHT, range_px - _travelled)
-	for a: Actor in Attacks.targets(team):
+	for a: Actor in Attacks.quarries(team):
 		if _hit.has(a):
 			continue
 		var d := global_position.distance_to(a.global_position)
@@ -653,7 +653,7 @@ func _chain_from(struck: Actor) -> void:
 	var from := struck.global_position
 	var best: Actor = null
 	var best_d := CHAIN_SIGHT
-	for a: Actor in Attacks.targets(team):
+	for a: Actor in Attacks.quarries(team):
 		if a == struck or _hit.has(a) or not is_instance_valid(a) or a.dead:
 			continue
 		var d := from.distance_to(a.global_position)

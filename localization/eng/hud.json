@@ -127,6 +127,7 @@
       "start": "START",
       "box": "TREASURE BOX",
       "dig": "DIG SPOT",
+      "crate": "CRATE",
       "bench": "BENCH",
       "door_west": "DOORWAY WEST",
       "door_east": "DOORWAY EAST",

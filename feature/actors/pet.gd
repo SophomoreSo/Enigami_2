@@ -112,7 +112,7 @@ func _pick() -> Actor:
 	var best: Actor = null
 	var best_d := SIGHT
 	var from := summoner.global_position
-	for a in Attacks.targets(int(summoner.get("team")) if summoner.get("team") != null else 0):
+	for a in Attacks.quarries(int(summoner.get("team")) if summoner.get("team") != null else 0):
 		if not is_instance_valid(a) or a.dead:
 			continue
 		var d := from.distance_to(a.global_position)

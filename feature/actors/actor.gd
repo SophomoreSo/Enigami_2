@@ -36,6 +36,10 @@ var health: float = 40.0
 ## How far from the feet a hit reaches this body, on the floor.
 var hurt_radius: float = 14.0
 var team: int = 1  ## 0 = player, 1 = monsters
+## Whether it is something to go after: what a homing bolt turns for, an aimed
+## blow swings at, a pet picks and the aim leans toward (`Arena.sought`). A
+## crate is struck by what reaches it and sought by nothing (`Crate`).
+var sought: bool = true
 ## The silhouette the picture stands on the feet: how wide, and how tall it
 ## stands up the screen from them. The collider is not this: it is the
 ## footprint, a flat shape round the feet (`_make_body`).

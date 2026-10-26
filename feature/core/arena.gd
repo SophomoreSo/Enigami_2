@@ -23,6 +23,9 @@ var world: Node = null
 ## Empty until asked for, and dropped when they are stale.
 var _actors: Array = []
 var _against: Dictionary = {}
+## Of those, by `team`, the ones worth going after (`sought`): `against` less
+## a crate and whatever else is only struck by what happens to reach it.
+var _sought: Dictionary = {}
 var _stale := true
 
 func _ready() -> void:
@@ -61,12 +64,22 @@ func against(team: int) -> Array:
 		_against[team] = out
 	return _against[team]
 
+## Of what something of `team` can strike, what it goes after: what a homing
+## bolt turns for, an aimed blow swings at, a pet picks and the aim's pull leans
+## toward (`Actor.sought`). Read it; do not change it.
+func sought(team: int) -> Array:
+	_refresh()
+	if not _sought.has(team):
+		_sought[team] = against(team).filter(func(a: Actor) -> bool: return a.sought)
+	return _sought[team]
+
 func _refresh() -> void:
 	if not _stale:
 		return
 	_stale = false
 	_actors.clear()
 	_against.clear()
+	_sought.clear()
 	for a in get_tree().get_nodes_in_group("actors"):
 		if a is Actor and not a.dead:
 			_actors.append(a)

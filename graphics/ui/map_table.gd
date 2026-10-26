@@ -482,6 +482,8 @@ func name_of(entry: String, in_tab: int = tab) -> String:
 			return Loc.t("hud.maker.mark.box")
 		MadeRoom.DIG:
 			return Loc.t("hud.maker.mark.dig")
+		MadeRoom.CRATE:
+			return Loc.t("hud.maker.mark.crate")
 		MadeRoom.BENCH:
 			return Loc.t("hud.maker.mark.bench")
 		MadeRoom.DOOR_WEST:
@@ -797,6 +799,8 @@ static func paint_mark(cv: CanvasItem, mark: String, r: Rect2) -> void:
 			_paint_box(cv, feet, k)
 		MadeRoom.DIG:
 			_paint_dig(cv, feet, k)
+		MadeRoom.CRATE:
+			CrateView.paint(cv, feet, float(PixelCamera.SCALE) * k)
 		MadeRoom.BENCH:
 			BenchView.paint(cv, feet, float(PixelCamera.SCALE) * k)
 		_:
@@ -912,6 +916,10 @@ static func stands_in(mark: String) -> Rect2:
 			return Rect2(-TreasureBoxView.W * 0.5 - 1.0, -high, TreasureBoxView.W + 2.0, high)
 		MadeRoom.DIG:
 			return Rect2(-DigSpotView.W * 0.5, -PixelCamera.SCALE * 4.0, DigSpotView.W, PixelCamera.SCALE * 4.0)
+		MadeRoom.CRATE:
+			var s := float(PixelCamera.SCALE)
+			return Rect2(-(CrateView.WIDE * 0.5 + 1.0) * s, -(CrateView.FRONT + CrateView.LID + 1) * s,
+				(CrateView.WIDE + 2.0) * s, (CrateView.FRONT + CrateView.LID + 1) * s)
 		MadeRoom.BENCH:
 			var s := float(PixelCamera.SCALE)
 			return Rect2(-(BenchView.WIDE * 0.5 + 1.0) * s, -BenchView.BACK * s, (BenchView.WIDE + 2.0) * s, BenchView.BACK * s)
