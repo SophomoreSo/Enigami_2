@@ -87,12 +87,12 @@
   "sandbox": {
     "swap_weapon": "무기 교체",
     "dragon_test": "드래곤 테스트 >",
-    "jean_grey_test": "진 그레이 테스트 >",
+    "ghost_test": "고스트 테스트 >",
     "lighting_test": "조명 테스트 >",
     "samples": "샘플 스킬",
     "sample": {
       "dragon": "적중할 때마다 돌진이 이어짐",
-      "jean_grey": "맞은 적에게 10초 빙의",
+      "ghost": "맞은 적에게 10초 빙의",
       "seeker": "번개처럼 날아가 끝까지 쫓아감"
     },
     "seeker": "추적 화살",
@@ -324,14 +324,14 @@
     "clear": "층 클리어   최고 기록 %d / %d",
     "board": "드래곤 대시"
   },
-  "jean": {
-    "title": "진 그레이 테스트",
+  "ghost": {
+    "title": "고스트 테스트",
     "subtitle": "직접 들어가지 않고 다이아몬드를 훔치세요",
     "body": "몸 %d / %d",
     "take": "다이아몬드를 가져가세요",
     "down": "다이아몬드를 다시 주우세요",
     "carry": "내 몸에게 가져다주세요",
-    "home": "들고 구덩이로 돌아가세요",
+    "home": "들고 숨은 곳으로 돌아가세요",
     "unseen": "들키지 않음",
     "seen": "%d명에게 들킴",
     "best": "%s  최고 기록 %s",

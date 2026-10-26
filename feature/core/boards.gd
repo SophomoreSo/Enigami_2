@@ -4,7 +4,7 @@ extends RefCounted
 ## The skill boards the game ships with, read from the content database and
 ## built into the `SkillBoard`s the circuit runs: the rows of `boards` and
 ## `board_parts` (see `data/db/README.md`). Each weapon's own graph as a new
-## profile gets it, every monster's, the dragon test's and the Jean Grey
+## profile gets it, every monster's, the dragon test's and the ghost
 ## test's, and the bench's samples are here. What a player builds onto a weapon's graph is theirs, and
 ## lives in the save.
 ##

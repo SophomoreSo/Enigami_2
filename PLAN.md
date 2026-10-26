@@ -138,7 +138,7 @@ Left to the user:
 | `LooseRock` (the rock weapon) | Rework | thrown with the faked arc, lies where it lands, picked back up: all of that but the arc carries |
 | `FallingThing` | Drop | nothing falls from a ceiling seen from above |
 | `StuckShuriken` | Rework | it sticks in a wall or lies on the floor where it stopped; the rule is the same, the wall test is a cell test |
-| `Sandbox`, `DragonTower`, `DragonTest`, `JeanGreyTest`, `JeanGreyBase`, `LightingTest` | Rework | the bench's sandbox carries as a flat room; the dragon test's tower is a platformer set piece and goes; the other two are kept only if the user wants them |
+| `Sandbox`, `DragonTower`, `DragonTest`, `JeanGreyTest`, `JeanGreyBase`, `LightingTest` | Rework | the bench's sandbox carries as a flat room. The dragon test and the Jean Grey test are brought back at the user's word (2026-10-25), the second as the **ghost test** (`GhostTest`, `GhostBase`): the tower's storeys are halls joined by doorways, and the heist is laid on a floor, the diamond on an island in a pit wider than a dash where v1 had it on a ledge past any jump |
 | Foliage rules, `VelocityBuffer`'s air | Keep | grass seen from above sways the same way |
 
 ## 4. The picture: `graphics/` (30,300 lines, 86 files)
@@ -154,7 +154,7 @@ Left to the user:
 | `PickupView`, `BenchView`, `TreasureBoxView`, `DigSpotView`, `DiamondView`, `LostKitView`, `PhonePropView` | Keep | sprites at a point; each gets a y-sort origin at its base |
 | `GateView`, `Rope` (697), `rope.gd` drawing | Drop | |
 | `RoomView` (456), `MadeRoomView` (547), `RockTiles`, `GroveTiles`, `MapTiles` (705), `MapCells`, `GroveGroundView` | Rework | the code-drawn rock and grove, side on, go; a room is a `TileMapLayer` per layer (floor, walls, props) on a y-sorted root, its tiles from a `TileSet` built at boot out of the atlas and the PixelLab tilesets; a wall cell paints a top and, where the cell below is floor, a front; autotiling by Godot's terrain sets |
-| `RaidView`, `SandboxView`, `MapMakerView`, `TowerView`, the test views | Rework/Drop | `RaidView` and `MapMakerView` carry with the new layers; `TowerView` and `DragonTestView` go with their worlds |
+| `RaidView`, `SandboxView`, `MapMakerView`, `TowerView`, the test views | Rework/Drop | `RaidView` and `MapMakerView` carry with the new layers; `TowerView` goes, the tower drawn as any room is; `DragonTestView` and the ghost test's view carry with their worlds |
 | `HideoutWorldView`, `HideoutScenery`, the five looks (`hideout_brass/keep/grove/city/orbit`, 5,800 lines), `HideoutThemes`, the HIDEOUT THEME page | Drop, then New | the five are side-on pictures drawn in code; the top-down hideout is a tiled interior with the same stations, one look, from a tileset. The user picks which of the five it takes after, if any, and the theme page goes |
 | `Lighting` (714, deferred 2D), `Lamp`, `Shine`, `Glass`, `Glazing`, `ShadowCaster`, the light shaders | Rework | a canvas system, so it carries where the 3D route dropped it; what changes is what a shadow is. The wall-figure shadow and the normals from a sprite's edge assume a side view and go; a lamp lights the floor round it, a body gets a blob shadow at its feet drawn by its view, `Glass`/`Glazing` stay as surface effects. If this is more than the look wants, `Lighting` is one `remove_child` away and lamps draw as additive glow |
 | `Fx` (shake, sparks, rings, floating numbers, pools), `CueVisuals` | Keep | 2D effects at a point; a cue with a `height` lifts its effect |
@@ -307,7 +307,7 @@ and the database — some 35,000 lines — copy.
 
 ## 14. Where it stands (2026-10-25)
 
-Every step is a commit, but two are not finished, and nothing has been run.
+Every step is a commit, but two are not finished.
 
 - **Step 17 is stopped** at the user's word: no more character sprites for
   now. Legna Dennis and Dren Repus are packed and in the game; Reniart Lamina
@@ -316,9 +316,12 @@ Every step is a commit, but two are not finished, and nothing has been run.
   atlas lacks are not made. `HEROES.md` names each PixelLab character.
 - **The `v2.0.0` tag** waits for the user, and the repository has no remote
   yet for CI to run on.
-- **Nothing has been run in Godot.** Not the game, not an import, not a test.
-  The code was checked by reading it and by searching it: no class v1 had and
-  this one dropped is still named in code, no input action is asked for that
-  the input map lacks, and every `Class.member` the code names exists. The
-  first `godot --headless --import --path .` is where the parse errors this
-  reading missed will show, and then `tests/run.sh` (see README.md).
+- **Run in Godot, the headless half passing.** Every scene under
+  `tests/circuit`, `tests/feature`, `tests/story`, `tests/perks` and
+  `tests/shared` passes (68 of them, 2026-10-25). Of the tests that need a
+  window, only those that draw rooms have been run: `hideout_map` and
+  `story_desk` pass (the second only some of the time), and `lighting`
+  (four checks of the bodies' shadows), `map_table` (a name missing from the
+  tilesets' popup) and `rock_view` (the rock's quarter turns) fail as they did
+  before anything here touched them. The rest of `tests/graphics` and
+  `tests/mobile` have not been run.

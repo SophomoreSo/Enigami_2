@@ -2,7 +2,7 @@ class_name SampleSkillsPanel
 extends BenchDrawer
 
 ## The bench's sample skills, in a drawer on the right edge of the screen
-## (`Sandbox.samples`) — the dragon test's graph, the Jean Grey test's, and the
+## (`Sandbox.samples`) — the dragon test's graph, the ghost test's, and the
 ## seeker arrow — each under the weapon it was built for and a line on what it
 ## does. Picking one puts it on that weapon at the bench, over the
 ## bench's copy and never the profile's, puts that weapon in hand, and pushes
@@ -41,8 +41,8 @@ static func _says(id: String) -> String:
 	match id:
 		"dragon":
 			return Loc.t("hud.sandbox.sample.dragon")
-		"jean_grey":
-			return Loc.t("hud.sandbox.sample.jean_grey")
+		"ghost":
+			return Loc.t("hud.sandbox.sample.ghost")
 		"seeker":
 			return Loc.t("hud.sandbox.sample.seeker")
 	return ""

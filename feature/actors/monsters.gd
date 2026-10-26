@@ -68,7 +68,7 @@ const DEFS := {
 		"board": "warden",
 	},
 	## A person with a rifle — not a monster, and not met in a raid (`pick` never
-	## names it): a guard of the Jean Grey test's building. It holds its post and
+	## names it): a guard of the ghost test's building. It holds its post and
 	## shoots what it notices, from further off than anything else sees, with a
 	## shot quick enough to be hard to step out of and heavy enough that three
 	## put a body down — two, once anything else has landed. Possessed, it walks

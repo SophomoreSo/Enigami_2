@@ -9,14 +9,15 @@ extends Node
 ## builds screens out of `graphics/` and drives them with `feature/`. Neither
 ## module reaches the other except through here and through `Cues`.
 
-enum State { TITLE, HIDEOUT, RAID, SANDBOX, RESULTS, INTRO, MAP_MAKER, STORY_MAKER, LIGHTING_TEST }
+enum State { TITLE, HIDEOUT, RAID, SANDBOX, RESULTS, INTRO, MAP_MAKER, STORY_MAKER, LIGHTING_TEST,
+	DRAGON_TEST, GHOST_TEST }
 
 var state: int = State.TITLE:
 	set(v):
 		state = v
 		# On the bench, and the test opened from it, perks are toggled rather
 		# than bought; everywhere else they are the profile's.
-		Perks.set_trial(v in [State.SANDBOX, State.LIGHTING_TEST])
+		Perks.set_trial(v in [State.SANDBOX, State.LIGHTING_TEST, State.DRAGON_TEST, State.GHOST_TEST])
 
 var current: Node = null
 var ui_layer: CanvasLayer
@@ -364,9 +365,29 @@ func goto_sandbox() -> void:
 	state = State.SANDBOX
 	var s := Sandbox.new()
 	s.exit_requested.connect(goto_title)
+	s.dragon_test_requested.connect(goto_dragon_test)
+	s.ghost_test_requested.connect(goto_ghost_test)
 	s.lighting_test_requested.connect(goto_lighting_test)
 	add_child(s)
 	current = s
+
+## Leaving the dragon test goes back to the sandbox it was opened from.
+func goto_dragon_test() -> void:
+	_clear()
+	state = State.DRAGON_TEST
+	var d := DragonTest.new()
+	d.exit_requested.connect(goto_sandbox)
+	add_child(d)
+	current = d
+
+## Leaving the ghost test goes back to the sandbox it was opened from, too.
+func goto_ghost_test() -> void:
+	_clear()
+	state = State.GHOST_TEST
+	var g := GhostTest.new()
+	g.exit_requested.connect(goto_sandbox)
+	add_child(g)
+	current = g
 
 ## Leaving the lighting test goes back to the sandbox it was opened from.
 func goto_lighting_test() -> void:
@@ -852,7 +873,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _toggle_magic() -> void:
 	if get_tree().paused:
 		return
-	if state in [State.RAID, State.SANDBOX, State.HIDEOUT, State.MAP_MAKER, State.LIGHTING_TEST]:
+	if state in [State.RAID, State.SANDBOX, State.HIDEOUT, State.MAP_MAKER, State.LIGHTING_TEST,
+			State.DRAGON_TEST, State.GHOST_TEST]:
 		Magic.toggle()
 		get_viewport().set_input_as_handled()
 

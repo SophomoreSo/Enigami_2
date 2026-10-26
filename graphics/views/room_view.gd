@@ -81,12 +81,14 @@ func _on_reshaped() -> void:
 	_cast()
 
 ## Which tileset the room is drawn in: a made map's own, the hideout's hall's,
-## and the rock for a raid's rooms.
+## the ghost test's grove, and the rock for a raid's rooms.
 func _tileset_id() -> String:
 	if room is MadeRoom and String((room as MadeRoom).tileset) != "":
 		return (room as MadeRoom).tileset
 	if room != null and room.get_parent() is HideoutWorld:
 		return Style.HIDEOUT_TILESET
+	if room is GhostBase:
+		return Style.GHOST_TILESET
 	return Style.RAID_TILESET
 
 ## Which tint the room takes: the tileset's say, by the region the room lies in.
@@ -118,11 +120,14 @@ func _lay_tiles() -> void:
 ## how many and how long is rolled from the room's own seed, so a room looks
 ## the same every time it is walked into, and from a roll of its own rather
 ## than the room's, so the monsters and the loot fall as they always did.
+## Nothing grows indoors: the dragon test's building has none.
 func _grow_foliage() -> void:
 	for p in plants:
 		if is_instance_valid(p):
 			p.queue_free()
 	plants.clear()
+	if room is DragonTower:
+		return
 	var ground := _ground()
 	if ground.is_empty():
 		return

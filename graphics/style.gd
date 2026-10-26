@@ -1126,6 +1126,8 @@ const PLAYER_ART := "player"
 const PLAYER_COLOR := Color(0.65, 0.9, 1.0)
 ## In the dragon test the player is the Dragon: the pack's lizard warrior, with
 ## its katana in hand in place of whatever the weapon would show.
+const DRAGON_ART := "lizard_m"
+const DRAGON_BLADE := "weapon_katana"
 
 ## --- monsters ---------------------------------------------------------------
 ## `art` names the character in the shared atlas, chosen so the sprite reads as
@@ -1264,11 +1266,12 @@ const DIALOGUE_HINT := Color(0.5, 0.5, 0.56)
 ## for a press to count, so the room says what it will answer to before the key
 ## is pressed. The things themselves are the scenery's, below.
 ## Which tileset each place is drawn in (`MapTiles.IDS`): a raid's rooms, the
-## hideout's hall, and the stage a scene of its own stands on. A made map
-## names its own.
+## hideout's hall, the stage a scene of its own stands on, and the ghost test's
+## ground, a ruin in the grove. A made map names its own.
 const RAID_TILESET := "rock"
 const HIDEOUT_TILESET := "keep"
 const STAGE_TILESET := "keep"
+const GHOST_TILESET := "grove"
 
 const HIDEOUT_PLATE := Color(0.06, 0.08, 0.11)
 const HIDEOUT_SIGN := Color(0.38, 0.52, 0.66)
