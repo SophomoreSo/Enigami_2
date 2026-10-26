@@ -104,6 +104,9 @@ var digs: Array[DigSpot] = []
 ## The crates standing in it, unbroken (`Crate`): the ones its record names,
 ## `crates`, each `{"pos": [x, y], "gold": n, "broken": bool}`.
 var crates: Array[Crate] = []
+## The birds on its floor that have not flown (`Bird`): the ones its record
+## names, `birds`, each `{"pos": [x, y], "flown": bool}`.
+var birds: Array[Bird] = []
 ## How far apart two spots of it are kept, and how far from the box: one dug
 ## should not be one stood on while opening something else.
 const DIG_APART := 96.0
@@ -470,6 +473,7 @@ func _spawn_contents() -> void:
 		data["digs"] = _roll_digs()
 	_spawn_digs()
 	_spawn_crates()
+	_spawn_birds()
 	for rec in data.get("benches", []):
 		var p: Array = rec.get("pos", [])
 		if p.size() == 2:
@@ -682,6 +686,21 @@ func _spawn_crates() -> void:
 		c.broke.connect(_on_crate_broke)
 		add_child(c)
 		crates.append(c)
+
+## The birds the record names, those that have not flown. None are rolled: a
+## room has the ones its map laid (`MadeRoom.BIRD`). One gone is gone from the
+## list, and has flown in the record, so it is not there next time.
+func _spawn_birds() -> void:
+	birds.clear()
+	for rec in data.get("birds", []):
+		if bool(rec.get("flown", false)):
+			continue
+		var b := Bird.new()
+		b.setup(rec)
+		b.room = self
+		b.flew.connect(func(gone: Bird) -> void: birds.erase(gone))
+		add_child(b)
+		birds.append(b)
 
 ## A crate broke: the gold in it spills out where it stood, as a kill's does,
 ## and it is broken in the record, so it is not standing there next time.

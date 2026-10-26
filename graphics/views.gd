@@ -72,6 +72,8 @@ func view_script_for(n: Node) -> GDScript:
 		return PhonePropView
 	if n is Diamond:
 		return DiamondView
+	if n is Bird:
+		return BirdView
 	if n is Station:
 		return StationView
 	if n is HideoutWorld:

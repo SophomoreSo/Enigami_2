@@ -78,6 +78,9 @@ func _on_cue(cue: StringName, d: Dictionary) -> void:
 			Audio.play("deny", 0.85 if String(d.get("kind", "")) == "stamina" else 1.0)
 		&"pickup":
 			Audio.play("pickup")
+		&"bird_flight":
+			# Wingbeats, a little different every bird, so a flock is many.
+			Audio.play("flutter", 1.0 + randf_range(-0.12, 0.12))
 		&"crate_break":
 			# A crack of wood: a hit's sound, low.
 			Audio.play("hit", 0.7 + randf_range(-0.05, 0.05))
