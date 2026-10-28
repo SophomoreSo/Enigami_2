@@ -4,6 +4,10 @@ extends Node2D
 ## The dragon test's screen: the camera, the tape over the picture, the HUD and
 ## the same assembly overlay the bench uses.
 ##
+## The building is three screens tall, so the camera goes up it after the
+## Dragon, easing after him through a chain of lunges and never past the top or
+## the foot of it, and is back at the door the moment the floor is set again.
+##
 ## Katana ZERO plays its levels back as tape, so this one does too: scanlines
 ## and a vignette over the world, a blue wash while a charge is held, blood left
 ## on the floor where a guard fell, and tracking noise as the tape rewinds for
@@ -18,6 +22,10 @@ var pages: ScreenPages
 var hud: DragonTestHud
 var tape: Tape
 var stains: Stains
+
+## How quickly the camera closes on the Dragon: the share of the way it goes in
+## a second.
+const FOLLOW := 5.0
 
 func _ready() -> void:
 	screen = get_parent() as DragonTest
@@ -63,12 +71,39 @@ func _ready() -> void:
 ## The blood lies on the building's floor: drawn by the building's own view,
 ## after the floor and with it, so it is under everyone standing in the halls
 ## and every wall — which the room's view only has once the building is up.
-func _process(_delta: float) -> void:
-	if stains.get_parent() == null and screen != null and is_instance_valid(screen):
+## The camera follows; the first frame it can, it is there at once.
+func _process(delta: float) -> void:
+	if screen == null or not is_instance_valid(screen):
+		return
+	if stains.get_parent() == null:
 		var floor_view := Views.of(screen.room)
 		if floor_view != null:
 			stains.z_index = -1
 			floor_view.add_child(stains)
+	follow(delta, not _followed)
+
+var _followed := false
+
+## Takes the camera towards the Dragon, by `delta`'s worth of `FOLLOW` — or
+## all the way, with `snap`: across as far as the building is wider than the
+## screen, and up and down as far as it is taller, never past its edges.
+func follow(delta: float, snap: bool) -> void:
+	if screen.room == null or not is_instance_valid(screen.room):
+		return
+	var p := screen.player
+	if p == null or not is_instance_valid(p):
+		return
+	_followed = true
+	var size := Vector2(screen.room.cols, screen.room.rows) * Room.CELL
+	var half := get_viewport().get_visible_rect().size * 0.5
+	var at := p.vessel().global_position - screen.room.global_position
+	var want := size * 0.5
+	if size.x > half.x * 2.0:
+		want.x = clampf(at.x, half.x, size.x - half.x)
+	if size.y > half.y * 2.0:
+		want.y = clampf(at.y, half.y, size.y - half.y)
+	want += screen.room.global_position
+	camera.position = want if snap else camera.position.lerp(want, clampf(FOLLOW * delta, 0.0, 1.0))
 
 ## See RaidView._unhandled_input: the editor consumes its own keys, R included.
 ## The map's key puts the screen up on the map's page, as it does in a raid.
@@ -100,6 +135,7 @@ func _on_editing(on: bool) -> void:
 	hud.visible = not on
 
 func _on_floor_reset() -> void:
+	follow(0.0, true)
 	stains.clear()
 	tape.rewind = Tape.REWIND
 	hud.rewind()

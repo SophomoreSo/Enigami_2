@@ -50,7 +50,9 @@ signal panel_changed(id: String)
 ## pillars to walk round, the player's start (`MadeRoom.START`) by the west
 ## wall, and the bench (`MadeRoom.BENCH`) on the open floor between the
 ## stations — far enough from each that no spot is in reach of a station's
-## press and the bench's at once; the bench answers the key itself.
+## press and the bench's at once; the bench answers the key itself. And three
+## birds (`MadeRoom.BIRD`) pecking on the floor in the hall's far corner,
+## which fly as the player comes near and are back the next time the hall is.
 const PLAN: PackedStringArray = [
 	"########################################",
 	"#......................................#",
@@ -68,8 +70,8 @@ const PLAN: PackedStringArray = [
 	"#............._........................#",
 	"#......................................#",
 	"#......................................#",
-	"#......................................#",
-	"#......................................#",
+	"#...........................v.v........#",
+	"#............................v.........#",
 	"#......................................#",
 	"#......................................#",
 	"#......................................#",

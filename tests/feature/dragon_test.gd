@@ -77,10 +77,12 @@ func _ready() -> void:
 	var p := screen.player
 
 	# The building is laid out by hand, a row of cells at a time.
-	var rows_ok := DragonTower.LAYOUT.size() == Room.H
+	# As wide as a room, and three rooms tall.
+	var rows_ok := DragonTower.LAYOUT.size() == Room.H * 3
 	for row in DragonTower.LAYOUT:
 		rows_ok = rows_ok and String(row).length() == Room.W
-	check(rows_ok, "the layout is %d rows of %d cells" % [Room.H, Room.W])
+	check(rows_ok and room.rows == Room.H * 3 and room.cols == Room.W,
+		"the layout is %d rows of %d cells" % [Room.H * 3, Room.W])
 
 	var posts := room.cells_marked("G")
 	check(posts.size() >= 6, "a squad to cut through (%d guards)" % posts.size())

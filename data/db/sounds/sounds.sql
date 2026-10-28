@@ -28,4 +28,5 @@ INSERT INTO sounds (id, path, description, use_flag) VALUES
 	('extract', 'res://audio/sfx/extract.wav', 'Rising triumphant chime: a triangle wave sweeping up an octave over half a second, retro game level complete, dry, no reverb', 'N'),
 	('parry', 'res://audio/sfx/parry.wav', 'Bright metallic ring: a triangle wave falling from high over 180 milliseconds, retro game parry clang, dry, no reverb', 'N'),
 	('boss', 'res://audio/sfx/boss.wav', 'Deep ominous drone hit: a low sawtooth growl sinking over 800 milliseconds with grit, a boss changing form, dark, dry, no reverb', 'N'),
-	('voice', 'res://audio/sfx/voice.wav', 'Tiny soft speech blip: a quiet square-wave beep of 40 milliseconds, text typing under dialogue, retro, dry, no reverb', 'N');
+	('voice', 'res://audio/sfx/voice.wav', 'Tiny soft speech blip: a quiet square-wave beep of 40 milliseconds, text typing under dialogue, retro, dry, no reverb', 'N'),
+	('flutter', 'res://audio/sfx/flutter.wav', 'Small bird taking flight: a quick soft flutter of wingbeats, a dozen papery flaps over 300 milliseconds fading as it rises away, retro game ambience, dry, no reverb', 'N');
