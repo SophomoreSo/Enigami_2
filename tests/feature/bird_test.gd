@@ -70,6 +70,20 @@ func _laid() -> void:
 		"one bird a mark in the Grove (%d)" % rec.size())
 	check(rec.all(func(b: Dictionary) -> bool: return not bool(b["flown"])), "and none has flown yet")
 	grove.free()
+	# And where a player meets them: every room of a raid's floor, and the hall
+	# of the hideout.
+	var bare: Array = []
+	for row in Db.rows("SELECT map_id FROM raid_rooms"):
+		var made := Maps.load_room(String(row["map_id"]))
+		if made == null or (made.record().get("birds", []) as Array).size() < 2:
+			bare.append(String(row["map_id"]))
+		if made != null:
+			made.free()
+	check(bare.is_empty(), "every room of a raid has a few (%s have none)" % str(bare))
+	var hall := MadeRoom.new()
+	hall.plan = HideoutWorld.PLAN
+	check(hall.cells_marked(MadeRoom.BIRD).size() >= 3, "and the hideout's hall has some")
+	hall.free()
 
 ## A room with a flock of three close together, two near each other further
 ## off, and one on its own across the floor; the player at the far end.
