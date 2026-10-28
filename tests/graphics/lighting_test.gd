@@ -147,6 +147,23 @@ func share(lamp: Lamp, world: Vector2) -> float:
 	var far := middle.distance_to(lamp.global_position) / lamp.radius
 	return lamp.energy * pow(clampf((1.0 - far) / (1.0 - lamp.inner), 0.0, 1.0), lamp.falloff)
 
+## Half way along the patch a body standing at `feet` leaves on the floor in
+## `lamp`'s light, and half way into its depth: it goes from the feet the way
+## the lamp is off them, FEET_LEAN of that and never more than FEET_REACH
+## (`Lighting._throw`).
+func in_patch(feet: Vector2, lamp: Lamp) -> Vector2:
+	var away := feet - lamp.global_position
+	var along := minf(away.length() * Lighting.FEET_LEAN, Lighting.FEET_REACH) * 0.5
+	return feet + away.normalized() * along + Vector2(0, Lighting.FEET_DEPTH * 0.5)
+
+## Whether `dimmed` of the `lit` a lamp gives is what is left of it half way
+## along a patch (`in_patch`): more than at the feet, where the patch takes
+## FEET_DARK of it, and less than at its far end, where it takes a third of
+## that. Read back in eight bits, a lamp's share of the floor's colour is a
+## dozen steps, so nothing finer is asked.
+func half_shaded(dimmed: float, lit: float) -> bool:
+	return dimmed > lit * (1.0 - Lighting.FEET_DARK) and dimmed < lit * (1.0 - Lighting.FEET_DARK / 3.0)
+
 ## Something drawn in code.
 class Painted extends Node2D:
 	var paint: Callable
@@ -456,16 +473,18 @@ func _shadows() -> void:
 	var behind := here + Vector2(50, 0)
 	var beside := here + Vector2(0, 50)
 	var before := here + Vector2(-50, 0)
-	# The box stands on its feet, its bottom edge: the lamp to its left leaves
-	# a patch on the floor from the feet away to the right, FEET_LEAN of the
-	# 60 the lamp is off, which is beyond FEET_REACH — so FEET_REACH, 40.
+	# The box stands on its feet, its bottom edge, and the lamp to its left is
+	# level with its middle: it leaves a patch on the floor from the feet away
+	# from it, the way it is off the feet — to the right and a little down the
+	# floor — FEET_LEAN of the 61 that is, which is beyond FEET_REACH: so
+	# FEET_REACH, 40. Read half way along it (`in_patch`).
 	var feet := here + Vector2(0, 10)
-	var far_foot := feet + Vector2(30, 3)
+	var far_foot := in_patch(feet, left)
 	var near_foot := feet + Vector2(-30, 3)
 	var img := await shown()
 	check(lighting.lamps_shadowed == 1, "a lamp that throws shadows is given a mask to mark them in")
 	var dimmed := at(img, far_foot).r / GROUND.r - 1.0
-	check(dimmed > share(left, far_foot) * 0.4 and dimmed < share(left, far_foot) * 0.65,
+	check(half_shaded(dimmed, share(left, far_foot)),
 		"a body in a lamp's light leaves a patch of shadow on the floor at its feet, away from the lamp (%.3f of %.3f)" % [dimmed, share(left, far_foot)])
 	check(near(at(img, near_foot), times(GROUND, 1.0 + share(left, near_foot))),
 		"and none on the lamp's side (%s)" % at(img, near_foot))
@@ -479,9 +498,9 @@ func _shadows() -> void:
 	var right := lamp_at(here + Vector2(60, 0), 160.0)
 	img = await shown()
 	check(lighting.lamps_shadowed == 2, "a second lamp has a mask's colour of its own")
-	var left_foot := feet + Vector2(-30, 3)
+	var left_foot := in_patch(feet, right)
 	var right_dim := at(img, left_foot).r / GROUND.r - 1.0 - share(left, left_foot)
-	check(right_dim > share(right, left_foot) * 0.4 and right_dim < share(right, left_foot) * 0.65,
+	check(half_shaded(right_dim, share(right, left_foot)),
 		"each lamp's shadows are its own: the second leaves its patch the other way, under the first's light (%.3f of %.3f)" % [right_dim, share(right, left_foot)])
 	await out([right])
 
@@ -493,9 +512,9 @@ func _shadows() -> void:
 	# A lamp over the body, up the floor from it: the patch falls down the floor.
 	left.position = here + Vector2(0, -60)
 	img = await shown()
-	var down := feet + Vector2(0, 30)
+	var down := in_patch(feet, left)
 	dimmed = at(img, down).r / GROUND.r - 1.0
-	check(dimmed > share(left, down) * 0.4 and dimmed < share(left, down) * 0.7,
+	check(half_shaded(dimmed, share(left, down)),
 		"a lamp up the floor from a body leaves its patch down the floor (%.3f of %.3f)" % [dimmed, share(left, down)])
 	# Inside the body: the patch is where the feet are and no further.
 	left.position = here
@@ -693,10 +712,14 @@ func _spot_sun_area() -> void:
 		"lighting what faces back up its way, and not what faces along it (%s, %s)" % [at(img, Vector2(210, 570)), at(img, Vector2(270, 570))])
 	await out([faces])
 	sun.shadows = true
-	var box := ShadowCaster.new()
-	box.box(Rect2(-10, -10, 20, 20))
-	box.position = Vector2(400, 500)
-	stage.add_child(box)
+	# A block of rock in it, its four sides loose edges as a room's are. A body
+	# throws no edge's shadow, in a sun or any light: it leaves its patch.
+	var block := ShadowCaster.new()
+	block.edges(PackedVector2Array([Vector2(-10, -10), Vector2(10, -10), Vector2(10, -10), Vector2(10, 10),
+			Vector2(10, 10), Vector2(-10, 10), Vector2(-10, 10), Vector2(-10, -10)]),
+		PackedVector2Array([Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]))
+	block.position = Vector2(400, 500)
+	stage.add_child(block)
 	img = await shown()
 	check(lighting.lamps_shadowed == 1, "a sun that throws shadows is given a mask")
 	var dark := true
@@ -706,7 +729,7 @@ func _spot_sun_area() -> void:
 	check(dark, "and what stands in it throws one all its way, as wide as itself and as far as the picture goes")
 	check(near(at(img, Vector2(360, 500)), times(GROUND, 1.5)) and near(at(img, Vector2(600, 470)), times(GROUND, 1.5)),
 		"and nothing on the side it comes from, or past its edges (%s, %s)" % [at(img, Vector2(360, 500)), at(img, Vector2(600, 470))])
-	await out([sky, box])
+	await out([sky, block])
 
 	# An area: a bar 120 across, shining down.
 	var middle := Vector2(900, 420)

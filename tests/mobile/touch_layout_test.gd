@@ -250,6 +250,13 @@ func _in_a_raid() -> void:
 	await frames(24)
 	var pad: TouchPad = game.touch_pad
 	check(pad != null and pad.visible, "a raid, with the console on the glass")
+	# Out of the exit the raid starts the player in, where HIT is USE: out in
+	# the open, where it is HIT.
+	var raid := game.current as Raid
+	raid.player.global_position = raid.room.to_global(raid.room.standing_near(raid.room.cell_center(20, 11)))
+	raid.player.velocity = Vector2.ZERO
+	await frames(3)
+	check(not pad.use_near, "stood out in the open, with nothing to use, so HIT is HIT")
 	touch(0, Vector2(600, 460), true)
 	await frames(3)
 	check(Input.is_action_pressed("attack"), "a thumb where HIT was put presses HIT")

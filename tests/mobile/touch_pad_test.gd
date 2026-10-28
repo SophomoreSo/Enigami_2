@@ -508,9 +508,11 @@ func _the_ways() -> void:
 	check(Input.is_action_pressed("move_up") and not Input.is_action_pressed("move_down"),
 		"pushed up, up is held and down let go of")
 	# A diagonal: both keys, as much of the way as lies along each, which the
-	# game reads as the diagonal, walked no faster than any one way.
+	# game reads as the diagonal, walked no faster than any one way. Already
+	# going up the floor, the body comes round onto it over a few steps, and is
+	# read once it has.
 	drag(0, landed + Vector2(-radius, -radius))
-	await settle(func() -> bool: return player.velocity.length() > Player.RUN_SPEED * 0.9 and player.velocity.x < 0.0)
+	await settle(func() -> bool: return player.velocity.normalized().dot(Vector2(-1, -1).normalized()) > 0.999)
 	check(Input.is_action_pressed("move_left") and Input.is_action_pressed("move_up"),
 		"pushed up and left, both are held")
 	var way := Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -1205,14 +1207,17 @@ func _another_window() -> void:
 
 	# Nothing left held when the console is switched off under a thumb that is
 	# still on it: a key lifted by the game rather than by its owner must not
-	# leave the player running into the next screen.
-	touch(0, spot("attack"), true)
+	# leave the player running into the next screen. DASH, a key and nothing
+	# more: a thumb on the glass is a click as well, and with the pad gone a
+	# click attacks again (`_the_drawer`), so a thumb held on HIT goes on
+	# attacking, as a click held down.
+	touch(0, spot("dash"), true)
 	await frames(2)
-	check(Input.is_action_pressed("attack"), "a key held as the console is switched off")
+	check(Input.is_action_pressed("dash"), "a key held as the console is switched off")
 	Touch.set_mode(Touch.OFF)
 	await frames(3)
 	check(not pad.visible, "turning it off takes the pad off the screen mid-raid")
-	check(not Input.is_action_pressed("attack") and not Touch.holding("attack"),
+	check(not Input.is_action_pressed("dash") and not Touch.holding("dash"),
 		"and lets go of everything it was holding")
 	check(Touch.aiming() == Vector2.ZERO, "and stops aiming")
 

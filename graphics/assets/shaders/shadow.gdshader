@@ -21,12 +21,12 @@ render_mode unshaded, blend_add, skip_vertex_transform;
 // picture of its own (`Lighting`): one of its three to a lamp, added, so
 // three lamps share a picture and none touches another's. It is marked SOLID
 // (lighting.gdshaderinc), which says the light does not reach there at all,
-// beside the shadows a body throws out of a round light's plane, which are
-// marked by how dark they are (figure_shadow.gdshader).
+// beside the patch a body leaves at its feet, which is marked by how dark it
+// is (figure_shadow.gdshader).
 //
-// Rock throws its shadows this way in every light. A body throws them this
-// way only in a spot's or a sun's: a point or an area is in front of it or
-// behind it, and it throws its shadow on the wall or at its feet instead.
+// Rock throws its shadows this way in every light. A body never does: it
+// stands on the floor every light is on, and in any light, a sun's too, it
+// leaves that patch instead.
 
 uniform vec2 light;                 // where the light is, in the world
 uniform bool parallel = false;      // a sun's: thrown `aim`, wherever the edge is
