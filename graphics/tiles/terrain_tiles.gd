@@ -29,7 +29,8 @@ extends RefCounted
 ## Which tile shows what is PixelLab's own rule for its cliff sets: the tile
 ## whose 4x4 pattern best matches the terrain round the cell, the four middle
 ## values counting most (`_score`). A set with no face is picked by its four
-## corners alone.
+## corners alone. Either is picked from the cells round it as they were read
+## beforehand (`Survey`).
 
 const DIR := "res://graphics/assets/tiles"
 const TILE := 16
@@ -55,7 +56,7 @@ var cliff: bool = false
 ## By the four corners, for a flat set: the 4-bit index NW·8 + NE·4 + SW·2 + SE.
 var _by_corners: Dictionary = {}
 ## The tile picked for a neighbourhood, by the neighbourhood: a 4x4 of
-## vertices is picked once and remembered.
+## vertices is picked once and remembered, by its four columns (`Survey`).
 var _picked: Dictionary = {}
 var _set: TileSet = null
 
@@ -134,10 +135,14 @@ static func _index(nw: int, ne: int, sw: int, se: int) -> int:
 ## The tile of the floor drawn at dual cell (i, j) — the tile centred on the
 ## corner the cells (i-1, j-1), (i, j-1), (i-1, j) and (i, j) meet at, which is
 ## drawn with its top-left at the middle of cell (i-1, j-1) — for a floor that
-## is a pit where `pit` says so. The index of the tile, or -1 for none.
-func floor_tile(i: int, j: int, pit: Callable) -> int:
-	var at := func(x: int, y: int) -> int: return LOWER if pit.call(x, y) else UPPER
-	return _by_corners.get(_index(at.call(i - 1, j - 1), at.call(i, j - 1), at.call(i - 1, j), at.call(i, j)), -1)
+## is a pit where `cells` has one. The index of the tile, or -1 for none.
+func floor_tile(i: int, j: int, cells: Survey) -> int:
+	var p := cells.pits
+	var w := cells.size.x
+	var at := cells.index(i - 1, j - 1)
+	# A corner is the floor, the upper, where it is no pit (`_index`).
+	return _by_corners.get((0 if p[at] else 8) + (0 if p[at + 1] else 4)
+		+ (0 if p[at + w] else 2) + (0 if p[at + w + 1] else 1), -1)
 
 ## The one tile of the set that is all its upper terrain — all floor, in a pit
 ## set — or -1.
@@ -153,20 +158,20 @@ func plain_lower() -> int:
 ## The tile of the walls drawn at dual cell (i, j): across, the tile straddling
 ## cells i-1 and i, with its top-left half a cell into cell (i-1, j); down the
 ## floor, the tile in row j, whose top corners are what cells (i-1, j) and
-## (i, j) are and whose bottom corners cells (i-1, j+1) and (i, j+1). `rock`
+## (i, j) are and whose bottom corners cells (i-1, j+1) and (i, j+1). `cells`
 ## says which cells are wall. The index of the tile, or -1 for none.
-func wall_tile(i: int, j: int, rock: Callable) -> int:
+func wall_tile(i: int, j: int, cells: Survey) -> int:
+	var c := cells.columns
 	if not cliff:
-		return _by_corners.get(_index(_v(i - 1, j, rock), _v(i, j, rock), _v(i - 1, j + 1, rock), _v(i, j + 1, rock)), -1)
-	# The 4x4 of vertices round the tile: rows j-1 to j+2, columns i-2 to i+1.
-	var key := PackedByteArray()
-	key.resize(16)
-	for r in 4:
-		for c in 4:
-			key[r * 4 + c] = _v(i - 2 + c, j - 1 + r, rock)
-	var k := key.hex_encode()
-	if _picked.has(k):
-		return _picked[k]
+		var w := cells.size.x
+		var at := cells.index(i - 1, j)
+		return _by_corners.get(_index(c[at] & 3, c[at + 1] & 3, c[at + w] & 3, c[at + w + 1] & 3), -1)
+	# The 4x4 of vertices round the tile — rows j-1 to j+2, columns i-2 to
+	# i+1 — as its four columns, a byte each.
+	var at := cells.index(i - 2, j - 1)
+	var key: int = c[at] | c[at + 1] << 8 | c[at + 2] << 16 | c[at + 3] << 24
+	if _picked.has(key):
+		return _picked[key]
 	var best := -1
 	var best_score := -999999
 	for t in tiles.size():
@@ -175,30 +180,102 @@ func wall_tile(i: int, j: int, rock: Callable) -> int:
 			continue
 		var score := 0
 		for r in 4:
-			for c in 4:
-				var want := int(pattern[r][c])
+			for col in 4:
+				var want := int(pattern[r][col])
 				if want == ANY:
 					continue
-				var middle := MIDDLE.has(Vector2i(r, c))
-				if int(key[r * 4 + c]) == want:
+				var middle := MIDDLE.has(Vector2i(r, col))
+				if ((key >> (col * 8 + r * 2)) & 3) == want:
 					score += 10 if middle else 1
 				else:
 					score -= 30 if middle else 1
 		if score > best_score:
 			best_score = score
 			best = t
-	_picked[k] = best
+	_picked[key] = best
 	return best
 
-## What vertex cell (x, y) is for the walls: upper for a wall, transition for
-## open floor directly under a wall — where the wall's face stands — and lower
-## for the rest.
-func _v(x: int, y: int, rock: Callable) -> int:
-	if rock.call(x, y):
-		return UPPER
-	if rock.call(x, y - 1):
-		return TRANSITION
-	return LOWER
+## --- the cells round the tiles ---------------------------------------------
+
+## What the cells under a stretch of tiles are, read once each for the tiles
+## to be picked from: whether each is wall, whether a pit, and what it is as a
+## vertex of the walls. A floor's tile reads the four cells its corner is
+## between, and a wall's the 4x4 of vertices round it, each of which is its
+## cell and the cell over it — asked as each tile was picked, a room's every
+## cell was asked some thirty times over, and a room is laid again whenever a
+## room is stood up beside it or taken down.
+class Survey extends RefCounted:
+	## The first cell read, and how many were read across and down.
+	var from := Vector2i.ZERO
+	var size := Vector2i.ZERO
+	## Each cell's, across and then down from `from`: 1 for wall, and 1 for a
+	## pit.
+	var rocks := PackedByteArray()
+	var pits := PackedByteArray()
+	## What each cell is as a vertex of the walls — upper for a wall, transition
+	## for open floor directly under one, where the wall's face stands, and
+	## lower for the rest — and below it, two bits each, what the three cells
+	## under it are: a column of the 4x4 a wall's tile is picked by. Its own is
+	## the lowest two bits.
+	var columns := PackedByteArray()
+
+	## The cells laying the dual tiles of `area` reads (`MapTiles.lay`), asked
+	## of `rock` and `pit`: a floor's tile reaches a cell up and to the left of
+	## its own, and a wall's two to the left, one to the right, two down, and
+	## up one and the cell over that.
+	static func of(area: Rect2i, rock: Callable, pit: Callable) -> Survey:
+		var s := Survey.new()
+		s.from = area.position - Vector2i(2, 2)
+		s.size = area.size + Vector2i(4, 5)
+		var n := s.size.x * s.size.y
+		s.rocks.resize(n)
+		s.pits.resize(n)
+		s.columns.resize(n)
+		s.read(Rect2i(s.from, s.size), rock, pit)
+		return s
+
+	## The dual tiles that read any of the cells of `rect`, as an area for
+	## `MapTiles.lay` — what has to be laid again once they are read again.
+	## A wall's tile reads from two cells to its left to one to its right, and
+	## from two up to two down, and a floor's tile within that.
+	static func tiles_reading(rect: Rect2i) -> Rect2i:
+		return Rect2i(rect.position - Vector2i(1, 2), rect.size + Vector2i(2, 3))
+
+	## The cells of `rect` asked again, of `rock` and `pit` — what is past a
+	## room's side, once a room is stood up there or taken down — and the
+	## columns brought up to date with them.
+	func read(rect: Rect2i, rock: Callable, pit: Callable) -> void:
+		var r := rect.intersection(Rect2i(from, size))
+		for y in range(r.position.y, r.end.y):
+			var at := index(r.position.x, y)
+			for x in range(r.position.x, r.end.x):
+				rocks[at] = 1 if rock.call(x, y) else 0
+				pits[at] = 1 if pit.call(x, y) else 0
+				at += 1
+		# From the bottom up, so the column under each cell is done before it.
+		# The top row has no cell over it to say it is a face, and no tile
+		# reads it.
+		var w := size.x
+		var n := columns.size()
+		for k in range(n - 1, -1, -1):
+			var v := LOWER
+			if rocks[k] != 0:
+				v = UPPER
+			elif k >= w and rocks[k - w] != 0:
+				v = TRANSITION
+			if k + w < n:
+				v |= (columns[k + w] << 2) & 0xFF
+			columns[k] = v
+
+	## Where cell (x, y) is in each of them.
+	func index(x: int, y: int) -> int:
+		return (y - from.y) * size.x + x - from.x
+
+	func rock(x: int, y: int) -> bool:
+		return rocks[index(x, y)] != 0
+
+	func pit(x: int, y: int) -> bool:
+		return pits[index(x, y)] != 0
 
 ## --- as a TileSet -----------------------------------------------------------
 
