@@ -11,6 +11,7 @@ const GameScript := preload("res://app/game.gd")
 
 var fails := 0
 var game: Node
+var _drawn := false
 
 func check(ok: bool, what: String) -> void:
 	if ok:
@@ -30,7 +31,19 @@ func until(ok: Callable, most: int = 1200) -> bool:
 		n += 1
 	return ok.call()
 
+## The frame on screen, once one has been drawn. A macOS window something else
+## covers is not drawn at all, and a frame waited for there never came — the
+## run hung — so while that lasts the frame is drawn here instead.
+func shown() -> Image:
+	_drawn = false
+	while not _drawn:
+		await get_tree().process_frame
+		if not DisplayServer.window_can_draw():
+			RenderingServer.force_draw(false)
+	return get_viewport().get_texture().get_image()
+
 func _ready() -> void:
+	RenderingServer.frame_post_draw.connect(func() -> void: _drawn = true)
 	DisplayServer.window_set_size(Vector2i(1280, 720))
 	var was := Loc.language
 	game = Node.new()
@@ -93,8 +106,7 @@ func _talk_in(lang: String) -> void:
 ## Everything asked of an open bubble over `who` — a world point, the middle of
 ## their body — whose head is `head` above it.
 func _measure(bubble: SpeechBubble, who: Vector2, head: float, lang: String, what: String) -> void:
-	await RenderingServer.frame_post_draw
-	var img := get_viewport().get_texture().get_image()
+	var img := await shown()
 	var to_screen := bubble.get_global_transform_with_canvas()
 	var box := to_screen * bubble.box()
 	var speaker := bubble.get_canvas_transform() * who

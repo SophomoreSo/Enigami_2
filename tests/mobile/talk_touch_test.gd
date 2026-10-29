@@ -16,7 +16,7 @@ extends Node
 ## and with a thumb still down at either end, or resting on the glass through
 ## it, which does nothing to the face that comes up under it: the one that
 ## pressed USE does not turn the first line, and the one that tapped the last
-## line away does not press HIT.
+## line away does not press DASH.
 
 const GameScript := preload("res://app/game.gd")
 
@@ -230,7 +230,9 @@ func _answering() -> void:
 ## --- ending -------------------------------------------------------------------
 
 ## Read on to the goodbye with taps. The tap that ends it is still down as the
-## console comes back, and dragged over HIT it presses nothing.
+## console comes back, and dragged over DASH it presses nothing. DASH, a key
+## and nothing more: by the SAGE, HIT is USE, and a thumb come down on it
+## again talks to them again.
 func _ending() -> void:
 	var page := spot("interact")
 	await tap(page)
@@ -249,15 +251,15 @@ func _ending() -> void:
 		"and a tap on it ends the conversation")
 	await frames(3)
 	check(pad.face == TouchPad.Face.PLAY, "and the console is the whole of it again")
-	var hit := spot("attack")
-	drag(0, hit)
+	var dash := spot("dash")
+	drag(0, dash)
 	await frames(3)
-	check(not Input.is_action_pressed("attack") and not Input.is_action_pressed("interact"),
-		"the thumb that tapped it away, dragged over HIT, presses nothing")
-	touch(0, hit, false)
+	check(not Input.is_action_pressed("dash") and not Input.is_action_pressed("interact"),
+		"the thumb that tapped it away, dragged over DASH, presses nothing")
+	touch(0, dash, false)
 	await frames(3)
-	touch(0, hit, true)
+	touch(0, dash, true)
 	await frames(2)
-	check(Input.is_action_pressed("attack"), "until it has lifted and come down again")
-	touch(0, hit, false)
+	check(Input.is_action_pressed("dash"), "until it has lifted and come down again")
+	touch(0, dash, false)
 	await frames(3)

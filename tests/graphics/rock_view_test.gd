@@ -158,6 +158,20 @@ func _thrown() -> void:
 	# its own slowing would draw the room dilated as well.
 	TimeCtl.set_process(false)
 	Engine.time_scale = 0.25
+	# How far it has turned over, a quarter at a time, every frame it flies,
+	# from the frame it leaves the hand — through the frames the picture below
+	# is read in, too. A throw comes down where it was aimed, no further than
+	# it carries: watched only from well out of the hand, what was left of the
+	# flight was shorter than a quarter turn takes, and every throw was seen at
+	# one quarter.
+	var turns: Array = []
+	var watch := func() -> void:
+		var pv := Views.of(_rock_up()) as ProjectileView
+		if pv != null:
+			var q := fmod(absf(roundf(pv._spin / (PI * 0.5))), 4.0)
+			if turns.is_empty() or turns.back() != q:
+				turns.append(q)
+	get_tree().process_frame.connect(watch)
 	bot.attack = true
 	await wait(0.06)
 	bot.attack = false
@@ -165,26 +179,14 @@ func _thrown() -> void:
 	var flying := _rock_away()
 	check(flying != null, "(a rock in the air)")
 	if flying == null:
+		get_tree().process_frame.disconnect(watch)
 		_clock_back()
 		return
-	# How far it has turned over, a quarter at a time, every frame from here
-	# while it flies — through the frames the picture below is read in, too.
-	# A slow screen has the rock on the floor a few frames after it is thrown,
-	# and started only after that read, CI's saw it at one quarter twice.
-	var turns: Array = []
-	var pv: ProjectileView = Views.of(flying)
-	var watch := func() -> void:
-		if pv != null and is_instance_valid(pv):
-			var q := fmod(absf(roundf(pv._spin / (PI * 0.5))), 4.0)
-			if turns.is_empty() or turns.back() != q:
-				turns.append(q)
-	watch.call()
-	get_tree().process_frame.connect(watch)
 	var im := await unlit_frame()
 	check(view.weapon_sprite.self_modulate.a == 0.0, "the hand is empty once it is thrown")
 	var seen := rock_pixels(im, on_screen(flying.global_position), 14) if is_instance_valid(flying) else 0
 	check(seen >= 6, "and it is the rock that flies (%d of its pixels)" % seen)
-	await until(func() -> bool: return turns.size() >= 2 or pv == null or not is_instance_valid(pv), 0.25)
+	await until(func() -> bool: return turns.size() >= 2 or _rock_up() == null, 0.25)
 	get_tree().process_frame.disconnect(watch)
 	_clock_back()
 	# Two quarters seen is a rock turning over.
@@ -194,6 +196,13 @@ func _thrown() -> void:
 func _clock_back() -> void:
 	Engine.time_scale = 1.0
 	TimeCtl.set_process(true)
+
+## The rock in the air, wherever it is; or null.
+func _rock_up() -> Projectile:
+	for c in world.get_children():
+		if c is Projectile and (c as Projectile).is_rock():
+			return c
+	return null
 
 ## The rock in the air, once it is well out of the hand; or null.
 func _rock_away() -> Projectile:

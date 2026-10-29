@@ -6,7 +6,9 @@ extends Node2D
 ## painted pixel of every frame names an opaque skin pixel, and the resolved
 ## frames are in the skin's colours. On screen: what the sprite puts there is
 ## the skin's colours and nothing else — no raw coordinates, no blending across
-## a texel — and swapping the skin swaps every frame at once.
+## a texel — and swapping the skin swaps every frame at once. On screen it is
+## worn by a hero with no sprites of their own: one who has them wears theirs
+## (`Style.hero_play_art`).
 ##
 ## Needs a real renderer: the screen part reads the frame back.
 
@@ -15,6 +17,8 @@ var player: Player
 var view: PlayerView
 ## Where the frame went, for looking at.
 var dir: String = "user://shots"
+## The hero the profile had, put back at the end.
+var _was_hero: String = ""
 
 func check(ok: bool, what: String) -> void:
 	if ok:
@@ -149,6 +153,15 @@ func _ready() -> void:
 		"the resolved idle frame is in the skin's colours (%d pixels, %d not)" % [res_drawn, res_off])
 
 	# --- the character, on screen --------------------------------------------------
+	# Played as a hero with no sprites of their own, who wears the player's art.
+	_was_hero = GameState.hero
+	var plain := ""
+	for id in Heroes.ids():
+		if Style.hero_play_art(id) == art:
+			plain = id
+			break
+	check(plain != "", "a hero with no sprites of their own plays in the player's art")
+	GameState.set_hero(plain)
 	player = spawn(Vector2(640, 360))
 	await frames(4)
 	view = Views.of(player) as PlayerView
@@ -232,5 +245,7 @@ func _ready() -> void:
 	_finish()
 
 func _finish() -> void:
+	if _was_hero != "":
+		GameState.set_hero(_was_hero)
 	print("[SKIN] ---- %d failures ----" % fails)
 	get_tree().quit(1 if fails > 0 else 0)

@@ -37,9 +37,10 @@ signal extraction_done(info: Dictionary)
 ## Raised once the grid, the collision and the contents are all in place. A
 ## room is drawn once and then never again, so the view waits for this.
 signal built()
-## A room was stood up beside this one, or taken down (`set_beside`): what is
-## past that edge is drawn by that room now, or is the rock again.
-signal beside_changed()
+## A room was stood up beside this one on side `dir`, or taken down
+## (`set_beside`): what is past that edge is drawn by that room now, or is the
+## rock again.
+signal beside_changed(dir: int)
 
 const W := 40
 const H := 22
@@ -219,15 +220,24 @@ func set_beside(dir: int, other: Room) -> void:
 		neighbours.erase(dir)
 	else:
 		neighbours[dir] = other
-	beside_changed.emit()
+	beside_changed.emit(dir)
 
 ## The room stood up whose cell the room's cell (x, y) is, past its edge: the
 ## one beside it on that side, or, out past a corner, the one beside that — or
-## null for rock. What the picture asks; a body's queries stop at the sides.
+## null for rock. What the picture asks, of every cell it lays; a body's
+## queries stop at the sides.
 func beside_at(x: int, y: int) -> Room:
+	var across := x >= 0 and x < cols
+	var down := y >= 0 and y < rows
+	# A cell of the room's own is nobody else's, and with no room stood up
+	# beside it no cell is.
+	if (across and down) or neighbours.is_empty():
+		return null
 	var l := centre_of(x, y)
 	var n := _beside(l)
-	if n != null:
+	# Past a side, it is that side's room or nobody's; only past a corner is
+	# there a room beside one beside this.
+	if n != null or across or down:
 		return n
 	var gp := to_global(l)
 	for along: Vector2 in [Vector2(clampf(l.x, 0.0, cols * CELL - 1.0), l.y), Vector2(l.x, clampf(l.y, 0.0, rows * CELL - 1.0))]:

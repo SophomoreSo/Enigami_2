@@ -157,8 +157,8 @@ func _lay_stage() -> void:
 	var rock := func(x: int, y: int) -> bool:
 		return y < middle.y - FLOOR_UP or y > middle.y + FLOOR_DOWN
 	var never := func(_x: int, _y: int) -> bool: return false
-	tiles.lay(_floor, _walls, rock, never,
-		Rect2i(left, top, cols, FLOOR_UP + FLOOR_DOWN + WALL * 2 + 1), hash(cut.scene_id) % 65536)
+	var area := Rect2i(left, top, cols, FLOOR_UP + FLOOR_DOWN + WALL * 2 + 1)
+	tiles.lay(_floor, _walls, TerrainTiles.Survey.of(area, rock, never), area, hash(cut.scene_id) % 65536)
 
 func _direction(d: Dictionary) -> void:
 	if d.has("camera"):

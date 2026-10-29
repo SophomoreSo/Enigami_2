@@ -160,9 +160,10 @@ func ambient() -> Color:
 ## --- a room's floor and walls ------------------------------------------------------
 ## The floor and the walls of a room, as tiles: laid in a `TileMapLayer` each
 ## for a room standing in the world, and drawn by hand for the creator's table.
-## Both read the room through two callables — `rock(x, y)` for whether a cell
-## is wall, `pit(x, y)` for whether it is a pit — over `area`, in cells, so a
-## room's rock past its edge and a map's are drawn the same way.
+## Both read the room's cells round `area`, in cells, as a survey of them
+## (`TerrainTiles.Survey`) — whether each is wall, and whether a pit — asked
+## once a cell of two callables, so a room's rock past its edge and a map's
+## are drawn the same way.
 
 ## Two layers for a room: the floor, and the walls, which sort among the
 ## bodies. Out of the tileset's own tiles, or the atlas's.
@@ -183,9 +184,11 @@ func layers() -> Array:
 ## (the pit set's was made from it), and the walls sort among the bodies above
 ## it — so a floor laid with them would be laid over everything on the floor
 ## under it, the pits and the marks left on it among them.
-func lay(floor_layer: TileMapLayer, walls_layer: TileMapLayer, rock: Callable, pit: Callable, area: Rect2i, salt: int = 0) -> void:
+##
+## `cells` is a survey of the cells round `area` (`TerrainTiles.Survey.of`).
+func lay(floor_layer: TileMapLayer, walls_layer: TileMapLayer, cells: TerrainTiles.Survey, area: Rect2i, salt: int = 0) -> void:
 	if walls == null:
-		_lay_atlas(floor_layer, walls_layer, rock, pit, area, salt)
+		_lay_atlas(floor_layer, walls_layer, cells, area, salt)
 		return
 	var floor_set := pits if pits != null else walls
 	var plain := pits.plain_upper() if pits != null else walls.plain_lower()
@@ -193,24 +196,33 @@ func lay(floor_layer: TileMapLayer, walls_layer: TileMapLayer, rock: Callable, p
 	for j in range(area.position.y, area.end.y + 1):
 		for i in range(area.position.x, area.end.x + 1):
 			var cell := Vector2i(i, j)
-			var f := floor_set.floor_tile(i, j, pit) if pits != null else plain
+			var f := floor_set.floor_tile(i, j, cells) if pits != null else plain
 			if f >= 0:
 				floor_layer.set_cell(cell, 0, floor_set.coords(f))
-			var w := walls.wall_tile(i, j, rock)
+			var w := walls.wall_tile(i, j, cells)
 			if w >= 0 and w != open_floor:
 				walls_layer.set_cell(cell, 0, walls.coords(w))
 
-func _lay_atlas(floor_layer: TileMapLayer, walls_layer: TileMapLayer, rock: Callable, pit: Callable, area: Rect2i, salt: int) -> void:
+## Takes up what `lay` lays over `area`, for part of a room to be laid again.
+func unlay(floor_layer: TileMapLayer, walls_layer: TileMapLayer, area: Rect2i) -> void:
+	# The dual tiles' area takes in its end; the atlas's, a tile a cell, not.
+	var last := area.end if walls == null else area.end + Vector2i.ONE
+	for j in range(area.position.y, last.y):
+		for i in range(area.position.x, last.x):
+			floor_layer.erase_cell(Vector2i(i, j))
+			walls_layer.erase_cell(Vector2i(i, j))
+
+func _lay_atlas(floor_layer: TileMapLayer, walls_layer: TileMapLayer, cells: TerrainTiles.Survey, area: Rect2i, salt: int) -> void:
 	for y in range(area.position.y, area.end.y):
 		for x in range(area.position.x, area.end.x):
 			var cell := Vector2i(x, y)
-			if pit.call(x, y):
+			if cells.pit(x, y):
 				floor_layer.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(AtlasTiles.PIT))
 				continue
-			if not rock.call(x, y):
+			if not cells.rock(x, y):
 				floor_layer.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(AtlasTiles.floor_at(x, y, salt)))
 				continue
-			var tile := AtlasTiles.wall_at(not rock.call(x, y + 1), not rock.call(x - 1, y), not rock.call(x + 1, y))
+			var tile := AtlasTiles.wall_at(not cells.rock(x, y + 1), not cells.rock(x - 1, y), not cells.rock(x + 1, y))
 			walls_layer.set_cell(cell, AtlasTiles.SOURCE, AtlasTiles.coords(tile))
 
 ## The same, drawn by hand on `c` for the cells of `area`, in world units —
@@ -234,17 +246,18 @@ func paint_area(c: CanvasItem, cells: MapCells, area: Rect2i) -> void:
 				elif cells.pit(x, y):
 					_tile(c, AtlasTiles.PIT, x, y, tint(MadeRoom.ROCK, cells.region))
 	else:
+		var around := TerrainTiles.Survey.of(area, rock, pit)
 		var floor_set := pits if pits != null else walls
 		var plain := pits.plain_upper() if pits != null else walls.plain_lower()
 		for j in range(area.position.y, area.end.y + 1):
 			for i in range(area.position.x, area.end.x + 1):
-				var f := floor_set.floor_tile(i, j, pit) if pits != null else plain
+				var f := floor_set.floor_tile(i, j, around) if pits != null else plain
 				floor_set.draw(c, f, Rect2(Vector2(i - 0.5, j - 0.5) * cell, Vector2.ONE * cell))
 		# The walls, and none of the open floor they have a tile for (`lay`).
 		var open_floor := walls.plain_lower()
 		for j in range(area.position.y, area.end.y + 1):
 			for i in range(area.position.x, area.end.x + 1):
-				var w := walls.wall_tile(i, j, rock)
+				var w := walls.wall_tile(i, j, around)
 				if w != open_floor:
 					walls.draw(c, w, Rect2(Vector2(i - 0.5, j) * cell, Vector2.ONE * cell))
 	for y in range(area.position.y, area.end.y):

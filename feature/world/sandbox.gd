@@ -25,6 +25,11 @@ signal sample_loaded(id: String)
 const MONSTER_BUTTONS := ["CRAWLER", "SENTRY", "LOBBER", "HOPPER", "DRIFTER", "BOMBER", "WARDEN", "ARBITER"]
 ## The column the apprentice stands in: by the left wall, out of the way.
 const APPRENTICE_CELL := 5
+## And the row: down the room from the middle, as the SAGE stands, so what
+## they say rises clear of the HUD's corner — the damage line, and the
+## drawer's tab under it. From the middle row a line four rows long went up
+## under the damage line, which was written across its words.
+const APPRENTICE_ROW := 15
 
 var room: Room
 var player: Player
@@ -138,7 +143,7 @@ func spawn_apprentice() -> void:
 	apprentice.mode = Npc.Mode.FREE
 	apprentice.collision_layer = 0
 	apprentice.collision_mask = 1
-	apprentice.position = room.cell_center(APPRENTICE_CELL, 11)
+	apprentice.position = room.cell_center(APPRENTICE_CELL, APPRENTICE_ROW)
 	add_child(apprentice)
 
 func spawn_monster(kind: String) -> void:
