@@ -47,7 +47,10 @@ extends Node
 ##
 ## And a body stands on the floor the lights are on, seen a little from the
 ## front: it is lit across its face as the rock is, by the way its edge
-## faces, and it throws a patch of shadow on the floor from its feet, away
+## faces, and all of it as the floor at its feet is lit — it stands up off the
+## floor there, so a light on the floor its head is drawn over, and its feet
+## are not in, does not light it (`bodies.gdshader`, `Figures`). It throws a
+## patch of shadow on the floor from its feet, away
 ## from the light — FEET_LEAN of the way the light is off it, never further
 ## than FEET_REACH — darkest at its feet and fading out. The patch darkens
 ## whatever is there but a body, by FEET_DARK, marked in the light's colour
@@ -120,6 +123,10 @@ const THROW := 64.0
 ## How near a lamp a surface has to be, in world units, before the way it
 ## faces starts to count for less: right under one, the way to it is any way.
 const CLOSE := 12.0
+## How tall a body is drawn, at most, in world units: a frame of a hero's
+## strips. A light's mesh reaches this far up the world past its own, so a body
+## whose feet are in the light is lit to the top of its head.
+const TALLEST := 140.0
 
 const LIGHT := preload("res://graphics/assets/shaders/light.gdshader")
 const AMBIENT := preload("res://graphics/assets/shaders/ambient.gdshader")
@@ -316,6 +323,7 @@ func follow(at: Vector2, texels: Vector2i, view: Transform2D) -> void:
 		for cast in _casts:
 			cast.patches.clear()
 		_figures.drawn.clear()
+		_figures.show_all()
 		return
 	_normals.canvas_transform = view
 	_lit.canvas_transform = view
@@ -326,7 +334,7 @@ func follow(at: Vector2, texels: Vector2i, view: Transform2D) -> void:
 		RenderingServer.global_shader_parameter_set(&"normals_size", Vector2(_normals.size))
 	_all.set_shader_parameter("ambient", Vector3(ambient.r, ambient.g, ambient.b))
 	var casters := _casters(lights)
-	_draw_bodies(casters, view)
+	_draw_bodies(lights, view)
 	_draw_lights(lights, _draw_shadows(lights, casters, view))
 
 ## The lights that reach the screen this frame: every shining thing's that is
@@ -374,6 +382,12 @@ func _take(out: Array[Lit], shine: Shine, xf: Transform2D, shown: Rect2, source:
 		_:
 			lit.middle = lit.at
 			lit.half = Vector2.ONE * (shine.radius + shine.reach)
+	if shine.type != Shine.Type.SUN:
+		# And up the world as far as a body standing in it is drawn: half of
+		# that more each way of its own frame, its middle half of it up, holds
+		# the whole of it moved up by as much, however it is turned.
+		lit.middle += Vector2(0.0, -TALLEST * 0.5)
+		lit.half += Vector2.ONE * TALLEST * 0.5
 	var x := Vector2.from_angle(lit.turn) * lit.half.x
 	var y := Vector2.from_angle(lit.turn + PI * 0.5) * lit.half.y
 	var spans := x.abs() + y.abs()
@@ -394,15 +408,17 @@ func _casters(lights: Array[Lit]) -> Array[ShadowCaster]:
 		break
 	return casters
 
-## Where each body stands, for the lights to read: only while one throws
-## shadows, since that is all it is read for.
-func _draw_bodies(casters: Array[ShadowCaster], view: Transform2D) -> void:
+## Where each body stands, and its feet, for the lights to read: while any
+## light is on the screen, since every light lights a body by its feet.
+func _draw_bodies(lights: Array[Lit], view: Transform2D) -> void:
 	_figures.drawn.clear()
 	_figures.view = view
-	for caster in casters:
-		if caster.body:
-			_figures.drawn.append(caster)
-	_figures.queue_redraw()
+	if not lights.is_empty():
+		for n in get_tree().get_nodes_in_group(ShadowCaster.GROUP):
+			var caster := n as ShadowCaster
+			if caster != null and caster.body and caster.is_visible_in_tree():
+				_figures.drawn.append(caster)
+	_figures.show_all()
 	_bodies.render_target_update_mode = SubViewport.UPDATE_DISABLED if _figures.drawn.is_empty() \
 		else SubViewport.UPDATE_ALWAYS
 
@@ -528,6 +544,8 @@ func _draw_lights(lights: Array[Lit], given: Dictionary) -> void:
 		m.set_shader_parameter("tint", Vector3(shine.color.r, shine.color.g, shine.color.b))
 		m.set_shader_parameter("power", lit.power)
 		m.set_shader_parameter("half_size", lit.half)
+		m.set_shader_parameter("lift", Vector2.ZERO if shine.type == Shine.Type.SUN \
+			else (lit.middle - lit.at).rotated(-lit.turn))
 		m.set_shader_parameter("turn", Vector2.from_angle(lit.turn))
 		m.set_shader_parameter("radius", shine.radius)
 		m.set_shader_parameter("reach", shine.reach)
@@ -612,14 +630,41 @@ class Cast extends Node2D:
 			draw_polygon(p[0], p[1])
 
 ## Where the bodies stand, drawn into a picture of their own: each figure
-## where the world draws it (`bodies.gdshader`).
+## where the world draws it, and how far below each pixel of it its feet are
+## (`bodies.gdshader`). Each body is drawn by a figure of its own, whose
+## material is told where its feet are: a uniform is the one number a canvas
+## hands a shader exactly as it was given.
 class Figures extends Node2D:
 	var view := Transform2D.IDENTITY
 	## The bodies' casters.
 	var drawn: Array = []
+	## A figure to each body drawn, kept from frame to frame.
+	var _pool: Array[Figure] = []
+
+	## Draws `drawn` this frame, a figure each, and none of the rest.
+	func show_all() -> void:
+		while _pool.size() < drawn.size():
+			var f := Figure.new()
+			var m := ShaderMaterial.new()
+			m.shader = (material as ShaderMaterial).shader
+			f.material = m
+			add_child(f)
+			_pool.append(f)
+		for i in _pool.size():
+			var f := _pool[i]
+			f.caster = drawn[i] if i < drawn.size() else null
+			f.view = view
+			f.visible = f.caster != null
+			if f.caster != null:
+				(f.material as ShaderMaterial).set_shader_parameter("feet", f.caster.global_position.y)
+			f.queue_redraw()
+
+## One body's figure, for `Figures`: the caster stands at the body's feet.
+class Figure extends Node2D:
+	var caster: ShadowCaster = null
+	var view := Transform2D.IDENTITY
 
 	func _draw() -> void:
-		for d in drawn:
-			# A body freed since it was gathered stands nowhere.
-			if is_instance_valid(d):
-				(d as ShadowCaster).draw_figure(self, view, Color(1.0, 1.0, 0.0, 1.0))
+		# A body freed since it was gathered stands nowhere.
+		if caster != null and is_instance_valid(caster):
+			caster.draw_figure(self, view, Color(1.0, 1.0, 0.0, 1.0))
