@@ -84,6 +84,18 @@ func _on_cue(cue: StringName, d: Dictionary) -> void:
 		&"crate_break":
 			# A crack of wood: a hit's sound, low.
 			Audio.play("hit", 0.7 + randf_range(-0.05, 0.05))
+		&"generator_crash":
+			# A machine coming apart: a blast, low.
+			Audio.play("explode", 0.85)
+		&"gate":
+			# A gate going down crackles out low; coming up, it catches high.
+			Audio.play("zap", 1.25 if bool(d.get("up", true)) else 0.45)
+		&"gate_shock":
+			Audio.play("zap", 1.0 + randf_range(-0.1, 0.1))
+		&"sight":
+			# A sight coming on: a thin high note. Going off is magic's to say.
+			if String(d.get("seeing", "")) != "":
+				Audio.play("zap", 1.7)
 		&"box_open":
 			# A pickup's chime, lower: several things at once, out of a box.
 			Audio.play("pickup", 0.8)

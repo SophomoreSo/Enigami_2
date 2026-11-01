@@ -10,14 +10,15 @@ extends Node
 ## module reaches the other except through here and through `Cues`.
 
 enum State { TITLE, HIDEOUT, RAID, SANDBOX, RESULTS, INTRO, MAP_MAKER, STORY_MAKER, LIGHTING_TEST,
-	DRAGON_TEST, GHOST_TEST }
+	DRAGON_TEST, GHOST_TEST, WIRE_TEST }
 
 var state: int = State.TITLE:
 	set(v):
 		state = v
 		# On the bench, and the test opened from it, perks are toggled rather
 		# than bought; everywhere else they are the profile's.
-		Perks.set_trial(v in [State.SANDBOX, State.LIGHTING_TEST, State.DRAGON_TEST, State.GHOST_TEST])
+		Perks.set_trial(v in [State.SANDBOX, State.LIGHTING_TEST, State.DRAGON_TEST, State.GHOST_TEST,
+			State.WIRE_TEST])
 
 var current: Node = null
 var ui_layer: CanvasLayer
@@ -270,8 +271,10 @@ func _clear() -> void:
 	# was lying on.
 	Phone.recover()
 	TimeCtl.clear()
-	# A state of the screen that was, like the dilation: the next starts in magic.
+	# A state of the screen that was, like the dilation: the next starts in magic,
+	# seeing the world as it is.
 	Magic.set_on(true)
+	Sight.set_seeing("")
 
 ## --- screens ----------------------------------------------------------------
 func goto_title() -> void:
@@ -367,6 +370,7 @@ func goto_sandbox() -> void:
 	s.exit_requested.connect(goto_title)
 	s.dragon_test_requested.connect(goto_dragon_test)
 	s.ghost_test_requested.connect(goto_ghost_test)
+	s.wire_test_requested.connect(goto_wire_test)
 	s.lighting_test_requested.connect(goto_lighting_test)
 	add_child(s)
 	current = s
@@ -388,6 +392,15 @@ func goto_ghost_test() -> void:
 	g.exit_requested.connect(goto_sandbox)
 	add_child(g)
 	current = g
+
+## Leaving the wire test goes back to the sandbox it was opened from, too.
+func goto_wire_test() -> void:
+	_clear()
+	state = State.WIRE_TEST
+	var w := WireTest.new()
+	w.exit_requested.connect(goto_sandbox)
+	add_child(w)
+	current = w
 
 ## Leaving the lighting test goes back to the sandbox it was opened from.
 func goto_lighting_test() -> void:
@@ -840,7 +853,7 @@ func _pause_heading(text: String, back: Callable) -> Control:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("magic_toggle"):
-		_toggle_magic()
+		_vision_key()
 		return
 	if event.is_action_pressed("open_phone"):
 		_toggle_phone()
@@ -865,17 +878,21 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pause()
 		get_viewport().set_input_as_handled()
 
-## Y: magic off, or back on (`Magic`) — wherever the player stands: a raid,
-## the bench, the hideout, and the map creator, where a map is laid and
+## Y, the vision key (`Sight.cycle`): magic off, or back on (`Magic`) — and
+## for a hero with a sight of their own (`Heroes.sight_of`), that sight
+## between the two, Legna Dennis's wires. The hero is whoever the world has
+## the player play as (`World.played`). Wherever the player stands: a
+## raid, the bench, the hideout, and the map creator, where a map is laid and
 ## played. Not while the game is paused, which is the menu's, and not on the
 ## title or the screens hanging off it, where there is no world for it to be
 ## the state of.
-func _toggle_magic() -> void:
+func _vision_key() -> void:
 	if get_tree().paused:
 		return
 	if state in [State.RAID, State.SANDBOX, State.HIDEOUT, State.MAP_MAKER, State.LIGHTING_TEST,
-			State.DRAGON_TEST, State.GHOST_TEST]:
-		Magic.toggle()
+			State.DRAGON_TEST, State.GHOST_TEST, State.WIRE_TEST]:
+		var who := (current as World).played() if current is World else GameState.hero
+		Sight.cycle(Heroes.sight_of(who))
 		get_viewport().set_input_as_handled()
 
 ## --- the bench's screen: who to play as -------------------------------------------

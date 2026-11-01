@@ -713,14 +713,16 @@ CREATE UNIQUE INDEX raid_rooms_one_entry ON raid_rooms (kind) WHERE kind = 'entr
 -- Who the player can play as: a row a hero, in the order they stand on the
 -- bench's screen (`place`, from 1), the character of the atlas each is drawn
 -- as (`sprite`, one `Sprites.has_character` knows) and the colour each wears
--- on their card. What a hero can do is to come: a column here when it does.
+-- on their card. What a hero can do is a column here: so far `sight`, what
+-- they see on the vision key that nobody else does (`Sight`).
 -- Rows are data/db/heroes/heroes.sql; see "A hero" in README.md.
 CREATE TABLE heroes (
 	id     TEXT PRIMARY KEY CHECK (id <> '' AND id = lower(id)),
 	place  INTEGER NOT NULL UNIQUE CHECK (place >= 1),
 	sprite TEXT NOT NULL CHECK (sprite <> ''),
 	color  TEXT NOT NULL CHECK (length(color) = 7 AND color GLOB '#[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]'),
-	prompt TEXT NOT NULL DEFAULT ''                       -- who they are, for the tool their sprites are made with (HEROES.md)
+	prompt TEXT NOT NULL DEFAULT '',                      -- who they are, for the tool their sprites are made with (HEROES.md)
+	sight  TEXT NOT NULL DEFAULT '' CHECK (sight IN ('', 'wires'))  -- '' nothing; 'wires' the wires an electrical system draws its power down
 );
 
 -- ---- the sound bank -----------------------------------------------------------

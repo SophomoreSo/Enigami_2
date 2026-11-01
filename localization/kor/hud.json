@@ -88,6 +88,7 @@
     "swap_weapon": "무기 교체",
     "dragon_test": "드래곤 테스트 >",
     "ghost_test": "고스트 테스트 >",
+    "wire_test": "전선 테스트 >",
     "lighting_test": "조명 테스트 >",
     "samples": "샘플 스킬",
     "sample": {
@@ -343,6 +344,22 @@
     "rock_out": "돌이 바닥에 있음",
     "keys": "R 초기화  TAB 편집  %s 몬스터에서 나가기  ESC 뒤로",
     "board": "사이킥 투척"
+  },
+  "wire": {
+    "title": "전선 테스트",
+    "subtitle": "전선을 따라 금고의 전원을 찾으세요",
+    "body": "몸 %d / %d",
+    "find": "금고 문에 전기가 흐릅니다. 어디서 오는지 찾으세요",
+    "open": "문이 꺼졌습니다. 금고로 들어가세요",
+    "crashed": "부순 발전기 %d / %d",
+    "best": "%s  최고 기록 %s",
+    "reached": "금고 도착  %s",
+    "fell": "몸이 쓰러졌습니다",
+    "again": "다시",
+    "sight_off": "%s  전선 보기",
+    "sight_on": "전선을 보는 중   %s  마법 끄기",
+    "magic_off": "마법 꺼짐   %s  되돌리기",
+    "keys": "R 초기화  ESC 뒤로"
   },
   "light": {
     "title": "조명 테스트",

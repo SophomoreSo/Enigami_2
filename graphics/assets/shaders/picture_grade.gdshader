@@ -11,17 +11,26 @@ shader_type canvas_item;
 // most of its own colour, so the fight stays readable while the place it is
 // in, which is dark and grey, changes.
 //
+// `wires` is Legna Dennis's sight (`Sight`): the world sunk into a dark
+// blue-black by how bright each pixel is, as if seen past, so that what the
+// sight shows over it — the wires under the floor and in the walls
+// (`WireSight`) — is what stands out. Shapes still read in it, faintly.
+//
 // `grey` is magic off (`Magic`): the colour drained out of the picture, by how
 // bright each pixel is to the eye. It goes on last, over the slow, since magic
 // off is the stronger of the two.
 uniform float grey : hint_range(0.0, 1.0) = 0.0;
 uniform float slow : hint_range(0.0, 1.0) = 0.0;
+uniform float wires : hint_range(0.0, 1.0) = 0.0;
 
 const vec3 LUMA = vec3(0.299, 0.587, 0.114);
 // The duotone, dark to light: a near-black indigo, violet, and a pale cyan.
 const vec3 DEEP = vec3(0.05, 0.03, 0.15);
 const vec3 MID = vec3(0.24, 0.18, 0.62);
 const vec3 HIGH = vec3(0.62, 0.96, 1.0);
+// The sight's dark: at the darkest, and as far up as the brightest goes.
+const vec3 SEEN_DEEP = vec3(0.015, 0.02, 0.05);
+const vec3 SEEN_HIGH = vec3(0.16, 0.24, 0.34);
 
 void fragment() {
 	vec4 c = texture(TEXTURE, UV);
@@ -42,6 +51,10 @@ void fragment() {
 		vec2 d = (UV - 0.5) * vec2(1.0, 0.8);
 		float corner = smoothstep(0.32, 0.8, length(d));
 		c.rgb *= 1.0 - corner * 0.5 * slow;
+	}
+	if (wires > 0.0) {
+		float seen = dot(c.rgb, LUMA);
+		c.rgb = mix(c.rgb, SEEN_DEEP + seen * SEEN_HIGH, wires);
 	}
 	float g = dot(c.rgb, LUMA);
 	COLOR = vec4(mix(c.rgb, vec3(g), grey), c.a);

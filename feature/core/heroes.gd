@@ -6,8 +6,8 @@ extends RefCounted
 ## stand on the bench's screen (`HeroSelect`), with the character of the atlas
 ## each is drawn as and the colour each wears, which is the picture's to read. Who is played as is the
 ## profile's (`GameState.hero`), chosen sat down on a bench. What a hero can
-## do is to come: the table grows a column for it when it does, and for now a
-## hero is a face and a name.
+## do is a column of the table: so far what they see on the vision key that
+## nobody else does (`sight_of`). Otherwise a hero is a face and a name.
 
 ## Every hero there is, in the order they stand.
 static func ids() -> PackedStringArray:
@@ -41,6 +41,12 @@ static func prompt_of(id: String) -> String:
 ## colour is the picture's (`HeroSelect.color_of`): the rules hand the words on.
 static func color_html(id: String) -> String:
 	return String(Db.value("SELECT color FROM heroes WHERE id = ?", [id], "#ffffff"))
+
+## What `id` sees on the vision key that nobody else does (`Sight`): '' for
+## nothing, or the table's word for it — "wires", the wires an electrical
+## system draws its power down.
+static func sight_of(id: String) -> String:
+	return String(Db.value("SELECT sight FROM heroes WHERE id = ?", [id], ""))
 
 ## What `id` is called, in the language being played: the English is the
 ## id's words as the fallback.

@@ -88,6 +88,7 @@
     "swap_weapon": "SWAP WEAPON",
     "dragon_test": "DRAGON TEST >",
     "ghost_test": "GHOST TEST >",
+    "wire_test": "WIRE TEST >",
     "lighting_test": "LIGHTING TEST >",
     "samples": "SAMPLE SKILLS",
     "sample": {
@@ -343,6 +344,22 @@
     "rock_out": "ROCK ON THE FLOOR",
     "keys": "R RESET  TAB EDIT  %s LEAVE MONSTER  ESC BACK",
     "board": "Psychic Throw"
+  },
+  "wire": {
+    "title": "WIRE TEST",
+    "subtitle": "FOLLOW THE WIRES TO WHAT POWERS THE VAULT",
+    "body": "BODY %d / %d",
+    "find": "THE VAULT'S GATE HAS POWER. FIND WHERE IT COMES FROM",
+    "open": "THE GATE IS DOWN. INTO THE VAULT",
+    "crashed": "GENERATORS CRASHED %d / %d",
+    "best": "%s  BEST %s",
+    "reached": "IN THE VAULT  %s",
+    "fell": "YOUR BODY FELL",
+    "again": "AGAIN",
+    "sight_off": "%s  SEE THE WIRES",
+    "sight_on": "SEEING THE WIRES   %s  MAGIC OFF",
+    "magic_off": "MAGIC OFF   %s  BACK",
+    "keys": "R RESET  ESC BACK"
   },
   "light": {
     "title": "LIGHTING TEST",

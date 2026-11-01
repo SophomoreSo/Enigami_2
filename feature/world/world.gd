@@ -24,3 +24,13 @@ func use_nearby() -> bool:
 ## asks, to clear the console's keys from under one.
 func paneled() -> bool:
 	return false
+
+## Who the player plays as here: the profile's hero (`GameState.hero`), or
+## the one a world stands its body up as (`Player.hero`) — the wire test's
+## Legna Dennis, whoever the profile plays. The shell asks, for what the
+## vision key shows (`Sight`).
+func played() -> String:
+	var p = get("player")
+	if p != null and is_instance_valid(p) and p is Player and (p as Player).hero != "":
+		return (p as Player).hero
+	return GameState.hero

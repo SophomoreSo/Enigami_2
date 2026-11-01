@@ -36,6 +36,7 @@ func _fill() -> void:
 	_add(Loc.t("hud.sandbox.swap_weapon"), UiKit.ACCENT, func() -> void: sandbox.cycle_weapon())
 	_add(Loc.t("hud.sandbox.dragon_test"), UiKit.ACCENT, func() -> void: sandbox.open_dragon_test())
 	_add(Loc.t("hud.sandbox.ghost_test"), UiKit.ACCENT, func() -> void: sandbox.open_ghost_test())
+	_add(Loc.t("hud.sandbox.wire_test"), UiKit.ACCENT, func() -> void: sandbox.open_wire_test())
 	_add(Loc.t("hud.sandbox.lighting_test"), UiKit.ACCENT, func() -> void: sandbox.open_lighting_test())
 	for kind in Sandbox.MONSTER_BUTTONS:
 		_add(Loc.t("hud.sandbox.spawn", [Monsters.name_for(kind)]), UiKit.WARN,
