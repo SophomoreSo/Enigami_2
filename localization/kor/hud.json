@@ -166,6 +166,7 @@
       "fireplace": "벽난로",
       "mushrooms": "빛나는 버섯",
       "fireflies": "반딧불이",
+      "spotlight": "스포트라이트",
       "grass": "풀",
       "flowers": "꽃",
       "bush": "덤불",
@@ -349,6 +350,7 @@
     "subtitle": "조명 사이를 걸어 보세요",
     "fire": "모닥불과 벽난로",
     "spot": "바닥을 비추는 스포트라이트",
+    "overhead": "머리 위의 스포트라이트",
     "time": "밝기  %s",
     "times": {
       "night": "밤",

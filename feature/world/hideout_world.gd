@@ -77,7 +77,8 @@ const PLAN: PackedStringArray = [
 	"#......................................#",
 	"########################################",
 ]
-## What is put about it: lanterns along the walls (`MadeRoomView.LIGHTS`).
+## What is put about it: lanterns along the walls (`MadeRoomView.LIGHTS`), and
+## a spotlight hung over the open floor below the pillars.
 const DRESSING: PackedStringArray = [
 	"........................................",
 	"...L.........L............L.........L...",
@@ -93,7 +94,7 @@ const DRESSING: PackedStringArray = [
 	"........................................",
 	"........................................",
 	"........................................",
-	"........................................",
+	"....................S...................",
 	"........................................",
 	"........................................",
 	"........................................",

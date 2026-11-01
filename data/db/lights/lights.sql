@@ -26,6 +26,14 @@ INSERT INTO lights (id, type, color, power, reach, volume, shadows) VALUES
 INSERT INTO lights (id, type, color, power, radius, reach, direction, spot_size, spot_blend, volume, shadows, y) VALUES
 	('lightbulb', 'spot', '#ffe9bd', 2.2, 2, 220, 90, 110, 0.35, 0.1, 1, 12);
 
+-- A spotlight hung overhead: light falling from above in a cone, onto an
+-- ellipse of the floor as wide as the cone's foot and nothing past it but a
+-- rim a few pixels soft. It throws no shadow of the light's own kind: what
+-- stands in it throws its shadow away from the spot under it, cast by the
+-- picture (graphics/overhead_shadows.gd) and kept inside this ellipse.
+INSERT INTO lights (id, type, color, power, reach, falloff, shape, size_x, size_y, direction, spread, volume, shadows) VALUES
+	('spotlight', 'area', '#ffd9a0', 1.4, 10, 1, 'ellipse', 300, 165, 90, 360, 0, 0);
+
 -- A fireplace: the mouth of the fire, a shape of light all round, wavering.
 INSERT INTO lights (id, type, color, power, reach, size_x, size_y, direction, spread, volume, shadows, flicker, y) VALUES
 	('fireplace', 'area', '#ff8a3d', 2.2, 190, 18, 10, 270, 360, 0.06, 1, 0.15, -12);

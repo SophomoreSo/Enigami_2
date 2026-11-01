@@ -166,6 +166,7 @@
       "fireplace": "FIREPLACE",
       "mushrooms": "GLOWING CAPS",
       "fireflies": "FIREFLIES",
+      "spotlight": "SPOTLIGHT",
       "grass": "GRASS",
       "flowers": "FLOWERS",
       "bush": "BUSH",
@@ -349,6 +350,7 @@
     "subtitle": "WALK THROUGH THE LIGHTS",
     "fire": "FIRE AND FIREPLACE",
     "spot": "SPOTLIGHT, DOWN THE FLOOR",
+    "overhead": "SPOTLIGHT OVERHEAD",
     "time": "LIGHT  %s",
     "times": {
       "night": "NIGHT",
