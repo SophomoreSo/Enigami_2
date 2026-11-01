@@ -46,12 +46,14 @@ func _configure() -> void:
 		art = Style.DRAGON_ART
 		return
 	# The hero played as, in their own sprites where they have them; and the
-	# next one picked on a bench, the moment they are.
-	art = Style.hero_play_art(GameState.hero)
+	# next one picked on a bench, the moment they are — unless the world has
+	# the body be a hero of its own (`Player.hero`), whoever the profile picks.
+	art = Style.hero_play_art(player.hero if player.hero != "" else GameState.hero)
 	GameState.hero_changed.connect(_on_hero)
 
 func _on_hero(id: String) -> void:
-	rewear(Style.hero_play_art(id))
+	if player.hero == "":
+		rewear(Style.hero_play_art(id))
 
 ## How far over the feet the top of the art stands, and a little: where the
 ## charge bar rides, and what is said over the head hangs from.

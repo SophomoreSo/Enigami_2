@@ -978,10 +978,11 @@ static func _hit_hitstop(h: Hit) -> bool:
 	return true
 
 ## The hit is heard, and a kill counted — the player's, unless it was the player
-## brought down by their own NEAR or their own thrown stone.
+## brought down by their own NEAR or their own thrown stone, or a thing on the
+## crates' side broken: a crate, a generator.
 static func _hit_heard(h: Hit) -> bool:
 	h.killed = h.target.dead
-	if h.killed and h.atk != null and h.atk.team == 0 and h.target.team != 0 and not (h.target is Crate):
+	if h.killed and h.atk != null and h.atk.team == 0 and h.target.team != 0 and h.target.team != Crate.TEAM:
 		GameState.register_kill()
 	Cues.at(&"hit", h.pos, {"payload": h.p, "killed": h.killed, "target_team": h.target.team})
 	return true

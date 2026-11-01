@@ -669,7 +669,7 @@ row's numbers in it, and lights a picture with each type.
 Who the player can play as, chosen sat down on a bench (`HeroSelect`): a row
 of `heroes` each, in `heroes/heroes.sql`, read by `Heroes`
 (`feature/core/heroes.gd`). A hero's name is `hud.heroes.name.<id>` in
-`localization/`. What a hero can do is to come: a column here when it does.
+`localization/`. What a hero can do is a column here: so far, what they see.
 
 | Column | What it is |
 |---|---|
@@ -678,6 +678,7 @@ of `heroes` each, in `heroes/heroes.sql`, read by `Heroes`
 | `heroes.sprite` | The character of the atlas standing in for them — one `Sprites.has_character` knows: `doc`, `angel`, `elf_m`, `wizzard_m`, `knight_m`, ... — on the bench's screen and in the dialogue box, until their own sprites are made. |
 | `heroes.color` | The colour their card wears, `#rrggbb`. |
 | `heroes.prompt` | Who they are, for the tool their sprites are made with (`graphics/assets/sprites/HEROES.md`). |
+| `heroes.sight` | What they see on the vision key (Y) that nobody else does (`Sight`): `''` nothing — the key turns magic off and on — or `wires`, the wires an electrical system draws its power down from its generator (`Wire`), which the key goes to before magic off. Legna Dennis's. |
 
 A hero's own sprites are `graphics/assets/sprites/<id>/<id>.<animation>.png`,
 a strip an animation, painted straight (`SkinnedCharacter`, "painted"); with

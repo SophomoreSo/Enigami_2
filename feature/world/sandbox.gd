@@ -17,6 +17,9 @@ signal editing_changed(on: bool)
 signal dragon_test_requested()
 ## The ghost test was asked for: a diamond to steal by possessing its guards.
 signal ghost_test_requested()
+## The wire test was asked for: a vault to get into by following the wires
+## Legna Dennis sees to the generators behind its gate.
+signal wire_test_requested()
 ## The lighting test was asked for: a light of each kind to walk through.
 signal lighting_test_requested()
 ## A sample skill was put on its weapon (`load_sample`).
@@ -172,6 +175,9 @@ func open_dragon_test() -> void:
 
 func open_ghost_test() -> void:
 	ghost_test_requested.emit()
+
+func open_wire_test() -> void:
+	wire_test_requested.emit()
 
 func open_lighting_test() -> void:
 	lighting_test_requested.emit()

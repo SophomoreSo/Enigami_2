@@ -249,6 +249,10 @@ var aim_point: Vector2 = Vector2.ZERO
 var aim_reach: float = 1.0
 ## The bench the body sits on, or null — see `sit`.
 var seat: Bench = null
+## Who this body is, as a hero (`Heroes`): '' for whoever the profile plays
+## as (`GameState.hero`). A world that stands its own up sets it before the
+## body is put down (`WireTest`), and it is drawn as them.
+var hero: String = ""
 ## Whether a way held since the body sat down has yet to be let go of: a walk
 ## into the bench, carried on over the walk to its seat, stands nobody up until
 ## it has been (`_mind_seat`).

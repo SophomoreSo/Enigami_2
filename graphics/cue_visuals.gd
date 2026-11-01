@@ -139,6 +139,27 @@ func _on_cue(cue: StringName, d: Dictionary) -> void:
 			Fx.burst(pos + Vector2(0, -8), CrateView.WOOD_LIT, 12, 170.0)
 			Fx.burst(pos + Vector2(0, -8), CrateView.GOLD, 4 + int(d.get("gold", 0)), 120.0)
 			Fx.shake(2.0)
+		&"generator_crash":
+			# Sparks off its insides, and smoke out of it.
+			Fx.burst(pos + Vector2(0, -16), WireSight.SPARK, 16, 230.0)
+			Fx.burst(pos + Vector2(0, -16), GeneratorView.SMOKE, 10, 90.0)
+			Fx.shake(5.0)
+		&"gate":
+			# Down, its beams come apart in sparks; up, they catch again.
+			if bool(d.get("up", true)):
+				Fx.burst(pos, ElectricGateView.BEAM_CORE, 6, 120.0)
+			else:
+				Fx.burst(pos, ElectricGateView.BEAM, 16, 210.0)
+				Fx.shake(3.0)
+		&"gate_shock":
+			# Whoever walked into the beams, lit up by them.
+			Fx.burst(pos + Vector2(0, -12), ElectricGateView.BEAM_CORE, 10, 170.0)
+			Fx.shake(3.0)
+		&"sight":
+			# A sight coming on: a small shake under it. The dark and the wires
+			# are the pixel camera's, every frame.
+			if String(d.get("seeing", "")) != "":
+				Fx.shake(1.5)
 		&"box_open":
 			Fx.burst(pos + Vector2(0, -8), Style.TREASURE_BAND, 10 + 3 * int(d.get("count", 0)), 160.0)
 		&"kit_back":

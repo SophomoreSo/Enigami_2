@@ -88,3 +88,16 @@ INSERT INTO lights (id, type, color, power, reach, size_x, size_y, spread, volum
 -- edge.
 INSERT INTO lights (id, type, color, power, radius, reach, direction, spot_size, spot_blend, volume, shadows) VALUES
 	('ceiling_lamp', 'spot', '#ffcc85', 1.4, 8, 230, 90, 55, 0.45, 0.08, 1);
+
+-- ---- what powers a place, and what it powers ----------------------------------
+-- (graphics/views/generator_view.gd, graphics/views/electric_gate_view.gd)
+
+-- A generator's lamp, green while it runs: a little light of its own, and no
+-- shadow of anything.
+INSERT INTO lights (id, type, color, power, reach, volume, shadows, y) VALUES
+	('generator', 'point', '#73ff8c', 0.8, 64, 0.04, 0, -20);
+
+-- An electric gate's beams across a doorway, crackling: the shape of them,
+-- lighting both ways out of it. Each gate is given its own length.
+INSERT INTO lights (id, type, color, power, reach, size_x, size_y, spread, volume, shadows, flicker) VALUES
+	('electric_gate', 'area', '#ff4f6b', 1.1, 90, 4, 96, 360, 0.08, 0, 0.12);

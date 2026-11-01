@@ -44,6 +44,10 @@ func view_script_for(n: Node) -> GDScript:
 		return EnemyView
 	if n is Crate:
 		return CrateView
+	if n is Generator:
+		return GeneratorView
+	if n is ElectricGate:
+		return ElectricGateView
 	if n is Projectile:
 		return ProjectileView
 	if n is Pet:
@@ -92,6 +96,8 @@ func view_script_for(n: Node) -> GDScript:
 		return DragonTestView
 	if n is GhostTest:
 		return GhostTestView
+	if n is WireTest:
+		return WireTestView
 	if n is LightingTest:
 		return LightingTestView
 	# The rest of the game's nodes get theirs as each arrives (PLAN.md).

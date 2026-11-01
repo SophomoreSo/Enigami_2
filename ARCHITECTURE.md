@@ -93,7 +93,8 @@ The shell in `app/` is the one place allowed to know all of them: `app/game.gd`
 is the composition root, and builds screens out of `graphics/`, `story/view/`
 and `mobile/view/` to drive `feature/` and `story/rules/`. What it asks a world
 while one is up — whether a board is open over it, whether a panel of its own
-is, whether the player stands by something to use — it asks through `World`
+is, whether the player stands by something to use, who the player plays as
+there — it asks through `World`
 (`feature/world/world.gd`), so a new thing to use is that world's edit and not
 the shell's.
 

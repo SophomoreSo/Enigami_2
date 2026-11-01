@@ -46,6 +46,10 @@ extends CanvasLayer
 ## glass seen through it, what is in front of a mirror shown in it. What is
 ## laid over the screen is the picture that comes to; with nothing lit and no
 ## glass on the screen, it is this buffer as it was.
+##
+## And what a hero's sight shows over it (`Sight`): Legna Dennis's wires, on a
+## layer of their own just above the picture (`WireSight`), with the picture
+## sunk dark under them while the sight is on.
 
 const SCALE := int(Sprites.PIXEL_SCALE)
 const BORDER := 1
@@ -61,14 +65,17 @@ const WORLD_LAYER := 1 << 19
 const FONT := preload("res://graphics/assets/fonts/Silkscreen-Regular.ttf")
 const TEXT_SIZE := 8
 ## How the picture is graded as it is shown: grey while magic is off
-## (`Magic`), and the slow-motion look while time is dilated (`TimeCtl`) — see
-## the shader. And how fast each goes in and comes back, in wholes a second:
-## the grey over a few frames, so it reads as the colour going rather than a
-## cut, and the slow faster, so it lands with the slowing it is the look of.
+## (`Magic`), the slow-motion look while time is dilated (`TimeCtl`), and dark
+## under the wires while Legna Dennis's sight is on (`Sight`) — see the
+## shader. And how fast each goes in and comes back, in wholes a second: the
+## grey over a few frames, so it reads as the colour going rather than a cut,
+## the slow faster, so it lands with the slowing it is the look of, and the
+## dark with the wires coming up over it (`WireSight`).
 const GRADE := preload("res://graphics/assets/shaders/picture_grade.gdshader")
 const GREY_SPEED := 5.0
 const SLOW_IN := 12.0
 const SLOW_OUT := 6.0
+const SIGHT_SPEED := WireSight.FADE_SPEED
 
 ## Pixel cameras currently up. A screen swap frees the old one at the end of the
 ## frame the new one arrived in, and the old one must not hand the world layer
@@ -81,6 +88,8 @@ var _image: Sprite2D
 var _grey := 0.0
 ## How far it has gone into the slow-motion look: 0 at full speed, 1 dilated.
 var _slow := 0.0
+## How far it has gone dark under the wires: 0 without the sight, 1 with it.
+var _wires := 0.0
 var _grade: ShaderMaterial
 ## The wall clock at the last frame, in microseconds: the slow eases on it,
 ## since the frame's own delta is the dilated one.
@@ -91,6 +100,8 @@ var velocity: VelocityBuffer
 var lighting: Lighting
 ## The glass in the picture, worked out after the light.
 var glazing: Glazing
+## What a hero's sight shows over the picture.
+var sight: WireSight
 
 ## Draws text into the world, centred on `at`, `size` in buffer pixels.
 ##
@@ -158,11 +169,15 @@ func _ready() -> void:
 	_grade.shader = GRADE
 	_grey = 0.0 if Magic.on else 1.0
 	_slow = 1.0 if TimeCtl.is_dilated() else 0.0
+	_wires = 1.0 if Sight.seeing == "wires" else 0.0
 	_grade.set_shader_parameter("grey", _grey)
 	_grade.set_shader_parameter("slow", _slow)
+	_grade.set_shader_parameter("wires", _wires)
 	_image.material = _grade
 	_clock = Time.get_ticks_usec()
 	add_child(_image)
+	sight = WireSight.new()
+	add_child(sight)
 	_follow()
 
 func _process(delta: float) -> void:
@@ -170,6 +185,10 @@ func _process(delta: float) -> void:
 	if _grey != want:
 		_grey = move_toward(_grey, want, delta * GREY_SPEED)
 		_grade.set_shader_parameter("grey", _grey)
+	var seeing := 1.0 if Sight.seeing == "wires" else 0.0
+	if _wires != seeing:
+		_wires = move_toward(_wires, seeing, delta * SIGHT_SPEED)
+		_grade.set_shader_parameter("wires", _wires)
 	var now := Time.get_ticks_usec()
 	var real := minf(float(now - _clock) / 1000000.0, 0.1)
 	_clock = now
