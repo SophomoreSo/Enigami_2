@@ -38,7 +38,7 @@ const DEFAULT := "rock"
 ## creator offers them: the lights and the growing things a room draws
 ## (`MadeRoomView.LIGHTS`, `MadeRoomView.FOLIAGE`, `MadeRoomView.FERN`).
 const PROPS := {"L": "lantern", "B": "lightbulb", "F": "fire", "H": "fireplace", "m": "mushrooms",
-	"*": "fireflies", "g": "grass", "f": "flowers", "b": "bush", "n": "fern"}
+	"*": "fireflies", "S": "spotlight", "g": "grass", "f": "flowers", "b": "bush", "n": "fern"}
 ## Those that are foliage (`Foliage`), by the kind each grows, and the colours
 ## a still of each is drawn in on the table.
 const FOLIAGE := {"g": "grass", "f": "flowers", "b": "bush"}
@@ -323,6 +323,10 @@ func icon(c: CanvasItem, layer: int, mark: String, at: Vector2, k: float) -> voi
 	if layer == MapMaker.DRESSING:
 		if FOLIAGE.has(mark):
 			paint_foliage_still(c, mark, Vector2(at.x, r.end.y - 4.0 * k), float(S) * k)
+		elif mark == MadeRoomView.SPOTLIGHT:
+			# Hung low and narrow enough to fit the cell, its cone on the floor.
+			MadeRoomView.paint_spotlight(c, Vector2(at.x, r.end.y - 2.0 * k), float(S) * k,
+				Room.CELL * 0.75, Room.CELL * 0.45)
 		else:
 			MadeRoomView.paint_prop(c, mark, Vector2(at.x, r.end.y - 2.0 * k), float(S) * k, 0.6, 3)
 		return

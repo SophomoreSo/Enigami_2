@@ -7,7 +7,10 @@ extends RoomView
 ## bush are patches of foliage (`Foliage`) that lean where somebody walks; a
 ## lantern, a fire, glowing caps and fireflies stand where they were put and
 ## give the light their kind of shining thing gives (`Shine`, the `lights`
-## rows); a fern stands where it was put. Nothing is rolled: a made room has
+## rows); a fern stands where it was put. A spotlight hangs high over its cell,
+## lights the floor under it in the foot of its cone and nowhere else, and what
+## stands in that light throws its shadow on the floor away from it
+## (`OverheadShadows`). Nothing is rolled: a made room has
 ## what was put in it, and none of the grass a raid's rooms are grown with.
 ##
 ## The walls' kinds — stone, earth, bark, planks, leaves, glass — are all the
@@ -19,12 +22,22 @@ extends RoomView
 ## the kind of patch it grows; the lights, by the row of `lights` each gives;
 ## and the fern, which only stands there.
 const FOLIAGE := {"g": "grass", "f": "flowers", "b": "bush"}
-const LIGHTS := {"L": "lantern", "B": "lightbulb", "F": "fire", "H": "fireplace", "m": "mushrooms", "*": "fireflies"}
+const LIGHTS := {"L": "lantern", "B": "lightbulb", "F": "fire", "H": "fireplace", "m": "mushrooms", "*": "fireflies",
+	"S": "spotlight"}
 const FERN := "n"
+## A spotlight's mark, and how high over the middle of its cell it hangs, in
+## world units: over everyone's head, which is what its shadows are cast from.
+const SPOTLIGHT := "S"
+const SPOTLIGHT_HANG := 120.0
+## The cone of light under it, as faint as it is where it leaves the bulb and
+## where it meets the floor.
+const SPOTLIGHT_HAZE := Vector2(0.2, 0.03)
 
 var made: MadeRoom
 ## The props standing about the room, in the order they were put down.
 var props: Array = []
+## The shadows the spotlights cast, in a room that has any.
+var shadows: OverheadShadows = null
 
 ## Something put about the floor that is not a plant: a lantern, a fire,
 ## glowing caps, fireflies, a fern — a small picture of it at its cell, which
@@ -50,6 +63,8 @@ static func paint_prop(c: CanvasItem, mark: String, foot: Vector2, px: float, t:
 	var box := func(x: int, y: int, w: int, h: int, col: Color) -> void:
 		c.draw_rect(Rect2(foot + Vector2(x, -y - h) * px, Vector2(w, h) * px), col)
 	match mark:
+		"S":
+			paint_spotlight(c, foot + Vector2(0.0, -Room.CELL * 0.5 * px / float(PixelCamera.SCALE)), px)
 		"L", "B":
 			# A lantern on a post: the post, the paper, and the flame in it.
 			box.call(-1, 0, 2, 10, Color(0.30, 0.22, 0.14))
@@ -82,6 +97,31 @@ static func paint_prop(c: CanvasItem, mark: String, foot: Vector2, px: float, t:
 				c.draw_line(foot, foot + way * 14.0, Color(0.24, 0.52, 0.26), px)
 				c.draw_line(foot + way * 14.0, foot + way * 14.0 + Vector2(0, -3.0), Color(0.36, 0.68, 0.34), px)
 
+## A spotlight hanging over `under` on the floor of `c`, a pixel of the buffer
+## `px` across: the cord up out of sight, the shade and the bulb, and the cone
+## of light falling from it to the sides of the ellipse it lights
+## (`lights`' `spotlight` row). `hang` and `wide`, in world units, draw it
+## hung lower and its cone narrower, as the creator's palette does to fit it in
+## a cell; left out, it is as it hangs in a room.
+static func paint_spotlight(c: CanvasItem, under: Vector2, px: float, hang: float = SPOTLIGHT_HANG,
+		wide: float = -1.0) -> void:
+	var k := px / float(PixelCamera.SCALE)
+	var bulb := under + Vector2(0.0, -hang * k)
+	var row := Shine.source("spotlight")
+	if wide < 0.0:
+		wide = float(row.get("size_x", 300.0)) * 0.5
+	wide *= k
+	var warm := Color.html(String(row.get("color", "#ffd9a0")))
+	c.draw_polygon(PackedVector2Array([bulb + Vector2(-2.5, 1.0) * px, bulb + Vector2(2.5, 1.0) * px,
+		under + Vector2(wide, 0.0), under + Vector2(-wide, 0.0)]),
+		PackedColorArray([Color(warm, SPOTLIGHT_HAZE.x), Color(warm, SPOTLIGHT_HAZE.x),
+			Color(warm, SPOTLIGHT_HAZE.y), Color(warm, SPOTLIGHT_HAZE.y)]))
+	c.draw_line(bulb + Vector2(0.0, -6.0) * px, bulb + Vector2(0.0, -6.0) * px + Vector2(0.0, -minf(260.0, hang) * k),
+		Color(0.08, 0.08, 0.1), px)
+	c.draw_colored_polygon(PackedVector2Array([bulb + Vector2(-5, 0) * px, bulb + Vector2(5, 0) * px,
+		bulb + Vector2(2.5, -6) * px, bulb + Vector2(-2.5, -6) * px]), Color(0.16, 0.17, 0.2))
+	c.draw_rect(Rect2(bulb + Vector2(-2, 0) * px, Vector2(4, 2) * px), warm.lightened(0.5))
+
 func _ready() -> void:
 	super._ready()
 	made = room as MadeRoom
@@ -108,6 +148,9 @@ func _dress() -> void:
 		if is_instance_valid(p):
 			p.queue_free()
 	props.clear()
+	if shadows != null and is_instance_valid(shadows):
+		shadows.queue_free()
+	shadows = null
 	if made == null:
 		return
 	for y in made.rows:
@@ -127,8 +170,27 @@ func _dress() -> void:
 				prop.salt = x * 31 + y
 				prop.position = made.cell_center(x, y) + Vector2(0.0, Room.CELL * 0.5)
 				prop.visibility_layer = PixelCamera.WORLD_LAYER
+				if mark == SPOTLIGHT:
+					# It hangs over everyone's head, and what it draws is light
+					# and the dark of its own fitting: nothing lights it.
+					prop.z_index = 1
+					prop.material = Lighting.glow()
 				add_child(prop)
 				props.append(prop)
-				if LIGHTS.has(mark):
+				if mark == SPOTLIGHT:
+					# Its light lands on the middle of its cell, under it.
+					Shine.give(prop, String(LIGHTS[mark]), Vector2(0.0, -Room.CELL * 0.5))
+					_cast_from(prop)
+				elif LIGHTS.has(mark):
 					Shine.give(prop, String(LIGHTS[mark]), Vector2(0.0, -8.0))
 			x += 1
+
+## The shadows `spotlight` casts, cast with the rest: on the floor, over it and
+## under everything standing, as cracks and stains are.
+func _cast_from(spotlight: Prop) -> void:
+	if shadows == null:
+		shadows = OverheadShadows.new()
+		shadows.visibility_layer = PixelCamera.WORLD_LAYER
+		shadows.z_index = -1
+		add_child(shadows)
+	shadows.lamps.append(spotlight)

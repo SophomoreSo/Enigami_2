@@ -39,7 +39,10 @@ extends Node
 ##
 ## And the game's own: a room's walls stop the light, a body throws a shadow
 ## and lights the room while it burns, a bolt is a lamp for as long as it
-## flies, and the rock is a rock.
+## flies, and the rock is a rock. A spotlight hung overhead lights the ellipse
+## at its cone's foot and nothing past it, and a body standing in it lays its
+## shadow on the floor away from the spot under the lamp, ended where the
+## light is.
 ##
 ## Needs a real renderer: every pass is drawn on the graphics card and read
 ## back, and `--headless` draws nothing. Each thing is tried in a corner of
@@ -217,6 +220,7 @@ func _ready() -> void:
 	await _out_there()
 	await out([ground])
 	await _the_room()
+	await _overhead()
 	print("[LIGHTING] ---- %d failures ----" % fails)
 	get_tree().quit(1 if fails > 0 else 0)
 
@@ -901,3 +905,99 @@ func _the_room() -> void:
 		"until something is built into it to burn, and then it is a lamp")
 	hot.queue_free()
 	await settle()
+
+## A spotlight hung over a made room (`MadeRoomView.SPOTLIGHT`): its light on
+## the ellipse of floor under it and nowhere past it; and a body standing in it
+## laying its shadow on the floor away from the spot under the lamp, longer the
+## further out it stands, and cut where the light ends.
+func _overhead() -> void:
+	for n in stage.get_children():
+		n.queue_free()
+	await frames(2)
+	var room := MadeRoom.new()
+	var plan := PackedStringArray()
+	var dressing := PackedStringArray()
+	for y in 14:
+		var wall := y == 0 or y == 13
+		plan.append("#".repeat(26) if wall else "#" + ".".repeat(24) + "#")
+		dressing.append(".".repeat(9) + "S" + ".".repeat(16) if y == 6 else ".".repeat(26))
+	room.plan = plan
+	room.dressing = dressing
+	stage.add_child(room)
+	room.stand()
+	await frames(4)
+	var view := Views.of(room) as MadeRoomView
+	check(view != null and view.shadows != null and view.shadows.lamps.size() == 1,
+		"a spotlight in a made room casts its shadows on its floor")
+	if view == null or view.shadows == null or view.shadows.lamps.is_empty():
+		return
+	var lamp: Node2D = view.shadows.lamps[0]
+	var light: Shine = Shine.on(lamp)[0]
+	check(light.type == Shine.Type.AREA and light.shape == Shine.Shape.ELLIPSE and not light.shadows,
+		"its light is an ellipse's, and throws no shadows of its own")
+	var under := lamp.global_position + light.position
+	check(under.distance_to(room.cell_center(9, 6)) < 0.5, "and falls on the middle of its cell, under it")
+	var radii := light.size * 0.5
+	var img := await shown()
+	var was := colours()
+	var lit := under + Vector2(radii.x * 0.6, radii.y * 0.5)
+	var past := under + Vector2(radii.x + light.reach + 16.0, 0.0)
+	check(at(img, lit).r > at(was, lit).r + 0.05, "it lights the floor in the foot of its cone")
+	check(near(at(img, past), at(was, past), 0.005),
+		"and nothing past it (%s for %s)" % [at(img, past), at(was, past)])
+
+	# The floor where the shadows will fall, before anybody stands there.
+	var bare := colours()
+	var body := Enemy.new()
+	body.setup("DUMMY", 1, "")
+	body.room = room
+	body.collision_layer = 4
+	body.collision_mask = 1
+	stage.add_child(body)
+	body.global_position = under + Vector2(96.0, 0.0)
+	await wait(0.3)
+	var seen := Views.of(body) as EnemyView
+	var tall := Sprites.art_rect(seen.art).size.y * seen.sprite.scale.y
+	var stretch := 96.0 / maxf(MadeRoomView.SPOTLIGHT_HANG - tall * 0.5, OverheadShadows.LEAST_ABOVE)
+	await settle()
+	var cast := colours()
+	var feet := body.global_position
+	# Past the patch at the feet, out along the way away from the lamp, a third
+	# of the way up the body as it lies on the floor; and as far toward it.
+	var along := maxf(OverheadShadows.FEET_SIZE.x + 3.0, tall * stretch * 0.4)
+	var shaded := feet + Vector2(along, 0.0)
+	var toward := feet - Vector2(along, 0.0)
+	check(at(cast, shaded).get_luminance() < at(bare, shaded).get_luminance() * 0.6,
+		"a body in it lays its shadow on the floor away from the lamp (%.2f of %.2f)"
+			% [at(cast, shaded).get_luminance(), at(bare, shaded).get_luminance()])
+	check(near(at(cast, toward), at(bare, toward), 0.01), "and none toward it")
+	# It is as wide as the frame the sprite shows, across the way it lies.
+	var frame := seen.sprite.sprite_frames.get_frame_texture(seen.sprite.animation, seen.sprite.frame)
+	var beside := feet + Vector2(along, frame.get_size().x * seen.sprite.scale.x * 0.5 + 3.0)
+	check(near(at(cast, beside), at(bare, beside), 0.01), "nor beside the way it lies")
+	var short := tall * stretch
+
+	# Further out it lies longer, and where its light ends so does its shadow.
+	body.global_position = under + Vector2(radii.x - 20.0, 0.0)
+	await wait(0.3)
+	await settle()
+	cast = colours()
+	stretch = (radii.x - 20.0) / maxf(MadeRoomView.SPOTLIGHT_HANG - tall * 0.5, OverheadShadows.LEAST_ABOVE)
+	check(tall * stretch > short * 1.3, "further out it is longer (%.0f to %.0f)" % [short, tall * stretch])
+	var inside := under + Vector2(radii.x - 4.0, 0.0)
+	var beyond := under + Vector2(radii.x + 4.0, 0.0)
+	check(tall * stretch > 28.0, "(its shadow would go past the light's rim, uncut: %.0f)" % (tall * stretch))
+	check(at(cast, inside).get_luminance() < at(bare, inside).get_luminance() * 0.6, "it reaches the rim")
+	check(near(at(cast, beyond), at(bare, beyond), 0.01), "and stops there (%s for %s)" % [at(cast, beyond), at(bare, beyond)])
+
+	# Out of the light, it throws none.
+	body.global_position = under + Vector2(0.0, radii.y + 40.0)
+	await wait(0.3)
+	await settle()
+	cast = colours()
+	var off := body.global_position + Vector2(0.0, OverheadShadows.FEET_SIZE.y + 4.0)
+	check(near(at(cast, off), at(bare, off), 0.01) and near(at(cast, body.global_position + Vector2(14.0, 0.0)),
+		at(bare, body.global_position + Vector2(14.0, 0.0)), 0.01), "a body out of its light throws no shadow in it")
+	body.queue_free()
+	room.queue_free()
+	await frames(2)

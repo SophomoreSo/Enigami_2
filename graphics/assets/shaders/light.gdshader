@@ -41,7 +41,12 @@ render_mode unshaded, blend_add;
 // to a light.
 //
 // A body stands on the floor the light is on, and is lit across its face as
-// the rock is. It leaves a patch of shadow on the floor from its feet, away
+// the rock is. It stands up off that floor from its feet, so all of it is as
+// far from the light as its feet are: a body whose head is drawn over a pool
+// of light it is not standing in is not lit by it, and one standing at the far
+// edge of a pool is lit to the top of its head (`bodies`, which says how far
+// below each pixel of a body its feet are). It leaves a patch of shadow on
+// the floor from its feet, away
 // from the light (figure_shadow.gdshader), marked in the same colour of the
 // mask as the rock's shadows, by how dark it is, and darkening whatever is
 // there but a body (`bodies`) by that much.
@@ -52,11 +57,12 @@ uniform sampler2D base : filter_nearest, repeat_disable;     // the world's colo
 uniform sampler2D normals : filter_nearest, repeat_disable;  // and how it faces (lighting.gdshaderinc)
 uniform sampler2D shade : filter_nearest, repeat_disable;    // where the lights that throw shadows do not reach
 uniform vec3 channel = vec3(0.0);   // which of `shade`'s colours is this light's; none for one that throws no shadow
-uniform sampler2D bodies : filter_nearest, repeat_disable;   // where a body stands (bodies.gdshader)
+uniform sampler2D bodies : filter_nearest, repeat_disable;   // where a body stands, and how far below its feet are (bodies.gdshader)
 uniform int type = 0;               // Shine.Type: 0 point, 1 sun, 2 spot, 3 area
 uniform vec3 tint = vec3(1.0);
 uniform float power = 1.0;
 uniform vec2 half_size = vec2(1.0); // what the mesh's -1 to 1 is, in world units, in its own frame
+uniform vec2 lift = vec2(0.0);      // where the mesh's middle is from the light, in its own frame: up the world, over the bodies standing in it
 uniform vec2 turn = vec2(1.0, 0.0); // how the mesh's frame is turned in the world: its cosine and sine
 uniform float radius = 0.0;
 uniform float reach = 160.0;
@@ -75,12 +81,17 @@ uniform bool beyond = false;        // whether the light is out past a room, and
 varying vec2 local;
 
 void vertex() {
-	local = VERTEX * half_size;
+	local = VERTEX * half_size + lift;
 }
 
 // A way in the mesh's own frame, in the world's.
 vec2 in_world(vec2 v) {
 	return vec2(v.x * turn.x - v.y * turn.y, v.x * turn.y + v.y * turn.x);
+}
+
+// A way in the world, in the mesh's own frame.
+vec2 in_frame(vec2 v) {
+	return vec2(v.x * turn.x + v.y * turn.y, -v.x * turn.y + v.y * turn.x);
 }
 
 // 1 well inside `edge`, 0 past it, easing down over the last `soft` of it.
@@ -95,9 +106,12 @@ void fragment() {
 	if (marked >= SOLID * 0.5) {
 		discard;
 	}
-	bool on_body = texelFetch(bodies, here, 0).g > 0.5;
+	vec4 body = texelFetch(bodies, here, 0);
+	bool on_body = body.g > 0.5;
 	// The patch a body leaves on the floor falls on what is not a body.
 	float shaded = on_body ? 0.0 : clamp(marked, 0.0, 1.0);
+	// Where on the floor this is: here, or for a body, the feet it stands on.
+	vec2 at = on_body ? local + in_frame(vec2(0.0, body.r)) : local;
 	float lit = power;
 	// The way to the light from here, in the world; nothing for a pixel inside
 	// what gives it, which is lit from every way at once.
@@ -109,12 +123,12 @@ void fragment() {
 	} else if (type == 3) {
 		vec2 near;
 		if (shape == 1) {
-			vec2 p = local / max(extent, vec2(0.0001));
-			near = dot(p, p) <= 1.0 ? local : extent * normalize(p);
+			vec2 p = at / max(extent, vec2(0.0001));
+			near = dot(p, p) <= 1.0 ? at : extent * normalize(p);
 		} else {
-			near = clamp(local, -extent, extent);
+			near = clamp(at, -extent, extent);
 		}
-		vec2 out_of_it = local - near;
+		vec2 out_of_it = at - near;
 		away = length(out_of_it);
 		if (away >= reach) {
 			discard;
@@ -128,7 +142,7 @@ void fragment() {
 			toward = in_world(-out_of_it / away);
 		}
 	} else {
-		float far = length(local);
+		float far = length(at);
 		away = max(far - radius, 0.0);
 		if (away >= reach) {
 			discard;
@@ -136,7 +150,7 @@ void fragment() {
 		lit *= pow(1.0 - away / reach, falloff);
 		toward = vec2(0.0);
 		if (far > 0.001) {
-			vec2 out_from_it = local / far;
+			vec2 out_from_it = at / far;
 			if (type == 2) {
 				lit *= inside(acos(clamp(dot(out_from_it, aim), -1.0, 1.0)), cone, blend);
 			}
