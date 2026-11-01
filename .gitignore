@@ -53,3 +53,12 @@ data/enigami.db.building
 # The frames tools/pack_strips.py fetched to pack a hero's strips from: remade from
 # PixelLab, and not the game's to ship.
 .frames/
+
+# The art pipeline: plain folders beside the checkouts, in Enigami_2/, and
+# not in the repository (see Enigami_2/CLAUDE.md and PIPELINE.md). Never
+# staged or pulled over, even if a copy turns up in a checkout.
+/Blender/
+/Cascadeur/
+/Kimodo/
+/Meshy/
+/PIPELINE.md
